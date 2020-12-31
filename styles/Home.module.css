@@ -62,6 +62,17 @@
   font-size: 1.5rem;
 }
 
+.login {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.login:hover,
+.login:focus,
+.login:active {
+  text-decoration: underline;
+}
+
 .code {
   background: #fafafa;
   border-radius: 5px;
