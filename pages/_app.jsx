@@ -1,9 +1,14 @@
+import { useEffect } from "react";
+import { ChakraProvider, extendTheme, CSSReset } from "@chakra-ui/react";
 import { parseCookies } from "nookies";
 import Router from "next/router";
 import Head from "next/head";
 
 import "../styles/globals.css";
 import Layout from "../components/layout";
+import { colors } from "../components/theme";
+
+const theme = extendTheme({ colors });
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -14,9 +19,12 @@ function MyApp({ Component, pageProps }) {
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
         />
       </Head>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <ChakraProvider theme={theme}>
+        <CSSReset />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </ChakraProvider>
     </>
   );
 }
