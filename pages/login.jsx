@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { setCookie } from "nookies";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import {
   FormControl,
   FormLabel,
@@ -50,54 +51,60 @@ function Login() {
   };
 
   return (
-    <Box maxW="sm" my="8" mx="auto" textAlign="center">
-      <Heading>Login Page</Heading>
-      <form
-        onSubmit={submitHandler}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: "0.5rem",
-          margin: "2rem auto",
-        }}
-      >
-        <FormControl id="username" isRequired>
-          <FormLabel>Username</FormLabel>
-          <Input type="text" onChange={(e) => setUsername(e.target.value)} />
-        </FormControl>
+    <>
+      <Head>
+        <title>Login | Santri Kita</title>
+      </Head>
 
-        <FormControl id="password" isRequired>
-          <FormLabel>Password</FormLabel>
-          <Input
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </FormControl>
-        <Button type="submit" colorScheme="teal" variant="solid">
-          Log in
-        </Button>
-      </form>
+      <Box maxW="sm" my="8" mx="auto" textAlign="center">
+        <Heading>Login Page</Heading>
+        <form
+          onSubmit={submitHandler}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "0.5rem",
+            margin: "2rem auto",
+          }}
+        >
+          <FormControl id="username" isRequired>
+            <FormLabel>Username</FormLabel>
+            <Input type="text" onChange={(e) => setUsername(e.target.value)} />
+          </FormControl>
 
-      {isLoading ? (
-        <Text fontSize="lg" fontWeight="medium">
-          Loading...
-        </Text>
-      ) : undefined}
+          <FormControl id="password" isRequired>
+            <FormLabel>Password</FormLabel>
+            <Input
+              type="password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </FormControl>
+          <Button type="submit" colorScheme="teal" variant="solid">
+            Log in
+          </Button>
+        </form>
 
-      {auth ? undefined : (
-        <Alert status="error" rounded="md">
-          <AlertIcon />
-          <AlertTitle>Wrong username or password</AlertTitle>
-          <CloseButton
-            position="absolute"
-            right="8px"
-            top="8px"
-            onClick={() => setAuth(true)}
-          />
-        </Alert>
-      )}
-    </Box>
+        {isLoading ? (
+          <Text fontSize="lg" fontWeight="medium">
+            Loading...
+          </Text>
+        ) : undefined}
+
+        {auth ? undefined : (
+          <Alert status="error" rounded="md">
+            <AlertIcon />
+            <AlertTitle>Wrong username or password</AlertTitle>
+            <CloseButton
+              position="absolute"
+              right="8px"
+              top="8px"
+              onClick={() => setAuth(true)}
+            />
+          </Alert>
+        )}
+      </Box>
+    </>
   );
 }
 

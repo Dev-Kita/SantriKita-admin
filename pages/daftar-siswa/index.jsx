@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import useSWR from "swr";
 import axios from "axios";
+import Head from "next/head";
 import { parseCookies } from "nookies";
+import SiswaTable from "../../components/daftar-siswa/siswaTable";
 import {
-  Heading,
+  VStack,
   Box,
   Flex,
   Spacer,
@@ -19,8 +21,8 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Skeleton,
 } from "@chakra-ui/react";
-import SiswaTable from "../../components/daftar-siswa/siswaTable";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -80,17 +82,31 @@ function DaftarSiswa() {
   // loading state
   if (!data) {
     return (
-      <Box bgColor="white" p="4" rounded="md">
-        <Heading fontSize="2xl" textAlign="center">
-          Loading...
-        </Heading>
-      </Box>
+      <>
+        <Flex mb="4">
+          <Spacer />
+          <Button variant="solid" colorScheme="teal">
+            Tambah Siswa
+          </Button>
+        </Flex>
+        <Box bgColor="white" p="4" rounded="md" borderWidth="1px">
+          <VStack align="stretch" spacing={2}>
+            <Skeleton height="20px" />
+            <Skeleton height="20px" />
+            <Skeleton height="20px" />
+          </VStack>
+        </Box>
+      </>
     );
   }
 
   // data tersedia
   return (
     <>
+      <Head>
+        <title>Daftar Siswa | Santri Kita</title>
+      </Head>
+
       <Flex mb="4">
         <Spacer />
         <Button onClick={onOpen} variant="solid" colorScheme="teal">

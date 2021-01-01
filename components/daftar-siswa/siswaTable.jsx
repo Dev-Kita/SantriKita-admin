@@ -1,4 +1,6 @@
 import React from "react";
+import NextLink from "next/link";
+import { useRouter } from "next/router";
 import {
   Table,
   Thead,
@@ -9,13 +11,14 @@ import {
   TableCaption,
   Box,
   Heading,
-  Button,
+  Link,
 } from "@chakra-ui/react";
 
 function SiswaTable({ data }) {
+  const router = useRouter();
   return (
     <>
-      <Box bgColor="white" p="4" rounded="md">
+      <Box bgColor="white" p="4" rounded="md" borderWidth="1px">
         <Heading fontSize="xl" mb="4" textAlign="center">
           Daftar Siswa
         </Heading>
@@ -35,24 +38,25 @@ function SiswaTable({ data }) {
             </Tr>
           </Thead>
           <Tbody>
-            {data.map(
-              ({ id, nama, classroom, tanggal_lahir, tahun_masuk }, i) => {
-                return (
-                  <Tr key={id}>
-                    <Td>{i + 1}</Td>
-                    <Td>{nama}</Td>
-                    <Td>{classroom}</Td>
-                    <Td>{tanggal_lahir}</Td>
-                    <Td isNumeric>{tahun_masuk}</Td>
-                    <Td>
-                      <Button colorScheme="teal" variant="solid">
-                        Edit
-                      </Button>
-                    </Td>
-                  </Tr>
-                );
-              }
-            )}
+            {data.map((siswa, i) => {
+              const { id, nama, classroom, tanggal_lahir, tahun_masuk } = siswa;
+              return (
+                <Tr key={id}>
+                  <Td>{i + 1}</Td>
+                  <Td>{nama}</Td>
+                  <Td>{classroom}</Td>
+                  <Td>{tanggal_lahir}</Td>
+                  <Td isNumeric>{tahun_masuk}</Td>
+                  <Td>
+                    <NextLink href={`${router.pathname}/${id}`}>
+                      <Link color="teal.500" fontWeight="medium">
+                        Detail
+                      </Link>
+                    </NextLink>
+                  </Td>
+                </Tr>
+              );
+            })}
           </Tbody>
         </Table>
       </Box>

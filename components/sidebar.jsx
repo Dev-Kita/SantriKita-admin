@@ -33,35 +33,34 @@ export default function Sidebar({ children }) {
   };
 
   return (
-    <Flex flexDir="row" justifyContent="space-between">
+    <Flex flexDir="row" justifyContent="space-between" bgColor="gray.800">
       <VStack
-        px="4"
         py="8"
+        pl="4"
         w="20%"
         h="100vh"
+        color="gray.200"
         align="stretch"
         justify="space-between"
       >
-        <Heading fontSize="2xl" color="teal.600" textAlign="center">
+        <Heading fontSize="2xl" color="teal.500" textAlign="center">
           SANTRI KITA
         </Heading>
-        <VStack
-          align="stretch"
-          divider={<StackDivider borderColor="gray.200" />}
-        >
+        <VStack align="stretch" spacing={2}>
           {sideMenu.map(({ title, slug }, i) => {
             return (
               <NextLink href={slug} key={i}>
                 <Link
-                  py="2"
+                  py="3"
                   px="4"
                   w="100%"
-                  rounded="md"
+                  roundedLeft="md"
                   fontWeight="medium"
-                  bgColor={router.pathname === slug ? "teal.100" : undefined}
+                  bgColor={router.pathname === slug ? "teal.600" : undefined}
+                  color={router.pathname === slug ? "gray.200" : undefined}
                   _hover={{
-                    background: "gray.100",
-                    color: "teal.700",
+                    background: "gray.700",
+                    color: "gray.100",
                   }}
                 >
                   {title}
@@ -70,7 +69,13 @@ export default function Sidebar({ children }) {
             );
           })}
         </VStack>
-        <Button colorScheme="red" variant="solid" onClick={logoutHandler}>
+
+        <Button
+          mx="4"
+          colorScheme="red"
+          variant="solid"
+          onClick={logoutHandler}
+        >
           Log out
         </Button>
       </VStack>
