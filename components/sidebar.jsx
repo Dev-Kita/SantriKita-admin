@@ -70,12 +70,7 @@ export default function Sidebar({ children }) {
             );
           })}
         </VStack>
-        <Button
-          colorScheme="red"
-          variant="solid"
-          justifySelf="end"
-          onClick={logoutHandler}
-        >
+        <Button colorScheme="red" variant="solid" onClick={logoutHandler}>
           Log out
         </Button>
       </VStack>
