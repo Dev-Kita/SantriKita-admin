@@ -44,7 +44,7 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
     }
 
     if (!jwt) {
-      if (ctx.pathname === "/dashboard") {
+      if (ctx.pathname !== "/login" && ctx.pathname !== "/") {
         redirectUser(ctx, "/login");
       }
     }

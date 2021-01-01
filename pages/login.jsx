@@ -61,6 +61,7 @@ function Login() {
         <Flex
           p="8"
           m="auto"
+          w="full"
           flexDir="column"
           border="1px"
           borderColor="gray.300"

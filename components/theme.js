@@ -7,7 +7,7 @@ export const customTheme = {
     700: "#2a69ac",
   },
   fonts: {
-    heading: "Open Sans",
+    heading: "Poppins",
     body: "Inter",
   },
 };
