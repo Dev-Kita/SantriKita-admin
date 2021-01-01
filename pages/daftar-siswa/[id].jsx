@@ -98,7 +98,15 @@ function DetailSiswa() {
               isReadOnly={!isEditing}
             />
           </FormControl>
-          <FormControl id="kelas">
+          <FormControl id="nis" mt="2">
+            <FormLabel>NIS</FormLabel>
+            <Input
+              type="number"
+              defaultValue={data.nis}
+              isReadOnly={!isEditing}
+            />
+          </FormControl>
+          <FormControl id="kelas" mt="2">
             <FormLabel>Kelas</FormLabel>
             <Input
               type="text"
@@ -106,7 +114,7 @@ function DetailSiswa() {
               isReadOnly={!isEditing}
             />
           </FormControl>
-          <FormControl id="tglLahir">
+          <FormControl id="tglLahir" mt="2">
             <FormLabel>Tanggal Lahir</FormLabel>
             <Input
               type="text"
@@ -114,7 +122,7 @@ function DetailSiswa() {
               isReadOnly={!isEditing}
             />
           </FormControl>
-          <FormControl id="name">
+          <FormControl id="name" mt="2">
             <FormLabel>Tahun Masuk</FormLabel>
             <Input
               type="number"
@@ -122,7 +130,7 @@ function DetailSiswa() {
               isReadOnly={!isEditing}
             />
           </FormControl>
-          <FormControl id="name">
+          <FormControl id="name" mt="2">
             <FormLabel>Tahun Masuk</FormLabel>
             <Input
               type="number"

@@ -29,6 +29,7 @@ function SiswaTable({ data }) {
             <Tr>
               <Th py="4">No</Th>
               <Th py="4">Nama</Th>
+              <Th py="4">NIS</Th>
               <Th py="4">Kelas</Th>
               <Th py="4">Tanggal Lahir</Th>
               <Th py="4" isNumeric>
@@ -39,11 +40,19 @@ function SiswaTable({ data }) {
           </Thead>
           <Tbody>
             {data.map((siswa, i) => {
-              const { id, nama, classroom, tanggal_lahir, tahun_masuk } = siswa;
+              const {
+                id,
+                nama,
+                nis,
+                classroom,
+                tanggal_lahir,
+                tahun_masuk,
+              } = siswa;
               return (
                 <Tr key={id}>
                   <Td>{i + 1}</Td>
                   <Td>{nama}</Td>
+                  <Td>{nis}</Td>
                   <Td>{classroom}</Td>
                   <Td>{tanggal_lahir}</Td>
                   <Td isNumeric>{tahun_masuk}</Td>

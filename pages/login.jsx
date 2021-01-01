@@ -10,6 +10,7 @@ import {
   Button,
   Heading,
   Box,
+  Flex,
   Text,
   Alert,
   AlertTitle,
@@ -56,54 +57,59 @@ function Login() {
         <title>Login | Santri Kita</title>
       </Head>
 
-      <Box maxW="sm" my="8" mx="auto" textAlign="center">
-        <Heading>Login Page</Heading>
-        <form
-          onSubmit={submitHandler}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: "0.5rem",
-            margin: "2rem auto",
-          }}
+      <Flex maxW="md" minHeight="100vh" m="auto" textAlign="center">
+        <Flex
+          p="8"
+          m="auto"
+          flexDir="column"
+          border="1px"
+          borderColor="gray.300"
+          rounded="md"
         >
-          <FormControl id="username" isRequired>
-            <FormLabel>Username</FormLabel>
-            <Input type="text" onChange={(e) => setUsername(e.target.value)} />
-          </FormControl>
+          <Heading fontSize="2xl">Login Page</Heading>
+          <form onSubmit={submitHandler}>
+            <Flex flexDir="column" justify="center" gridGap="2" my="8">
+              <FormControl id="username" isRequired>
+                <FormLabel>Username</FormLabel>
+                <Input
+                  type="text"
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </FormControl>
 
-          <FormControl id="password" isRequired>
-            <FormLabel>Password</FormLabel>
-            <Input
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </FormControl>
-          <Button type="submit" colorScheme="teal" variant="solid">
-            Log in
-          </Button>
-        </form>
+              <FormControl id="password" isRequired>
+                <FormLabel>Password</FormLabel>
+                <Input
+                  type="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </FormControl>
+              <Button type="submit" colorScheme="teal" variant="solid">
+                Log in
+              </Button>
+            </Flex>
+          </form>
 
-        {isLoading ? (
-          <Text fontSize="lg" fontWeight="medium">
-            Loading...
-          </Text>
-        ) : undefined}
+          {isLoading ? (
+            <Text fontSize="lg" fontWeight="medium">
+              Loading...
+            </Text>
+          ) : undefined}
 
-        {auth ? undefined : (
-          <Alert status="error" rounded="md">
-            <AlertIcon />
-            <AlertTitle>Wrong username or password</AlertTitle>
-            <CloseButton
-              position="absolute"
-              right="8px"
-              top="8px"
-              onClick={() => setAuth(true)}
-            />
-          </Alert>
-        )}
-      </Box>
+          {auth ? undefined : (
+            <Alert status="error" rounded="md">
+              <AlertIcon />
+              <AlertTitle>Wrong username or password</AlertTitle>
+              <CloseButton
+                position="absolute"
+                right="8px"
+                top="8px"
+                onClick={() => setAuth(true)}
+              />
+            </Alert>
+          )}
+        </Flex>
+      </Flex>
     </>
   );
 }

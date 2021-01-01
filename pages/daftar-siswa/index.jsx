@@ -54,6 +54,7 @@ function DaftarSiswa() {
   });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [nama, setNama] = useState("");
+  const [nis, setNis] = useState("");
   const [kelas, setKelas] = useState("");
   const [tglLahir, setTglLahir] = useState("");
   const [tahunMasuk, setTahunMasuk] = useState(null);
@@ -62,6 +63,7 @@ function DaftarSiswa() {
   const tambahSiswaHadler = async () => {
     const siswaData = {
       nama: nama,
+      nis: nis,
       classroom: kelas,
       tanggal_lahir: tglLahir,
       tahun_masuk: tahunMasuk,
@@ -126,6 +128,14 @@ function DaftarSiswa() {
                 <Input
                   placeholder="Name"
                   onChange={(e) => setNama(e.target.value)}
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>NIS</FormLabel>
+                <Input
+                  placeholder="NIS"
+                  type="number"
+                  onChange={(e) => setNis(e.target.value)}
                 />
               </FormControl>
               <FormControl isRequired>
