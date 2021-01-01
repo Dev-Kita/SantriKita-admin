@@ -76,7 +76,7 @@ function DaftarSiswa() {
       },
     });
     onClose();
-    console.log(data);
+    // console.log(data);
   };
 
   // error handling
@@ -85,6 +85,10 @@ function DaftarSiswa() {
   if (!data) {
     return (
       <>
+        <Head>
+          <title>Daftar Siswa | Santri Kita</title>
+        </Head>
+
         <Flex mb="4">
           <Spacer />
           <Button variant="solid" colorScheme="teal">
@@ -93,6 +97,9 @@ function DaftarSiswa() {
         </Flex>
         <Box bgColor="white" p="4" rounded="md" borderWidth="1px">
           <VStack align="stretch" spacing={2}>
+            <Skeleton height="20px" />
+            <Skeleton height="20px" />
+            <Skeleton height="20px" />
             <Skeleton height="20px" />
             <Skeleton height="20px" />
             <Skeleton height="20px" />

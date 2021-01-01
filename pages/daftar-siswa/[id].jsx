@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import useSWR from "swr";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import HapusSiswaAlert from "../../components/daftar-siswa/hapusSiswaAlert";
 import {
   Box,
   VStack,
@@ -16,7 +17,6 @@ import {
   FormLabel,
   Input,
   Button,
-  Text,
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
@@ -41,10 +41,26 @@ const fetcher = async (url) => {
 
 function DetailSiswa() {
   const router = useRouter();
+  // Fetch data dengan SWR Hooks
   const { data, error } = useSWR(`/students/${router.query.id}`, fetcher, {
     refreshInterval: 1000,
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const onClose = () => setOpenAlert(false);
+  const cancelRef = useRef();
+
+  // Function untuk meng-Handle hapus data siswa
+  const deleteHandler = async () => {
+    const jwt = parseCookies().jwt;
+    const { data } = await axios.delete(`${URL}/students/${router.query.id}`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    // console.log(data);
+    router.replace("/daftar-siswa");
+  };
 
   if (error) console.log(error);
   if (!data) {
@@ -56,6 +72,9 @@ function DetailSiswa() {
 
         <Box bgColor="white" p="4" rounded="md" borderWidth="1px">
           <VStack align="stretch" spacing={2}>
+            <Skeleton height="20px" />
+            <Skeleton height="20px" />
+            <Skeleton height="20px" />
             <Skeleton height="20px" />
             <Skeleton height="20px" />
             <Skeleton height="20px" />
@@ -83,11 +102,23 @@ function DetailSiswa() {
             >
               {isEditing ? "Batal" : "Edit"}
             </Button>
-            <Button variant="solid" size="sm" colorScheme="red">
-              Delete
+            <Button
+              variant="solid"
+              size="sm"
+              colorScheme="red"
+              onClick={() => setOpenAlert(true)}
+            >
+              Hapus
             </Button>
           </ButtonGroup>
         </Flex>
+
+        <HapusSiswaAlert
+          deleteHandler={deleteHandler}
+          openAlert={openAlert}
+          cancelRef={cancelRef}
+          onClose={onClose}
+        />
 
         <form>
           <FormControl id="name">
