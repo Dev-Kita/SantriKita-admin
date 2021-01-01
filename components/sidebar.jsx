@@ -43,15 +43,15 @@ export default function Sidebar({ children }) {
         justify="space-between"
       >
         <Heading fontSize="2xl" color="teal.600" textAlign="center">
-          Santri Kita
+          SANTRI KITA
         </Heading>
         <VStack
           align="stretch"
           divider={<StackDivider borderColor="gray.200" />}
         >
-          {sideMenu.map(({ title, slug }) => {
+          {sideMenu.map(({ title, slug }, i) => {
             return (
-              <NextLink href={slug}>
+              <NextLink href={slug} key={i}>
                 <Link
                   py="2"
                   px="4"

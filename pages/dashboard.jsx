@@ -1,16 +1,13 @@
-import axios from "axios";
 import React from "react";
-import { useRouter } from "next/router";
+import { Box, Heading } from "@chakra-ui/react";
 
 function Dashboard() {
-  const router = useRouter();
-  // console.log(data);
-
   return (
-    <div>
-      <h1>Wellcome to dashboard</h1>
-      <br />
-    </div>
+    <Box bgColor="white" p="4" rounded="md">
+      <Heading textAlign="center" fontSize="2xl">
+        Wellcome to dashboard
+      </Heading>
+    </Box>
   );
 }
 
