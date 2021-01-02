@@ -1,7 +1,7 @@
 import Head from "next/head";
 import NextLink from "next/link";
 import styles from "../styles/Home.module.css";
-import { Heading, Link, Text } from "@chakra-ui/react";
+import { Heading, Button, Text } from "@chakra-ui/react";
 
 export default function Home() {
   return (
@@ -15,9 +15,10 @@ export default function Home() {
         <Heading>Welcome to Santri Kita</Heading>
 
         <Text fontSize="xl" mt="4">
-          Get started by{" "}
           <NextLink href="/login">
-            <Link color="teal.600">Login</Link>
+            <Button variant="solid" colorScheme="teal">
+              Log in
+            </Button>
           </NextLink>
         </Text>
       </main>

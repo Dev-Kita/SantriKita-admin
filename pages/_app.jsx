@@ -5,8 +5,8 @@ import Router from "next/router";
 import Head from "next/head";
 
 import Layout from "../components/layout";
-import { customTheme } from "../components/theme";
-import { Fonts } from "../components/Font";
+import { customTheme } from "../components/customStyles/theme";
+import { Fonts } from "../components/customStyles/Font";
 
 const theme = extendTheme(customTheme);
 

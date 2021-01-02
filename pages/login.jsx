@@ -1,9 +1,11 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import NextLink from "next/link";
 import { setCookie } from "nookies";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import {
+  Link,
   FormControl,
   FormLabel,
   Input,
@@ -73,6 +75,11 @@ function Login() {
           borderColor="gray.300"
           rounded="md"
         >
+          <NextLink href="/">
+            <Link fontSize="lg" color="teal.600">
+              Santri Kita
+            </Link>
+          </NextLink>
           <Heading fontSize="2xl">Login Page</Heading>
           <form onSubmit={submitHandler}>
             <Flex flexDir="column" justify="center" gridGap="2" my="8">

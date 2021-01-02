@@ -3,8 +3,9 @@ import useSWR from "swr";
 import axios from "axios";
 import Head from "next/head";
 import { parseCookies } from "nookies";
-import SiswaTable from "../../components/daftar-siswa/siswaTable";
 import CardWrapper from "../../components/cardWrapper";
+import SiswaTable from "../../components/daftar-siswa/siswaTable";
+
 import {
   VStack,
   Flex,
@@ -27,7 +28,7 @@ import {
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Function untuk fetch data dari API
+// Function untuk fetch data dari API students
 const fetcher = async (url) => {
   try {
     const jwt = parseCookies().jwt;
