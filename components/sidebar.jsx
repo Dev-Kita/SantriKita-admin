@@ -43,7 +43,7 @@ export default function Sidebar({ children }) {
         align="stretch"
         justify="space-between"
       >
-        <Heading fontSize="2xl" color="teal.500" textAlign="center">
+        <Heading ml="4" fontSize="3xl" color="teal.400">
           SANTRI KITA
         </Heading>
         <VStack align="stretch" spacing={2}>

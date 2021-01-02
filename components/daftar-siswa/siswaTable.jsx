@@ -1,6 +1,7 @@
 import React from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
+import CardWrapper from "../cardWrapper";
 import {
   Table,
   Thead,
@@ -18,7 +19,7 @@ function SiswaTable({ data }) {
   const router = useRouter();
   return (
     <>
-      <Box bgColor="white" p="4" rounded="md" borderWidth="1px">
+      <CardWrapper>
         <Heading fontSize="xl" mb="4" textAlign="center">
           Daftar Siswa
         </Heading>
@@ -68,7 +69,7 @@ function SiswaTable({ data }) {
             })}
           </Tbody>
         </Table>
-      </Box>
+      </CardWrapper>
     </>
   );
 }

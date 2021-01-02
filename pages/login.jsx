@@ -16,6 +16,7 @@ import {
   AlertTitle,
   CloseButton,
   AlertIcon,
+  Spinner,
 } from "@chakra-ui/react";
 
 const url = process.env.NEXT_PUBLIC_API_URL;
@@ -85,16 +86,21 @@ function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </FormControl>
-              <Button type="submit" colorScheme="teal" variant="solid">
+              <Button type="submit" mt="2" colorScheme="teal" variant="solid">
                 Log in
               </Button>
             </Flex>
           </form>
 
           {isLoading ? (
-            <Text fontSize="lg" fontWeight="medium">
-              Loading...
-            </Text>
+            <Box justifyContent="center">
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="teal.500"
+              />
+            </Box>
           ) : undefined}
 
           {auth ? undefined : (

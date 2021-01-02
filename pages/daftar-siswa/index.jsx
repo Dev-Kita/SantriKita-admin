@@ -4,9 +4,9 @@ import axios from "axios";
 import Head from "next/head";
 import { parseCookies } from "nookies";
 import SiswaTable from "../../components/daftar-siswa/siswaTable";
+import CardWrapper from "../../components/cardWrapper";
 import {
   VStack,
-  Box,
   Flex,
   Spacer,
   Button,
@@ -22,6 +22,7 @@ import {
   FormLabel,
   Input,
   Skeleton,
+  SkeletonText,
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
@@ -82,6 +83,7 @@ function DaftarSiswa() {
   // error handling
   if (error) console.log(error);
   // loading state
+  // if (!data) return <h1>loading</h1>;
   if (!data) {
     return (
       <>
@@ -95,16 +97,12 @@ function DaftarSiswa() {
             Tambah Siswa
           </Button>
         </Flex>
-        <Box bgColor="white" p="4" rounded="md" borderWidth="1px">
+        <CardWrapper>
           <VStack align="stretch" spacing={2}>
-            <Skeleton height="20px" />
-            <Skeleton height="20px" />
-            <Skeleton height="20px" />
-            <Skeleton height="20px" />
-            <Skeleton height="20px" />
-            <Skeleton height="20px" />
+            <Skeleton height="20px" mb="4" rounded="md" />
+            <SkeletonText mt="4" noOfLines={4} spacing="4" rounded="full" />
           </VStack>
-        </Box>
+        </CardWrapper>
       </>
     );
   }
@@ -185,6 +183,7 @@ function DaftarSiswa() {
         </ModalContent>
       </Modal>
 
+      <SiswaTable data={data} />
       <SiswaTable data={data} />
     </>
   );

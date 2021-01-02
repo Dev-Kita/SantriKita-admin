@@ -9,7 +9,7 @@ function Dashboard() {
         <title>Dashboard | Santri Kita</title>
       </Head>
 
-      <Box bgColor="white" p="4" rounded="md" borderWidth="1px">
+      <Box bgColor="white" p="4" rounded="md" borderWidth="1px" boxShadow="lg">
         <Heading textAlign="center" fontSize="2xl">
           Wellcome to dashboard
         </Heading>
