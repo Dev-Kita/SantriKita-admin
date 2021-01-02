@@ -1,11 +1,12 @@
-import React, { useState, useRef, useReducer, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
-import useSWR from "swr";
 import { parseCookies } from "nookies";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import Head from "next/head";
 import HapusSiswaAlert from "../../components/daftar-siswa/hapusSiswaAlert";
 import CardWrapper from "../../components/cardWrapper";
+import NextLink from "next/link";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   VStack,
   ButtonGroup,
@@ -26,8 +27,6 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 function DetailSiswa({ siswa }) {
   // console.log(siswa);
   const router = useRouter();
-  // Fetch individual data dengan SWR Hooks
-  // const { data, error } = useSWR(`/students/${router.query.id}`, fetcher);
   const [nama, setNama] = useState(siswa.nama);
   const [nis, setNis] = useState(siswa.nis);
   const [kelas, setKelas] = useState(siswa.classroom);
@@ -108,7 +107,13 @@ function DetailSiswa({ siswa }) {
         </Head>
 
         <CardWrapper>
-          <Flex gridGap="4" my="4">
+          <Flex gridGap="4" my="4" align="center">
+            <NextLink href="/daftar-siswa">
+              <Button size="sm" leftIcon={<ArrowBackIcon />} variant="solid">
+                Kembali
+              </Button>
+            </NextLink>
+            <Spacer />
             <Heading fontSize="xl">Siswa Detail</Heading>
             <Spacer />
             <ButtonGroup>

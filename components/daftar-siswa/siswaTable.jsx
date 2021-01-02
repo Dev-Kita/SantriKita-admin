@@ -15,63 +15,67 @@ import {
   Link,
 } from "@chakra-ui/react";
 
-function SiswaTable({ data }) {
+function SiswaTable(props) {
+  const { data } = props;
   const router = useRouter();
-  return (
-    <>
-      <CardWrapper>
-        <Heading fontSize="xl" mb="4" textAlign="center">
-          Daftar Siswa
-        </Heading>
+  if (!data) return <h1>Waiting</h1>;
+  if (data) {
+    return (
+      <>
+        <CardWrapper>
+          <Heading fontSize="xl" mb="4" textAlign="center">
+            Daftar Siswa
+          </Heading>
 
-        <Table variant="simple" size="sm">
-          <TableCaption>Daftar Siswa</TableCaption>
-          <Thead bgColor="gray.100">
-            <Tr>
-              <Th py="4">No</Th>
-              <Th py="4">Nama</Th>
-              <Th py="4">NIS</Th>
-              <Th py="4">Kelas</Th>
-              <Th py="4">Tanggal Lahir</Th>
-              <Th py="4" isNumeric>
-                Tahun Masuk
-              </Th>
-              <Th py="4">Edit</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {data.map((siswa, i) => {
-              const {
-                id,
-                nama,
-                nis,
-                classroom,
-                tanggal_lahir,
-                tahun_masuk,
-              } = siswa;
-              return (
-                <Tr key={id}>
-                  <Td>{i + 1}</Td>
-                  <Td>{nama}</Td>
-                  <Td>{nis}</Td>
-                  <Td>{classroom}</Td>
-                  <Td>{tanggal_lahir}</Td>
-                  <Td isNumeric>{tahun_masuk}</Td>
-                  <Td>
-                    <NextLink href={`${router.pathname}/${id}`}>
-                      <Link color="teal.500" fontWeight="medium">
-                        Detail
-                      </Link>
-                    </NextLink>
-                  </Td>
-                </Tr>
-              );
-            })}
-          </Tbody>
-        </Table>
-      </CardWrapper>
-    </>
-  );
+          <Table variant="simple" size="sm">
+            <TableCaption>Daftar Siswa</TableCaption>
+            <Thead bgColor="gray.100">
+              <Tr>
+                <Th py="4">No</Th>
+                <Th py="4">Nama</Th>
+                <Th py="4">NIS</Th>
+                <Th py="4">Kelas</Th>
+                <Th py="4">Tanggal Lahir</Th>
+                <Th py="4" isNumeric>
+                  Tahun Masuk
+                </Th>
+                <Th py="4">Detail</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {data.map((siswa, i) => {
+                const {
+                  id,
+                  nama,
+                  nis,
+                  classroom,
+                  tanggal_lahir,
+                  tahun_masuk,
+                } = siswa;
+                return (
+                  <Tr key={id}>
+                    <Td>{i + 1}</Td>
+                    <Td>{nama}</Td>
+                    <Td>{nis}</Td>
+                    <Td>{classroom}</Td>
+                    <Td>{tanggal_lahir}</Td>
+                    <Td isNumeric>{tahun_masuk}</Td>
+                    <Td>
+                      <NextLink href={`${router.pathname}/${id}`}>
+                        <Link color="teal.500" fontWeight="medium">
+                          Detail
+                        </Link>
+                      </NextLink>
+                    </Td>
+                  </Tr>
+                );
+              })}
+            </Tbody>
+          </Table>
+        </CardWrapper>
+      </>
+    );
+  }
 }
 
 export default SiswaTable;

@@ -83,7 +83,6 @@ function DaftarSiswa() {
   // error handling
   if (error) console.log(error);
   // loading state
-  // if (!data) return <h1>loading</h1>;
   if (!data) {
     return (
       <>
@@ -107,86 +106,86 @@ function DaftarSiswa() {
     );
   }
 
-  // data tersedia
-  return (
-    <>
-      <Head>
-        <title>Daftar Siswa | Santri Kita</title>
-      </Head>
+  if (data) {
+    return (
+      <>
+        <Head>
+          <title>Daftar Siswa | Santri Kita</title>
+        </Head>
 
-      <Flex mb="4">
-        <Spacer />
-        <Button onClick={onOpen} variant="solid" colorScheme="teal">
-          Tambah Siswa
-        </Button>
-      </Flex>
+        <Flex mb="4">
+          <Spacer />
+          <Button onClick={onOpen} variant="solid" colorScheme="teal">
+            Tambah Siswa
+          </Button>
+        </Flex>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Tambah Siswa</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <form>
-              <FormControl isRequired>
-                <FormLabel>Nama</FormLabel>
-                <Input
-                  placeholder="Name"
-                  onChange={(e) => setNama(e.target.value)}
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>NIS</FormLabel>
-                <Input
-                  placeholder="NIS"
-                  type="number"
-                  onChange={(e) => setNis(e.target.value)}
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Kelas</FormLabel>
-                <Input
-                  placeholder="Kelas"
-                  onChange={(e) => setKelas(e.target.value)}
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Tanggal Lahir</FormLabel>
-                <Input
-                  type="date"
-                  onChange={(e) => setTglLahir(e.target.value)}
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Tahun Masuk</FormLabel>
-                <Input
-                  type="number"
-                  onChange={(e) => setTahunMasuk(e.target.value)}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Tahun Keluar</FormLabel>
-                <Input
-                  type="number"
-                  onChange={(e) => setTahunKeluar(e.target.value)}
-                />
-              </FormControl>
-            </form>
-          </ModalBody>
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Tambah Siswa</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <form>
+                <FormControl isRequired>
+                  <FormLabel>Nama</FormLabel>
+                  <Input
+                    placeholder="Name"
+                    onChange={(e) => setNama(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>NIS</FormLabel>
+                  <Input
+                    placeholder="NIS"
+                    type="number"
+                    onChange={(e) => setNis(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Kelas</FormLabel>
+                  <Input
+                    placeholder="Kelas"
+                    onChange={(e) => setKelas(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Tanggal Lahir</FormLabel>
+                  <Input
+                    type="date"
+                    onChange={(e) => setTglLahir(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Tahun Masuk</FormLabel>
+                  <Input
+                    type="number"
+                    onChange={(e) => setTahunMasuk(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Tahun Keluar</FormLabel>
+                  <Input
+                    type="number"
+                    onChange={(e) => setTahunKeluar(e.target.value)}
+                  />
+                </FormControl>
+              </form>
+            </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="teal" mr={3} onClick={tambahSiswaHadler}>
-              Simpan
-            </Button>
-            <Button onClick={onClose}>Batal</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+            <ModalFooter>
+              <Button colorScheme="teal" mr={3} onClick={tambahSiswaHadler}>
+                Simpan
+              </Button>
+              <Button onClick={onClose}>Batal</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
-      <SiswaTable data={data} />
-      <SiswaTable data={data} />
-    </>
-  );
+        <SiswaTable data={data} />
+      </>
+    );
+  }
 }
 
 export default DaftarSiswa;

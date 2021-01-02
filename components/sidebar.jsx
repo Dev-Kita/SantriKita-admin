@@ -80,7 +80,7 @@ export default function Sidebar({ children }) {
         </Button>
       </VStack>
 
-      <Box w="80%" bgColor="gray.100" p="8">
+      <Box w="80%" bgColor="gray.100">
         {children}
       </Box>
     </Flex>

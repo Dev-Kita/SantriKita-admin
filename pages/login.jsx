@@ -45,7 +45,7 @@ function Login() {
       setAuth(true);
       setIsLoading(false);
 
-      router.replace("/dashboard");
+      router.prefetch("/dashboard");
     } catch (error) {
       setAuth(false);
       setIsLoading(false);

@@ -2,6 +2,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import Sidebar from "./sidebar";
 import { Box } from "@chakra-ui/react";
+import Topbar from "./topbar";
 
 function Layout({ children }) {
   const router = useRouter();
@@ -10,7 +11,12 @@ function Layout({ children }) {
       {router.pathname === "/" || router.pathname === "/login" ? (
         <Box>{children}</Box>
       ) : (
-        <Sidebar>{children}</Sidebar>
+        <Sidebar>
+          <Topbar />
+          <Box px="8" py="4">
+            {children}
+          </Box>
+        </Sidebar>
       )}
     </Box>
   );
