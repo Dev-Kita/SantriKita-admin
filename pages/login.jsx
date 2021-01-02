@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { setCookie } from "nookies";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -28,6 +28,11 @@ function Login() {
   const [auth, setAuth] = useState(true);
   const router = useRouter();
 
+  useEffect(() => {
+    // Prefetch halaman dashboard
+    router.prefetch("/dashboard");
+  }, []);
+
   const submitHandler = async (e) => {
     try {
       e.preventDefault();
@@ -45,7 +50,7 @@ function Login() {
       setAuth(true);
       setIsLoading(false);
 
-      router.prefetch("/dashboard");
+      router.push("/dashboard");
     } catch (error) {
       setAuth(false);
       setIsLoading(false);
