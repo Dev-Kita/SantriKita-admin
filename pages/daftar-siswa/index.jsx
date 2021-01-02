@@ -5,7 +5,7 @@ import Head from "next/head";
 import { parseCookies } from "nookies";
 import CardWrapper from "../../components/cardWrapper";
 import SiswaTable from "../../components/daftar-siswa/siswaTable";
-
+import { AddIcon } from "@chakra-ui/icons";
 import {
   VStack,
   Flex,
@@ -93,8 +93,8 @@ function DaftarSiswa() {
 
         <Flex mb="4">
           <Spacer />
-          <Button variant="solid" colorScheme="teal">
-            Tambah Siswa
+          <Button leftIcon={<AddIcon />} variant="solid" colorScheme="teal">
+            Siswa
           </Button>
         </Flex>
         <CardWrapper>
@@ -116,8 +116,13 @@ function DaftarSiswa() {
 
         <Flex mb="4">
           <Spacer />
-          <Button onClick={onOpen} variant="solid" colorScheme="teal">
-            Tambah Siswa
+          <Button
+            leftIcon={<AddIcon />}
+            onClick={onOpen}
+            variant="solid"
+            colorScheme="teal"
+          >
+            Siswa
           </Button>
         </Flex>
 

@@ -6,7 +6,7 @@ import { parseCookies } from "nookies";
 import Select from "react-select";
 import CardWrapper from "../../components/cardWrapper";
 import PelanggaranTable from "../../components/pelanggaran/pelanggaranTable";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
   VStack,
   Flex,
@@ -40,7 +40,7 @@ const fetcher = async (url) => {
   try {
     const jwt = parseCookies().jwt;
 
-    const { data } = await axios.get(`${URL}${url}`, {
+    const { data } = await axios.get(`${URL}${url}?_sort=tanggal:DESC`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -107,8 +107,8 @@ function DaftarPelanggaran({ siswa }) {
 
         <Flex mb="4">
           <Spacer />
-          <Button variant="solid" colorScheme="teal">
-            Tambah Pelanggaran
+          <Button leftIcon={<AddIcon />} variant="solid" colorScheme="teal">
+            Pelanggaran
           </Button>
         </Flex>
         <CardWrapper>
@@ -130,8 +130,13 @@ function DaftarPelanggaran({ siswa }) {
 
         <Flex mb="4">
           <Spacer />
-          <Button onClick={onOpen} variant="solid" colorScheme="teal">
-            Tambah Pelanggaran
+          <Button
+            leftIcon={<AddIcon />}
+            onClick={onOpen}
+            variant="solid"
+            colorScheme="teal"
+          >
+            Pelanggaran
           </Button>
         </Flex>
 
@@ -149,6 +154,8 @@ function DaftarPelanggaran({ siswa }) {
                     defaultValue={selectedName}
                     onChange={setSelectedName}
                     options={newSiswa}
+                    isClearable
+                    isSearchable
                   />
                 </FormControl>
                 <FormControl isRequired>

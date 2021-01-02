@@ -15,8 +15,8 @@ import CardWrapper from "../components/cardWrapper";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
-function Dashboard({ jumlahSiswa }) {
-  console.log(jumlahSiswa);
+function Dashboard({ jumlahSiswa, jumlahPelanggaran }) {
+  // console.log(jumlahSiswa, jumlahPelanggaran);
   if (!jumlahSiswa) return <h2>Loading</h2>;
   return (
     <>
@@ -42,9 +42,9 @@ function Dashboard({ jumlahSiswa }) {
 
           <CardWrapper width="49%">
             <Stat>
-              <StatLabel>Jumlah Siswa</StatLabel>
-              <StatNumber>{jumlahSiswa}</StatNumber>
-              <StatHelpText>Total Siswa Terdata</StatHelpText>
+              <StatLabel>Jumlah Pelanggaran</StatLabel>
+              <StatNumber>{jumlahPelanggaran}</StatNumber>
+              <StatHelpText>Total Pelanggaran Terdata</StatHelpText>
             </Stat>
           </CardWrapper>
         </Flex>
@@ -55,13 +55,21 @@ function Dashboard({ jumlahSiswa }) {
 
 export async function getServerSideProps(context) {
   const jwt = parseCookies(context).jwt;
-  const { data } = await axios.get(`${URL}/students/count`, {
+  const studentsCount = await axios.get(`${URL}/students/count`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
+  const violationsCount = await axios.get(`${URL}/violations/count`, {
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
   });
   return {
-    props: { jumlahSiswa: data },
+    props: {
+      jumlahSiswa: studentsCount.data,
+      jumlahPelanggaran: violationsCount.data,
+    },
   };
 }
 
