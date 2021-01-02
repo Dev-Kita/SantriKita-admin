@@ -2,6 +2,7 @@ import React from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import CardWrapper from "../cardWrapper";
+import Moment from "react-moment";
 import {
   Table,
   Thead,
@@ -58,7 +59,9 @@ function SiswaTable(props) {
                     <Td>{nama}</Td>
                     <Td>{nis}</Td>
                     <Td>{classroom}</Td>
-                    <Td>{tanggal_lahir}</Td>
+                    <Td>
+                      <Moment format="DD MMM YYYY">{tanggal_lahir}</Moment>
+                    </Td>
                     <Td isNumeric>{tahun_masuk}</Td>
                     <Td>
                       <NextLink href={`${router.pathname}/${id}`}>

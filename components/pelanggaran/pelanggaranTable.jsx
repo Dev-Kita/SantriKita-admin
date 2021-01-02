@@ -1,5 +1,6 @@
 import React from "react";
 import NextLink from "next/link";
+import Moment from "react-moment";
 import { useRouter } from "next/router";
 import CardWrapper from "../cardWrapper";
 import {
@@ -43,7 +44,9 @@ function PelanggaranTable({ data }) {
                   <Td>{i + 1}</Td>
                   <Td>{student.nama}</Td>
                   <Td>{pelanggaran}</Td>
-                  <Td>{tanggal}</Td>
+                  <Td>
+                    <Moment format="DD MMM YYYY">{tanggal}</Moment>
+                  </Td>
                   <Td>{status}</Td>
                   <Td>
                     {/* <NextLink href={`${router.pathname}/${id}`}>
