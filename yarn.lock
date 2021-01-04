@@ -2665,28 +2665,10 @@ glob@^7.1.3, glob@^7.1.4:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-goober@^2.0.18:
-  version "2.0.18"
-  resolved "https://registry.yarnpkg.com/goober/-/goober-2.0.18.tgz#5a7c1dbac104a4bccb1547f0218ef80d0171ad10"
-  integrity sha512-XaYq9GqRkWHS0DFPQZQLhrKGWWbiz+ydiEbMRN8eGJZ7enDjmWnRv3RWn5RwdukjnHUA6b/AQcf4QWjellKOCw==
-
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
-
-gridjs-react@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/gridjs-react/-/gridjs-react-3.2.1.tgz#78b24125c1e27cc91a7d36ed9ff10d6d7eac7ee6"
-  integrity sha512-3HkZaHOlicS9ZjlAypZ7sLjT1pnGAd+w2v7KUhjEHEL2t7MVV0xtlGPKnorLsfmtrWRB/CXm84UwPfxdJ1gBdQ==
-
-gridjs@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/gridjs/-/gridjs-3.2.1.tgz#0b3d240bc6d7f546c71238e6c0c3d2e0af289df8"
-  integrity sha512-2g2doNGj1/6PUUbT2uAyJ8myDUX/BnQDpLBUC5WWXxpZjYGxK9tg4mm+Yp34/WiUCIjQHWq6TEVKjmY8GKWDlA==
-  dependencies:
-    preact "^10.5.7"
-    tslib "^2.0.1"
 
 has-flag@^3.0.0:
   version "3.0.0"
@@ -3942,11 +3924,6 @@ postcss@^7.0.14, postcss@^7.0.26, postcss@^7.0.32, postcss@^7.0.5, postcss@^7.0.
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-preact@^10.5.7:
-  version "10.5.9"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.5.9.tgz#8caba9288b4db1d593be2317467f8735e43cda0b"
-  integrity sha512-X4m+4VMVINl/JFQKALOCwa3p8vhMAhBvle0hJ/W44w/WWfNb2TA7RNicDV3K2dNVs57f61GviEnVLiwN+fxiIg==
-
 prebuild-install@^5.3.5:
   version "5.3.6"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.6.tgz#7c225568d864c71d89d07f8796042733a3f54291"
@@ -4144,13 +4121,6 @@ react-moment@^1.1.1:
   resolved "https://registry.yarnpkg.com/react-moment/-/react-moment-1.1.1.tgz#5fe9fb257039590c804e2b3aedfc3ceb0a6ffb16"
   integrity sha512-WjwvxBSnmLMRcU33do0KixDB+9vP3e84eCse+rd+HNklAMNWyRgZTDEQlay/qK6lcXFPRuEIASJTpEt6pyK7Ww==
 
-react-multi-select-component@^3.0.8:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/react-multi-select-component/-/react-multi-select-component-3.0.8.tgz#96afe11bde131cbfa2d38c456b768064523dcc72"
-  integrity sha512-FIgKE4doUqzbK80tuXxNpSfy88yPSdm5RISWqrfDIKqV2Yov62obuAFlc2+K15qJ9qH8bJCz1iQIOzsJZDNUQg==
-  dependencies:
-    goober "^2.0.18"
-
 react-refresh@0.8.3:
   version "0.8.3"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.8.3.tgz#721d4657672d400c5e3c75d063c4a85fb2d5d68f"
@@ -4197,6 +4167,11 @@ react-style-singleton@^2.1.0:
     get-nonce "^1.0.0"
     invariant "^2.2.4"
     tslib "^1.0.0"
+
+react-table@^7.6.2:
+  version "7.6.2"
+  resolved "https://registry.yarnpkg.com/react-table/-/react-table-7.6.2.tgz#b60932fa6d457c2bca0da49815cd6a8fe9451f77"
+  integrity sha512-urwNZTieb+xg/+BITUIrqdH5jZfJlw7rKVAAq25iXpBPwbQojLCEKJuGycLbVwn8fzU+Ovly3y8HHNaLNrPCvQ==
 
 react-transition-group@^4.3.0:
   version "4.4.1"
@@ -4994,7 +4969,7 @@ tslib@^1.0.0, tslib@^1.10.0, tslib@^1.9.0, tslib@^1.9.3:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
-tslib@^2.0.0, tslib@^2.0.1:
+tslib@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.0.3.tgz#8e0741ac45fc0c226e58a17bfc3e64b9bc6ca61c"
   integrity sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==

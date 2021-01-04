@@ -221,6 +221,8 @@ function DaftarPelanggaran({ siswa }) {
   }
 }
 
+
+// FETCH DATA SISWA UNTUK OPSI SISWA YANG MELAKUKAN PELANGGARAN
 export async function getServerSideProps(context) {
   try {
     const jwt = parseCookies(context).jwt;
