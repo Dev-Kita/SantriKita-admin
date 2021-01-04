@@ -10,7 +10,6 @@ function CardWrapper({ children, width }) {
       p="4"
       rounded="md"
       borderWidth="1px"
-      boxShadow="lg"
     >
       {children}
     </Box>

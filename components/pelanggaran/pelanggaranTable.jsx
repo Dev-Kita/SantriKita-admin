@@ -17,6 +17,8 @@ import {
 } from "@chakra-ui/react";
 
 function PelanggaranTable({ data }) {
+  const router = useRouter();
+
   return (
     <>
       <CardWrapper>
@@ -49,12 +51,11 @@ function PelanggaranTable({ data }) {
                   </Td>
                   <Td>{status}</Td>
                   <Td>
-                    {/* <NextLink href={`${router.pathname}/${id}`}>
+                    <NextLink href={`${router.pathname}/${id}`}>
                       <Link color="teal.500" fontWeight="medium">
                         Detail
                       </Link>
-                    </NextLink> */}
-                    Detail
+                    </NextLink>
                   </Td>
                 </Tr>
               );

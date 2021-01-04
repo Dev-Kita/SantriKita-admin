@@ -23,7 +23,7 @@ import {
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Komponen Utama
+// KKOMPONEN UTAMA
 function DetailSiswa({ siswa }) {
   // console.log(siswa);
   const router = useRouter();
@@ -136,6 +136,7 @@ function DetailSiswa({ siswa }) {
             </ButtonGroup>
           </Flex>
 
+          {/* KONFIRMASI HAPUS SISWA */}
           <HapusSiswaAlert
             deleteHandler={deleteHandler}
             openAlert={openAlert}
@@ -221,7 +222,7 @@ function DetailSiswa({ siswa }) {
   }
 }
 
-// Pre-render data individual siswa
+// PRE-RENDER DATA INDIVIDUAL SISWA
 export async function getServerSideProps(context) {
   const jwt = parseCookies(context).jwt;
   const { data } = await axios.get(`${URL}/students/${context.params.id}`, {

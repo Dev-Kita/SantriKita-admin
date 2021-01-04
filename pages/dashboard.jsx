@@ -15,9 +15,9 @@ import CardWrapper from "../components/cardWrapper";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 
-function Dashboard({ jumlahSiswa, jumlahPelanggaran }) {
+function Dashboard() {
   // console.log(jumlahSiswa, jumlahPelanggaran);
-  if (!jumlahSiswa) return <h2>Loading</h2>;
+
   return (
     <>
       <Head>
@@ -35,7 +35,7 @@ function Dashboard({ jumlahSiswa, jumlahPelanggaran }) {
           <CardWrapper width="49%">
             <Stat>
               <StatLabel>Jumlah Siswa</StatLabel>
-              <StatNumber>{jumlahSiswa}</StatNumber>
+              <StatNumber>0</StatNumber>
               <StatHelpText>Total Siswa Terdata</StatHelpText>
             </Stat>
           </CardWrapper>
@@ -43,7 +43,7 @@ function Dashboard({ jumlahSiswa, jumlahPelanggaran }) {
           <CardWrapper width="49%">
             <Stat>
               <StatLabel>Jumlah Pelanggaran</StatLabel>
-              <StatNumber>{jumlahPelanggaran}</StatNumber>
+              <StatNumber>0</StatNumber>
               <StatHelpText>Total Pelanggaran Terdata</StatHelpText>
             </Stat>
           </CardWrapper>
@@ -53,24 +53,24 @@ function Dashboard({ jumlahSiswa, jumlahPelanggaran }) {
   );
 }
 
-export async function getServerSideProps(context) {
-  const jwt = parseCookies(context).jwt;
-  const studentsCount = await axios.get(`${URL}/students/count`, {
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-    },
-  });
-  const violationsCount = await axios.get(`${URL}/violations/count`, {
-    headers: {
-      Authorization: `Bearer ${jwt}`,
-    },
-  });
-  return {
-    props: {
-      jumlahSiswa: studentsCount.data,
-      jumlahPelanggaran: violationsCount.data,
-    },
-  };
-}
+// export async function getServerSideProps(context) {
+//   const jwt = parseCookies(context).jwt;
+//   const studentsCount = await axios.get(`${URL}/students/count`, {
+//     headers: {
+//       Authorization: `Bearer ${jwt}`,
+//     },
+//   });
+//   const violationsCount = await axios.get(`${URL}/violations/count`, {
+//     headers: {
+//       Authorization: `Bearer ${jwt}`,
+//     },
+//   });
+//   return {
+//     props: {
+//       jumlahSiswa: studentsCount.data,
+//       jumlahPelanggaran: violationsCount.data,
+//     },
+//   };
+// }
 
 export default Dashboard;

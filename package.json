@@ -16,6 +16,8 @@
     "clsx": "^1.1.1",
     "emotion-theming": "^11.0.0",
     "framer-motion": "^3.1.1",
+    "gridjs": "^3.2.1",
+    "gridjs-react": "^3.2.1",
     "moment": "^2.29.1",
     "next": "10.0.4",
     "nookies": "^2.5.0",
