@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { parseCookies } from "nookies";
 import {
   Tooltip,
   Box,
-  HStack,
+  Text,
   Flex,
   Spacer,
   Breadcrumb,
@@ -13,9 +14,15 @@ import {
 } from "@chakra-ui/react";
 
 function Topbar() {
+  const [username, setUsername] = useState("username");
   const { asPath } = useRouter();
   const link = asPath.split("/");
   const x = link.shift();
+
+  useEffect(() => {
+    setUsername(parseCookies().username);
+  }, []);
+
   return (
     <Flex bgColor="white" py="4" px="8" align="center">
       <Box>
@@ -33,8 +40,13 @@ function Topbar() {
       </Box>
       <Spacer />
       <Box>
-        <Tooltip hasArrow label="Admin" bg="gray.300" color="black">
-          <Avatar size="sm" name="Admin" cursor="default" />
+        <Tooltip hasArrow label={username} bg="gray.300" color="black">
+          <Flex align="center">
+            <Avatar size="sm" name={username} cursor="default" />
+            <Text ml="2" fontWeight="bold">
+              {username}
+            </Text>
+          </Flex>
         </Tooltip>
       </Box>
     </Flex>

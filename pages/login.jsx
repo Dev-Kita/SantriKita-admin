@@ -46,7 +46,11 @@ function Login() {
       const loginResponse = login.data;
 
       setCookie(null, "jwt", loginResponse.jwt, {
-        maxAge: 24 * 60 * 60,
+        maxAge: 10 * 60 * 60,
+        path: "/",
+      });
+      setCookie(null, "username", loginResponse.user.username, {
+        maxAge: 10 * 60 * 60,
         path: "/",
       });
       setAuth(true);

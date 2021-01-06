@@ -29,6 +29,7 @@ export default function Sidebar({ children }) {
   // Logout Handler
   const logoutHandler = () => {
     destroyCookie(null, "jwt");
+    destroyCookie(null, "username");
     router.replace("/login");
   };
 
