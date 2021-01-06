@@ -237,7 +237,11 @@ const siswaFetcher = async ({ queryKey }) => {
       },
     });
     const newSiswa = data.map((student) => {
-      return { value: student.nama, label: student.nama, id: student.id };
+      return {
+        value: student.nama,
+        label: `${student.nama} (${student.kelas.kelas})`,
+        id: student.id,
+      };
     });
     return newSiswa;
   } catch (error) {

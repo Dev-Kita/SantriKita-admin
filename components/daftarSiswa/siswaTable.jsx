@@ -29,7 +29,6 @@ import {
 
 // MAIN COMPONENT
 function SiswaTable({ data }) {
-  console.log(data);
   const router = useRouter();
   // DATA YANG DITAMPILKAN DI TABLE
   const newData = data.map((siswaData, i) => {
@@ -37,7 +36,7 @@ function SiswaTable({ data }) {
       no: i + 1,
       nama: siswaData.nama,
       nis: siswaData.nis,
-      classroom: siswaData.classroom,
+      classroom: siswaData.kelas.kelas,
       tanggalLahir: (
         <Moment format="DD MMM YYYY">{siswaData.tanggal_lahir}</Moment>
       ),
@@ -88,7 +87,7 @@ function SiswaTable({ data }) {
       <CardWrapper>
         <Flex align="center">
           <Heading fontSize="xl" mb="4" textAlign="center">
-            Daftar Pelanggaran
+            Daftar Kelas
           </Heading>
           <Spacer />
 
@@ -171,7 +170,7 @@ function GlobalFilter({
           setValue(e.target.value);
           onChange(e.target.value);
         }}
-        placeholder={`Nama, Pelanggaran, atau Status...`}
+        placeholder={`Nama, Kelas, atau NIS...`}
         variant="outline"
         mb="4"
       />

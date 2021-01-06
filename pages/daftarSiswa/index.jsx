@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import axios from "axios";
 import Head from "next/head";
+import Select from "react-select";
 import SkeletonLoading from "../../components/skeletonLoading";
 import { parseCookies } from "nookies";
-import CardWrapper from "../../components/cardWrapper";
-import SiswaTable from "../../components/daftar-siswa/siswaTable";
+import SiswaTable from "../../components/daftarSiswa/siswaTable";
 import { AddIcon } from "@chakra-ui/icons";
 import {
   VStack,
@@ -23,8 +23,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Skeleton,
-  SkeletonText,
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
@@ -32,29 +30,28 @@ const jwt = parseCookies().jwt;
 
 function DaftarSiswa() {
   // useSWR Hooks untuk fetch data client-side
-  const { data, isError, isLoading, isSuccess } = useQuery(
-    ["students", "?_sort=tahun_masuk:asc,classroom:asc"],
-    siswaFetcher,
-    { refetchInterval: 3000 }
-  );
+  const siswaData = useQuery(["students", "?_sort=tahun_masuk:asc"], fetcher, {
+    refetchInterval: 3000,
+  });
+  const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [nama, setNama] = useState("");
-  const [nis, setNis] = useState("");
+  const [nis, setNis] = useState(null);
   const [kelas, setKelas] = useState("");
   const [tglLahir, setTglLahir] = useState("");
   const [tahunMasuk, setTahunMasuk] = useState(null);
   const [tahunKeluar, setTahunKeluar] = useState(null);
 
   const tambahSiswaHadler = async () => {
-    const siswaData = {
+    const newSiswaData = {
       nama: nama,
       nis: nis,
-      classroom: kelas,
+      kelas: { id: kelas.id },
       tanggal_lahir: tglLahir,
       tahun_masuk: tahunMasuk,
       tahun_keluar: tahunKeluar,
     };
-    const { data } = await axios.post(`${URL}/students`, siswaData, {
+    const { data } = await axios.post(`${URL}/students`, newSiswaData, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -64,9 +61,9 @@ function DaftarSiswa() {
   };
 
   // error handling
-  if (isError) console.log(error);
+  if (siswaData.isError) console.log(error);
   // loading state
-  if (isLoading) {
+  if (siswaData.isLoading) {
     return (
       <>
         <SkeletonLoading title={"Daftar Siswa"} plusButton={"Siswa"} />
@@ -74,7 +71,7 @@ function DaftarSiswa() {
     );
   }
 
-  if (isSuccess) {
+  if (siswaData.isSuccess) {
     return (
       <>
         <Head>
@@ -117,9 +114,12 @@ function DaftarSiswa() {
                 </FormControl>
                 <FormControl isRequired>
                   <FormLabel>Kelas</FormLabel>
-                  <Input
-                    placeholder="Kelas"
-                    onChange={(e) => setKelas(e.target.value)}
+                  <Select
+                    defaultValue={kelas}
+                    onChange={setKelas}
+                    options={kelasData.data}
+                    isClearable
+                    isSearchable
                   />
                 </FormControl>
                 <FormControl isRequired>
@@ -155,14 +155,14 @@ function DaftarSiswa() {
           </ModalContent>
         </Modal>
 
-        <SiswaTable data={data} />
+        <SiswaTable data={siswaData.data} />
       </>
     );
   }
 }
 
 // Function untuk fetch data dari API students
-const siswaFetcher = async ({ queryKey }) => {
+const fetcher = async ({ queryKey }) => {
   try {
     const collection = queryKey[0];
     let endpoint = `${URL}/${collection}`;
@@ -177,6 +177,14 @@ const siswaFetcher = async ({ queryKey }) => {
         Authorization: `Bearer ${jwt}`,
       },
     });
+
+    let newKelas = [];
+    if (collection === "classrooms") {
+      newKelas = data.map((kelas) => {
+        return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
+      });
+      return newKelas;
+    }
 
     return data;
   } catch (error) {

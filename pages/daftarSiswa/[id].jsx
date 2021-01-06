@@ -2,8 +2,10 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
+import { useQuery } from "react-query";
 import Head from "next/head";
-import HapusSiswaAlert from "../../components/daftar-siswa/hapusSiswaAlert";
+import Select from "react-select";
+import HapusSiswaAlert from "../../components/daftarSiswa/hapusSiswaAlert";
 import CardWrapper from "../../components/cardWrapper";
 import NextLink from "next/link";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -22,17 +24,21 @@ import {
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
+const jwt = parseCookies().jwt;
 
 // KKOMPONEN UTAMA
-function DetailSiswa({ siswa }) {
-  // console.log(siswa);
+function DetailSiswa({ siswa, daftarKelas }) {
   const router = useRouter();
+  const selKelas = daftarKelas.filter((k) => k.value === siswa.kelas.kelas);
+  // console.log(daftarKelas);
+  // console.log(siswa);
   const [nama, setNama] = useState(siswa.nama);
   const [nis, setNis] = useState(siswa.nis);
-  const [kelas, setKelas] = useState(siswa.classroom);
+  const [kelas, setKelas] = useState(selKelas[0]);
   const [tglLahir, setTglLahir] = useState(siswa.tanggal_lahir);
   const [tahunMasuk, setTahunMasuk] = useState(siswa.tahun_masuk);
   const [tahunKeluar, setTahunKeluar] = useState(siswa.tahun_keluar);
+
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
@@ -41,7 +47,7 @@ function DetailSiswa({ siswa }) {
   const siswaInfo = {
     nama: nama,
     nis: nis,
-    classroom: kelas,
+    kelas: { id: kelas.id },
     tanggal_lahir: tglLahir,
     tahun_masuk: tahunMasuk,
     tahun_keluar: tahunKeluar,
@@ -49,14 +55,13 @@ function DetailSiswa({ siswa }) {
 
   // Function untuk meng-Handle hapus data siswa
   const deleteHandler = async () => {
-    const jwt = parseCookies().jwt;
     // Delete data dari DB
     const { data } = await axios.delete(`${URL}/students/${router.query.id}`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
     });
-    router.replace("/daftar-siswa");
+    router.replace("/daftarSiswa");
   };
 
   // Function untuk menghandle edit data siswa
@@ -108,7 +113,7 @@ function DetailSiswa({ siswa }) {
 
         <CardWrapper>
           <Flex gridGap="4" my="4" align="center">
-            <NextLink href="/daftar-siswa">
+            <NextLink href="/daftarSiswa">
               <Button size="sm" leftIcon={<ArrowBackIcon />} variant="solid">
                 Kembali
               </Button>
@@ -121,7 +126,10 @@ function DetailSiswa({ siswa }) {
                 variant="solid"
                 size="sm"
                 colorScheme={isEditing ? undefined : "teal"}
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={() => {
+                  setIsEditing(!isEditing);
+                  setKelas(selKelas[0]);
+                }}
               >
                 {isEditing ? "Batal" : "Edit"}
               </Button>
@@ -165,12 +173,22 @@ function DetailSiswa({ siswa }) {
             </FormControl>
             <FormControl id="kelas" mt="2">
               <FormLabel>Kelas</FormLabel>
-              <Input
-                type="text"
-                value={kelas}
-                isReadOnly={!isEditing}
-                onChange={(e) => setKelas(e.target.value)}
-              />
+              {isEditing ? (
+                <Select
+                  defaultValue={kelas}
+                  onChange={setKelas}
+                  options={daftarKelas}
+                  isClearable
+                  isSearchable
+                />
+              ) : (
+                <Input
+                  type="text"
+                  value={kelas.label}
+                  isReadOnly
+                  onChange={(e) => setKelas(e.target.value)}
+                />
+              )}
             </FormControl>
             <FormControl id="tglLahir" mt="2">
               <FormLabel>Tanggal Lahir</FormLabel>
@@ -222,16 +240,59 @@ function DetailSiswa({ siswa }) {
   }
 }
 
+// Function untuk fetch data dari API students
+const fetcher = async ({ queryKey }) => {
+  try {
+    const collection = queryKey[0];
+    let endpoint = `${URL}/${collection}`;
+
+    if (queryKey[1]) {
+      const params = queryKey[1];
+      endpoint = `${URL}/${collection}${params}`;
+    }
+
+    const { data } = await axios.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    let newKelas = [];
+    if (collection === "classrooms") {
+      newKelas = data.map((kelas) => {
+        return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
+      });
+      return newKelas;
+    }
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    return { msg: "Query data failed" };
+  }
+};
+
 // PRE-RENDER DATA INDIVIDUAL SISWA
 export async function getServerSideProps(context) {
   const jwt = parseCookies(context).jwt;
-  const { data } = await axios.get(`${URL}/students/${context.params.id}`, {
+  const siswaData = await axios.get(`${URL}/students/${context.params.id}`, {
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
   });
+
+  const kelasData = await axios.get(`${URL}/classrooms`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
+
+  const newKelasData = kelasData.data.map((kelas) => {
+    return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
+  });
+
   return {
-    props: { siswa: data },
+    props: { siswa: siswaData.data, daftarKelas: newKelasData },
   };
 }
 

@@ -15,9 +15,10 @@ import {
 
 const sideMenu = [
   { title: "Dashboard", slug: "/dashboard" },
-  { title: "Daftar Siswa", slug: "/daftar-siswa" },
-  { title: "Riwayat Pembelajaran", slug: "/riwayat-pembelajaran" },
-  { title: "Riwayat Kesehatan", slug: "/riwayat-kesehatan" },
+  { title: "Daftar Siswa", slug: "/daftarSiswa" },
+  { title: "Kelas", slug: "/kelas" },
+  { title: "Riwayat Pembelajaran", slug: "/riwayatPembelajaran" },
+  { title: "Riwayat Kesehatan", slug: "/riwayatKesehatan" },
   { title: "Biaya", slug: "/biaya" },
   { title: "Prestasi", slug: "/prestasi" },
   { title: "Pelanggaran", slug: "/pelanggaran" },
