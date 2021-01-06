@@ -193,3 +193,15 @@
 // };
 
 // export default DaftarRiwayatPembelajaran;
+
+import React from "react";
+
+function RiwayatBelajar() {
+  return (
+    <div>
+      <h1>Riwayat Belajar</h1>
+    </div>
+  );
+}
+
+export default RiwayatBelajar;
