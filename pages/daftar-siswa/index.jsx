@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import useSWR from "swr";
+import { useQuery, useQueryClient } from "react-query";
 import axios from "axios";
 import Head from "next/head";
+import SkeletonLoading from "../../components/skeletonLoading";
 import { parseCookies } from "nookies";
 import CardWrapper from "../../components/cardWrapper";
 import SiswaTable from "../../components/daftar-siswa/siswaTable";
@@ -27,33 +28,15 @@ import {
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
-
-// Function untuk fetch data dari API students
-const fetcher = async (url) => {
-  try {
-    const jwt = parseCookies().jwt;
-
-    const { data } = await axios.get(
-      `${URL}${url}?_sort=tahun_masuk:asc,classroom:asc`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    return { msg: "You need to login first" };
-  }
-};
+const jwt = parseCookies().jwt;
 
 function DaftarSiswa() {
   // useSWR Hooks untuk fetch data client-side
-  const { data, error } = useSWR(`/students`, fetcher, {
-    refreshInterval: 1000,
-  });
+  const { data, isError, isLoading, isSuccess } = useQuery(
+    ["students", "?_sort=tahun_masuk:asc,classroom:asc"],
+    siswaFetcher,
+    { refetchInterval: 3000 }
+  );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [nama, setNama] = useState("");
   const [nis, setNis] = useState("");
@@ -71,7 +54,6 @@ function DaftarSiswa() {
       tahun_masuk: tahunMasuk,
       tahun_keluar: tahunKeluar,
     };
-    const jwt = parseCookies().jwt;
     const { data } = await axios.post(`${URL}/students`, siswaData, {
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -82,32 +64,17 @@ function DaftarSiswa() {
   };
 
   // error handling
-  if (error) console.log(error);
+  if (isError) console.log(error);
   // loading state
-  if (!data) {
+  if (isLoading) {
     return (
       <>
-        <Head>
-          <title>Daftar Siswa | Santri Kita</title>
-        </Head>
-
-        <Flex mb="4">
-          <Spacer />
-          <Button leftIcon={<AddIcon />} variant="solid" colorScheme="teal">
-            Siswa
-          </Button>
-        </Flex>
-        <CardWrapper>
-          <VStack align="stretch" spacing={2}>
-            <Skeleton height="20px" mb="4" rounded="md" />
-            <SkeletonText mt="4" noOfLines={4} spacing="4" rounded="full" />
-          </VStack>
-        </CardWrapper>
+        <SkeletonLoading title={"Daftar Siswa"} plusButton={"Siswa"} />
       </>
     );
   }
 
-  if (data) {
+  if (isSuccess) {
     return (
       <>
         <Head>
@@ -193,5 +160,29 @@ function DaftarSiswa() {
     );
   }
 }
+
+// Function untuk fetch data dari API students
+const siswaFetcher = async ({ queryKey }) => {
+  try {
+    const collection = queryKey[0];
+    let endpoint = `${URL}/${collection}`;
+
+    if (queryKey[1]) {
+      const params = queryKey[1];
+      endpoint = `${URL}/${collection}${params}`;
+    }
+
+    const { data } = await axios.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    return { msg: "Query data failed" };
+  }
+};
 
 export default DaftarSiswa;

@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import NextLink from "next/link";
+import Moment from "react-moment";
 import { useRouter } from "next/router";
 import CardWrapper from "../cardWrapper";
-import Moment from "react-moment";
+import { ChevronUpIcon, ChevronDownIcon, SearchIcon } from "@chakra-ui/icons";
+import {
+  useTable,
+  useSortBy,
+  useGlobalFilter,
+  useAsyncDebounce,
+} from "react-table";
+
 import {
   Table,
   Thead,
@@ -10,75 +18,165 @@ import {
   Tr,
   Th,
   Td,
-  TableCaption,
-  Box,
+  Flex,
+  Spacer,
+  InputGroup,
+  InputLeftAddon,
+  Input,
   Heading,
   Link,
 } from "@chakra-ui/react";
 
-function SiswaTable(props) {
-  const { data } = props;
+// MAIN COMPONENT
+function SiswaTable({ data }) {
+  console.log(data);
   const router = useRouter();
-  if (!data) return <h1>Waiting</h1>;
-  if (data) {
-    return (
-      <>
-        <CardWrapper>
-          <Heading fontSize="xl" mb="4" textAlign="center">
-            Daftar Siswa
-          </Heading>
+  // DATA YANG DITAMPILKAN DI TABLE
+  const newData = data.map((siswaData, i) => {
+    return {
+      no: i + 1,
+      nama: siswaData.nama,
+      nis: siswaData.nis,
+      classroom: siswaData.classroom,
+      tanggalLahir: (
+        <Moment format="DD MMM YYYY">{siswaData.tanggal_lahir}</Moment>
+      ),
+      tahunMasuk: siswaData.tahun_masuk,
+      tahunKeluar: siswaData.tahun_keluar,
+      detail: (
+        <NextLink href={`${router.pathname}/${siswaData.id}`}>
+          <Link color="teal.500" fontWeight="medium">
+            Detail
+          </Link>
+        </NextLink>
+      ),
+    };
+  });
+  const rowsData = useMemo(() => newData, [data]);
+  const columns = useMemo(
+    () => [
+      { Header: "No", accessor: "no" },
+      { Header: "Nama", accessor: "nama" },
+      { Header: "NIS", accessor: "nis" },
+      { Header: "Kelas", accessor: "classroom" },
+      { Header: "Tanggal Lahir", accessor: "tanggalLahir" },
+      { Header: "Tahun Masuk", accessor: "tahunMasuk" },
+      { Header: "Tahun Keluar", accessor: "tahunKeluar" },
+      { Header: "Detail", accessor: "detail" },
+    ],
+    []
+  );
 
-          <Table variant="simple" size="sm">
-            <TableCaption>Daftar Siswa</TableCaption>
-            <Thead bgColor="gray.100">
-              <Tr>
-                <Th py="4">No</Th>
-                <Th py="4">Nama</Th>
-                <Th py="4">NIS</Th>
-                <Th py="4">Kelas</Th>
-                <Th py="4">Tanggal Lahir</Th>
-                <Th py="4" isNumeric>
-                  Tahun Masuk
-                </Th>
-                <Th py="4">Detail</Th>
+  // INISIALISASI REACT-TABLE
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    state,
+    preGlobalFilteredRows,
+    setGlobalFilter,
+  } = useTable(
+    { columns: columns, data: rowsData },
+    useGlobalFilter,
+    useSortBy
+  );
+
+  return (
+    <>
+      <CardWrapper>
+        <Flex align="center">
+          <Heading fontSize="xl" mb="4" textAlign="center">
+            Daftar Pelanggaran
+          </Heading>
+          <Spacer />
+
+          {/* Search */}
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={state.globalFilter}
+            setGlobalFilter={setGlobalFilter}
+          />
+        </Flex>
+
+        {/* TEST */}
+        <Table {...getTableProps()} size="sm" variant="simple">
+          <Thead>
+            {headerGroups.map((headerGroup) => (
+              <Tr {...headerGroup.getHeaderGroupProps()} bgColor="gray.100">
+                {headerGroup.headers.map((column) => (
+                  <Th
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    py="4"
+                  >
+                    {column.render("Header")}
+                    {/* Sorting indikator */}
+                    <span>
+                      {column.isSorted ? (
+                        column.isSortedDesc ? (
+                          <ChevronDownIcon ml="2" w="4" h="4" />
+                        ) : (
+                          <ChevronUpIcon ml="2" w="4" h="4" />
+                        )
+                      ) : (
+                        ""
+                      )}
+                    </span>
+                  </Th>
+                ))}
               </Tr>
-            </Thead>
-            <Tbody>
-              {data.map((siswa, i) => {
-                const {
-                  id,
-                  nama,
-                  nis,
-                  classroom,
-                  tanggal_lahir,
-                  tahun_masuk,
-                } = siswa;
-                return (
-                  <Tr key={id}>
-                    <Td>{i + 1}</Td>
-                    <Td>{nama}</Td>
-                    <Td>{nis}</Td>
-                    <Td>{classroom}</Td>
-                    <Td>
-                      <Moment format="DD MMM YYYY">{tanggal_lahir}</Moment>
-                    </Td>
-                    <Td isNumeric>{tahun_masuk}</Td>
-                    <Td>
-                      <NextLink href={`${router.pathname}/${id}`}>
-                        <Link color="teal.500" fontWeight="medium">
-                          Detail
-                        </Link>
-                      </NextLink>
-                    </Td>
-                  </Tr>
-                );
-              })}
-            </Tbody>
-          </Table>
-        </CardWrapper>
-      </>
-    );
-  }
+            ))}
+          </Thead>
+
+          <Tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <Tr {...row.getRowProps()}>
+                  {row.cells.map((cell) => (
+                    <Td {...cell.getCellProps()}>{cell.render("Cell")}</Td>
+                  ))}
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+      </CardWrapper>
+    </>
+  );
+}
+
+// COMPONENT UNTUK GLOBAL SEARCH DAN MENAMPILKAN SEARCHBAR
+function GlobalFilter({
+  preGlobalFilteredRows,
+  globalFilter,
+  setGlobalFilter,
+}) {
+  const count = preGlobalFilteredRows.length;
+  const [value, setValue] = useState(globalFilter);
+  const onChange = useAsyncDebounce((value) => {
+    setGlobalFilter(value || undefined);
+  }, 200);
+
+  return (
+    <InputGroup w="40%" textTransform="capitalize" rounded="lg">
+      <InputLeftAddon
+        children={<SearchIcon color="gray.600" />}
+        bgColor="gray.100"
+      />
+      <Input
+        value={value || ""}
+        onChange={(e) => {
+          setValue(e.target.value);
+          onChange(e.target.value);
+        }}
+        placeholder={`Nama, Pelanggaran, atau Status...`}
+        variant="outline"
+        mb="4"
+      />
+    </InputGroup>
+  );
 }
 
 export default SiswaTable;

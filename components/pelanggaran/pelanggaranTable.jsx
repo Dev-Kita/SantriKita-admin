@@ -17,6 +17,8 @@ import {
   Tr,
   Th,
   Td,
+  Flex,
+  Spacer,
   InputGroup,
   InputLeftAddon,
   Input,
@@ -26,7 +28,7 @@ import {
 
 // MAIN COMPONENT
 function PelanggaranTable({ data }) {
-  console.log(data);
+  // console.log(data);
   const router = useRouter();
   // DATA YANG DITAMPILKAN DI TABLE
   const newData = data.map((pelanggaranData, i) => {
@@ -77,16 +79,19 @@ function PelanggaranTable({ data }) {
   return (
     <>
       <CardWrapper>
-        <Heading fontSize="xl" mb="4" textAlign="center">
-          Daftar Pelanggaran
-        </Heading>
+        <Flex align="center">
+          <Heading fontSize="xl" mb="4" textAlign="center">
+            Daftar Pelanggaran
+          </Heading>
+          <Spacer />
 
-        {/* Search */}
-        <GlobalFilter
-          preGlobalFilteredRows={preGlobalFilteredRows}
-          globalFilter={state.globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
+          {/* Search */}
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={state.globalFilter}
+            setGlobalFilter={setGlobalFilter}
+          />
+        </Flex>
 
         {/* TEST */}
         <Table {...getTableProps()} size="sm" variant="simple">
@@ -148,7 +153,7 @@ function GlobalFilter({
   }, 200);
 
   return (
-    <InputGroup w="full" textTransform="capitalize" rounded="lg">
+    <InputGroup w="40%" textTransform="capitalize" rounded="lg">
       <InputLeftAddon
         children={<SearchIcon color="gray.600" />}
         bgColor="gray.100"

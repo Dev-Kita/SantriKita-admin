@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { ChakraProvider, extendTheme, CSSReset } from "@chakra-ui/react";
 import { parseCookies } from "nookies";
+import { QueryClient, QueryClientProvider } from "react-query";
 import Router from "next/router";
 import Head from "next/head";
 
@@ -9,17 +10,20 @@ import { customTheme } from "../components/customStyles/theme";
 import { Fonts } from "../components/customStyles/Font";
 
 const theme = extendTheme(customTheme);
+const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      <ChakraProvider theme={theme}>
-        <Fonts />
-        <CSSReset />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ChakraProvider>
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider theme={theme}>
+          <Fonts />
+          <CSSReset />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ChakraProvider>
+      </QueryClientProvider>
     </>
   );
 }

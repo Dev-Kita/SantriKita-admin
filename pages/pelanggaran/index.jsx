@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import useSWR from "swr";
 import axios from "axios";
 import Head from "next/head";
 import { parseCookies } from "nookies";
+import { useQuery, useQueryClient } from "react-query";
 import Select from "react-select";
-import CardWrapper from "../../components/cardWrapper";
+import SkeletonLoading from "../../components/skeletonLoading";
 import PelanggaranTable from "../../components/pelanggaran/pelanggaranTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
-  VStack,
   Flex,
   Spacer,
   Button,
@@ -24,8 +23,6 @@ import {
   FormLabel,
   Textarea,
   Input,
-  Skeleton,
-  SkeletonText,
   Menu,
   MenuButton,
   MenuList,
@@ -33,40 +30,23 @@ import {
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
-
-// FETCH DATA
-// Function untuk get data API violations
-const fetcher = async (url) => {
-  try {
-    const jwt = parseCookies().jwt;
-
-    const { data } = await axios.get(`${URL}${url}?_sort=tanggal:DESC`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    return { msg: "Query data failed" };
-  }
-};
+const jwt = parseCookies().jwt;
 
 // COMPONENT UTAMA
-function DaftarPelanggaran({ siswa }) {
+function DaftarPelanggaran() {
+  // const queryClient = useQueryClient();
   // DEKLARASI HOOKS DAN VARIABEL
-  const { data, error } = useSWR(`/violations`, fetcher, {
-    refreshInterval: 1000,
-  });
-  const newSiswa = siswa.map((student) => {
-    return { value: student.nama, label: student.nama, id: student.id };
-  });
+  const pelanggaranData = useQuery(
+    ["violations", "?_sort=tanggal:DESC"],
+    pelanggaranFetcher,
+    { refetchInterval: 3000 }
+  );
+  const siswaData = useQuery("students", siswaFetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedName, setSelectedName] = useState(null);
   const [pelanggaran, setPelanggaran] = useState("");
   const [tanggal, setTanggal] = useState("");
-  const [status, setStatus] = useState("");
+  const [statusPelanggaran, setStatusPelanggaran] = useState("");
   const statusList = ["Ringan", "Sedang", "Berat"];
   const [keterangan, setKeterangan] = useState("");
 
@@ -77,7 +57,7 @@ function DaftarPelanggaran({ siswa }) {
         pelanggaran: pelanggaran,
         keterangan: keterangan,
         tanggal: tanggal,
-        status: status,
+        status: statusPelanggaran,
         student: { id: selectedName.id },
       };
       const jwt = parseCookies().jwt;
@@ -87,7 +67,7 @@ function DaftarPelanggaran({ siswa }) {
         },
       });
       setSelectedName(null);
-      setStatus("");
+      setStatusPelanggaran("");
       onClose();
     } catch (error) {
       console.log(error);
@@ -96,32 +76,20 @@ function DaftarPelanggaran({ siswa }) {
 
   // RENDER HALAMAN JSX
   // error handling
-  if (error) console.log(error);
+  if (pelanggaranData.isError) console.log(error);
   // loading state
-  if (!data) {
+  if (pelanggaranData.isLoading) {
     return (
       <>
-        <Head>
-          <title>Daftar Pelanggaran | Santri Kita</title>
-        </Head>
-
-        <Flex mb="4">
-          <Spacer />
-          <Button leftIcon={<AddIcon />} variant="solid" colorScheme="teal">
-            Pelanggaran
-          </Button>
-        </Flex>
-        <CardWrapper>
-          <VStack align="stretch" spacing={2}>
-            <Skeleton height="20px" mb="4" rounded="md" />
-            <SkeletonText mt="4" noOfLines={4} spacing="4" rounded="full" />
-          </VStack>
-        </CardWrapper>
+        <SkeletonLoading
+          title={"Daftar Pelanggaran"}
+          plusButton={"Pelanggaran"}
+        />
       </>
     );
   }
 
-  if (data) {
+  if (pelanggaranData.isSuccess) {
     return (
       <>
         <Head>
@@ -153,7 +121,7 @@ function DaftarPelanggaran({ siswa }) {
                   <Select
                     defaultValue={selectedName}
                     onChange={setSelectedName}
-                    options={newSiswa}
+                    options={siswaData.data}
                     isClearable
                     isSearchable
                   />
@@ -176,13 +144,15 @@ function DaftarPelanggaran({ siswa }) {
                   <FormLabel>Status</FormLabel>
                   <Menu>
                     <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                      {status ? status : "Status"}
+                      {statusPelanggaran ? statusPelanggaran : "Status"}
                     </MenuButton>
                     <MenuList>
                       {statusList.map((statusItem, i) => (
                         <MenuItem
                           key={i}
-                          onClick={(e) => setStatus(e.target.innerHTML)}
+                          onClick={(e) =>
+                            setStatusPelanggaran(e.target.innerHTML)
+                          }
                         >
                           {statusItem}
                         </MenuItem>
@@ -215,29 +185,65 @@ function DaftarPelanggaran({ siswa }) {
         </Modal>
 
         {/* TABEL PELANGGARAN */}
-        <PelanggaranTable data={data} />
+        <PelanggaranTable data={pelanggaranData.data} />
       </>
     );
   }
 }
 
-
-// FETCH DATA SISWA UNTUK OPSI SISWA YANG MELAKUKAN PELANGGARAN
-export async function getServerSideProps(context) {
+// FETCH DATA
+// Function untuk get data API pelanggaran
+const pelanggaranFetcher = async ({ queryKey }) => {
   try {
-    const jwt = parseCookies(context).jwt;
+    // Define data tabel / collection yang akan di query
+    const collection = queryKey[0];
+    // Define API endpoint
+    let endpoint = `${URL}/${collection}`;
+    // Define endpoint jika ada parameter lain (sorting, filter, dll)
+    if (queryKey[1]) {
+      const params = queryKey[1];
+      endpoint = `${URL}/${collection}${params}`;
+    }
 
-    const { data } = await axios.get(`${URL}/students`, {
+    const { data } = await axios.get(endpoint, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
     });
 
-    return { props: { siswa: data } };
+    return data;
   } catch (error) {
     console.log(error);
     return { msg: "Query data failed" };
   }
-}
+};
+
+// Function untuk get data API daftar siswa
+const siswaFetcher = async ({ queryKey }) => {
+  try {
+    // Define data tabel / collection yang akan di query
+    const collection = queryKey[0];
+    // Define API endpoint
+    let endpoint = `${URL}/${collection}`;
+    // Define endpoint jika ada parameter lain (sorting, filter, dll)
+    if (queryKey[1]) {
+      const params = queryKey[1];
+      endpoint = `${URL}/${collection}${params}`;
+    }
+
+    const { data } = await axios.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    const newSiswa = data.map((student) => {
+      return { value: student.nama, label: student.nama, id: student.id };
+    });
+    return newSiswa;
+  } catch (error) {
+    console.log(error);
+    return { msg: "Query data failed" };
+  }
+};
 
 export default DaftarPelanggaran;
