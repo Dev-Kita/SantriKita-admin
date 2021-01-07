@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from "react";
 import NextLink from "next/link";
-import Moment from "react-moment";
 import {
   useTable,
   useSortBy,
@@ -27,16 +26,19 @@ import {
 } from "@chakra-ui/react";
 
 // MAIN COMPONENT
-function KelasTable({ data }) {
+function PrestasiTable({ data }) {
   const router = useRouter();
   // DATA YANG DITAMPILKAN DI TABLE
-  const newData = data.map((kelasData, i) => {
+  const newData = data.map((prestasiData, i) => {
     return {
       no: i + 1,
-      kelas: kelasData.kelas,
-      pembimbing: kelasData.pembimbing,
+      nama: prestasiData.student.nama,
+      lomba: prestasiData.kegiatan_lomba,
+      prestasi: prestasiData.prestasi,
+      lingkup: prestasiData.lingkup,
+      tahun: prestasiData.tahun,
       detail:
-        // <NextLink href={`${router.pathname}/${kelasData.id}`}>
+        // <NextLink href={`${router.pathname}/${prestasiData.id}`}>
         //   <Link color="teal.500" fontWeight="medium">
         //     Detail
         //   </Link>
@@ -48,8 +50,11 @@ function KelasTable({ data }) {
   const columns = useMemo(
     () => [
       { Header: "No", accessor: "no" },
-      { Header: "Kelas", accessor: "kelas" },
-      { Header: "Pembimbing", accessor: "pembimbing" },
+      { Header: "Nama", accessor: "nama" },
+      { Header: "Kegiatan / Lomba", accessor: "lomba" },
+      { Header: "Prestasi", accessor: "prestasi" },
+      { Header: "Lingkup", accessor: "lingkup" },
+      { Header: "Tahun", accessor: "tahun" },
       { Header: "Detail", accessor: "detail" },
     ],
     []
@@ -76,7 +81,7 @@ function KelasTable({ data }) {
       <CardWrapper>
         <Flex align="center">
           <Heading fontSize="xl" mb="4" textAlign="center">
-            Daftar Kelas
+            Daftar Prestasi
           </Heading>
           <Spacer />
 
@@ -159,7 +164,7 @@ function GlobalFilter({
           setValue(e.target.value);
           onChange(e.target.value);
         }}
-        placeholder={`Kelas atau Pembimbing...`}
+        placeholder={`Nama, Lomba, atau Prestasi...`}
         variant="outline"
         mb="4"
       />
@@ -167,4 +172,4 @@ function GlobalFilter({
   );
 }
 
-export default KelasTable;
+export default PrestasiTable;

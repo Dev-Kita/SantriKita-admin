@@ -76,7 +76,7 @@ function DaftarKelas() {
             variant="solid"
             colorScheme="teal"
           >
-            Siswa
+            Kelas
           </Button>
         </Flex>
 

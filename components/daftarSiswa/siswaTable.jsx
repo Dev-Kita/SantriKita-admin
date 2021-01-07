@@ -87,7 +87,7 @@ function SiswaTable({ data }) {
       <CardWrapper>
         <Flex align="center">
           <Heading fontSize="xl" mb="4" textAlign="center">
-            Daftar Kelas
+            Daftar Siswa
           </Heading>
           <Spacer />
 
