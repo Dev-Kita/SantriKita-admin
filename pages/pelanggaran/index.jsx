@@ -60,7 +60,6 @@ function DaftarPelanggaran() {
         status: statusPelanggaran,
         student: { id: selectedName.id },
       };
-      const jwt = parseCookies().jwt;
       const { data } = await axios.post(`${URL}/violations`, newPelanggaran, {
         headers: {
           Authorization: `Bearer ${jwt}`,

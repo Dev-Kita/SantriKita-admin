@@ -4,6 +4,7 @@ import { parseCookies } from "nookies";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Router from "next/router";
 import Head from "next/head";
+import { endpoint } from "../utils/gql";
 
 import Layout from "../components/layout";
 import { customTheme } from "../components/customStyles/theme";

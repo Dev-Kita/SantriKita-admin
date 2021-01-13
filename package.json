@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@apollo/client": "^3.3.6",
     "@chakra-ui/icons": "^1.0.2",
     "@chakra-ui/react": "^1.1.0",
     "@emotion/react": "^11.1.4",
@@ -16,6 +17,8 @@
     "clsx": "^1.1.1",
     "emotion-theming": "^11.0.0",
     "framer-motion": "^3.1.1",
+    "graphql": "^15.4.0",
+    "graphql-request": "^3.4.0",
     "moment": "^2.29.1",
     "next": "10.0.4",
     "nookies": "^2.5.0",
