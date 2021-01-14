@@ -26,14 +26,14 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
-import { client } from "../../utils/gql";
+import { gqlClient } from "../_app";
 import { ALL_BIAYA, ADD_BIAYA } from "../../utils/biayaQuery";
 
 const useBiayaQuery = () => {
   return useQuery(
     "bills",
     async () => {
-      const data = await client.request(ALL_BIAYA);
+      const data = await gqlClient.request(ALL_BIAYA);
       return data;
     },
     { refetchInterval: 3000 }

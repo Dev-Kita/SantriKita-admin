@@ -12,7 +12,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <Heading>Welcome to Santri Kita</Heading>
+        <Heading>Welcome to Santri Kita Admin</Heading>
 
         <Text fontSize="xl" mt="4">
           <NextLink href="/login">

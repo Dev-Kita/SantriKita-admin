@@ -4,14 +4,31 @@ import { parseCookies } from "nookies";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Router from "next/router";
 import Head from "next/head";
-import { endpoint } from "../utils/gql";
+// import { endpoint } from "../utils/gql";
+import { GraphQLClient } from "graphql-request";
 
 import Layout from "../components/layout";
 import { customTheme } from "../components/customStyles/theme";
 import { Fonts } from "../components/customStyles/Font";
 
+// INIT GRAPHQL
+export const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/graphql`;
+export const jwt = parseCookies().jwt;
+
+// ChakraUI Custom Config
 const theme = extendTheme(customTheme);
+// react-query & graphql-request init
 const queryClient = new QueryClient();
+export const gqlClient = new GraphQLClient(
+  endpoint,
+  jwt
+    ? {
+        headers: {
+          authorization: `Bearer ${jwt}`,
+        },
+      }
+    : undefined
+);
 
 function MyApp({ Component, pageProps }) {
   return (
