@@ -42,7 +42,6 @@ const useBiayaQuery = () => {
 
 function Biaya() {
   const biayaData = useBiayaQuery();
-  console.table(biayaData.data.bills);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedName, setSelectedName] = useState("");
   const [tahun, setTahun] = useState(null);
@@ -89,6 +88,7 @@ function Biaya() {
         id: student.id,
       };
     });
+    // console.table(biayaData.data.bills);
 
     return (
       <>

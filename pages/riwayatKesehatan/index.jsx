@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";
-import Head from "next/head";
-import { parseCookies } from "nookies";
 import { useQuery, useQueryClient } from "react-query";
-import Select from "react-select";
+import Head from "next/head";
 import SkeletonLoading from "../../components/skeletonLoading";
-import PelanggaranTable from "../../components/pelanggaran/pelanggaranTable";
-import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
+import BiayaTable from "../../components/biaya/biayaTable.jsx";
+import { AddIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import Select from "react-select";
 import {
   Flex,
   Spacer,
@@ -28,72 +26,74 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
+import { client } from "../../utils/gql";
+import { ADD_KESEHATAN, ALL_KESEHATAN } from "../../utils/kesehatanQuery";
 
-const URL = process.env.NEXT_PUBLIC_API_URL;
-const jwt = parseCookies().jwt;
-
-// COMPONENT UTAMA
-function DaftarPrestasi() {
-  // const queryClient = useQueryClient();
-  // DEKLARASI HOOKS DAN VARIABEL
-  const pelanggaranData = useQuery(
-    ["violations", "?_sort=tanggal:DESC"],
-    pelanggaranFetcher,
+const useKesehatanQuery = () => {
+  return useQuery(
+    "medicalHistories",
+    async () => {
+      const data = await client.request(ALL_KESEHATAN);
+      return data;
+    },
     { refetchInterval: 3000 }
   );
-  const siswaData = useQuery("students", siswaFetcher);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedName, setSelectedName] = useState(null);
-  const [pelanggaran, setPelanggaran] = useState("");
-  const [tanggal, setTanggal] = useState("");
-  const [statusPelanggaran, setStatusPelanggaran] = useState("");
-  const statusList = ["Ringan", "Sedang", "Berat"];
-  const [keterangan, setKeterangan] = useState("");
+};
 
-  // EVENT HANDLER FUNCTION
-  const tambahPelanggaranHadler = async () => {
-    try {
-      const newPelanggaran = {
-        pelanggaran: pelanggaran,
-        keterangan: keterangan,
-        tanggal: tanggal,
-        status: statusPelanggaran,
-        student: { id: selectedName.id },
-      };
-      const jwt = parseCookies().jwt;
-      const { data } = await axios.post(`${URL}/violations`, newPelanggaran, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      setSelectedName(null);
-      setStatusPelanggaran("");
-      onClose();
-    } catch (error) {
-      console.log(error);
-    }
+function Biaya() {
+  const medicalData = useKesehatanQuery();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedName, setSelectedName] = useState("");
+  const [tahun, setTahun] = useState(null);
+  const [semester, setSemester] = useState(null);
+  const [keperluan, setKeperluan] = useState("");
+  const [nominal, setNominal] = useState(null);
+  const [nominalDibayar, setNominalDibayar] = useState(null);
+  const [tanggal, setTanggal] = useState("");
+  const [status, setStatus] = useState("");
+  const statusList = ["Lunas", "Belum Lunas"];
+
+  const tambahBiayaHandler = async () => {
+    const variables = {
+      student: selectedName.id,
+      Keperluan: keperluan,
+      semester: Number(semester),
+      tahun: Number(tahun),
+      nominal: Number(nominal),
+      nominal_dibayar: Number(nominalDibayar),
+      tanggal: tanggal,
+      status: status,
+    };
+
+    const res = await client.request(ADD_BIAYA, variables);
+    onClose();
   };
 
-  // RENDER HALAMAN JSX
   // error handling
-  if (pelanggaranData.isError) console.log(error);
+  if (medicalData.isError) console.log("error");
   // loading state
-  if (pelanggaranData.isLoading) {
+  if (medicalData.isLoading) {
     return (
       <>
-        <SkeletonLoading
-          title={"Daftar Pelanggaran"}
-          plusButton={"Pelanggaran"}
-        />
+        <SkeletonLoading title={"Daftar Biaya"} plusButton={"Biaya"} />
       </>
     );
   }
 
-  if (pelanggaranData.isSuccess) {
+  if (medicalData.isSuccess) {
+    const newSiswa = medicalData.data.students.map((student) => {
+      return {
+        value: student.nama,
+        label: `${student.nama} (${student.kelas.kelas})`,
+        id: student.id,
+      };
+    });
+    console.table(medicalData.data.medicalHistories);
+
     return (
       <>
         <Head>
-          <title>Daftar Pelanggaran | Santri Kita</title>
+          <title>Daftar Biaya | Santri Kita</title>
         </Head>
 
         <Flex mb="4">
@@ -104,7 +104,7 @@ function DaftarPrestasi() {
             variant="solid"
             colorScheme="teal"
           >
-            Pelanggaran
+            Biaya
           </Button>
         </Flex>
 
@@ -112,7 +112,7 @@ function DaftarPrestasi() {
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Tambah Pelanggaran</ModalHeader>
+            <ModalHeader>Tambah Pembayaran</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <form>
@@ -121,16 +121,48 @@ function DaftarPrestasi() {
                   <Select
                     defaultValue={selectedName}
                     onChange={setSelectedName}
-                    options={siswaData.data}
+                    options={newSiswa}
                     isClearable
                     isSearchable
                   />
                 </FormControl>
                 <FormControl isRequired>
-                  <FormLabel>Pelanggaran</FormLabel>
+                  <FormLabel>Keperluan</FormLabel>
                   <Input
-                    placeholder="Pelanggaran"
-                    onChange={(e) => setPelanggaran(e.target.value)}
+                    placeholder="Keperluan"
+                    onChange={(e) => setKeperluan(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Semester</FormLabel>
+                  <Input
+                    placeholder="Semester"
+                    type="number"
+                    onChange={(e) => setSemester(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Tahun</FormLabel>
+                  <Input
+                    placeholder="Tahun"
+                    type="number"
+                    onChange={(e) => setTahun(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Biaya</FormLabel>
+                  <Input
+                    placeholder="Biaya Bulanan"
+                    type="number"
+                    onChange={(e) => setNominal(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Nominal Dibayar</FormLabel>
+                  <Input
+                    placeholder="Nominal Dibayar"
+                    type="numeber"
+                    onChange={(e) => setNominalDibayar(e.target.value)}
                   />
                 </FormControl>
                 <FormControl isRequired>
@@ -140,19 +172,18 @@ function DaftarPrestasi() {
                     onChange={(e) => setTanggal(e.target.value)}
                   />
                 </FormControl>
+
                 <FormControl isRequired>
                   <FormLabel>Status</FormLabel>
                   <Menu>
                     <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                      {statusPelanggaran ? statusPelanggaran : "Status"}
+                      {status ? status : "Status"}
                     </MenuButton>
                     <MenuList>
                       {statusList.map((statusItem, i) => (
                         <MenuItem
                           key={i}
-                          onClick={(e) =>
-                            setStatusPelanggaran(e.target.innerHTML)
-                          }
+                          onClick={(e) => setStatus(e.target.innerHTML)}
                         >
                           {statusItem}
                         </MenuItem>
@@ -160,23 +191,11 @@ function DaftarPrestasi() {
                     </MenuList>
                   </Menu>
                 </FormControl>
-
-                <FormControl>
-                  <FormLabel>Keterangan</FormLabel>
-                  <Textarea
-                    placeholder="Keterangan"
-                    onChange={(e) => setKeterangan(e.target.value)}
-                  />
-                </FormControl>
               </form>
             </ModalBody>
 
             <ModalFooter>
-              <Button
-                colorScheme="teal"
-                mr={3}
-                onClick={tambahPelanggaranHadler}
-              >
+              <Button colorScheme="teal" mr={3} onClick={tambahBiayaHandler}>
                 Simpan
               </Button>
               <Button onClick={onClose}>Batal</Button>
@@ -184,70 +203,10 @@ function DaftarPrestasi() {
           </ModalContent>
         </Modal>
 
-        {/* TABEL PELANGGARAN */}
-        <PelanggaranTable data={pelanggaranData.data} />
+        {/* <BiayaTable data={medicalData.data.bills} /> */}
       </>
     );
   }
 }
 
-// FETCH DATA
-// Function untuk get data API pelanggaran
-const pelanggaranFetcher = async ({ queryKey }) => {
-  try {
-    // Define data tabel / collection yang akan di query
-    const collection = queryKey[0];
-    // Define API endpoint
-    let endpoint = `${URL}/${collection}`;
-    // Define endpoint jika ada parameter lain (sorting, filter, dll)
-    if (queryKey[1]) {
-      const params = queryKey[1];
-      endpoint = `${URL}/${collection}${params}`;
-    }
-
-    const { data } = await axios.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    return { msg: "Query data failed" };
-  }
-};
-
-// Function untuk get data API daftar siswa
-const siswaFetcher = async ({ queryKey }) => {
-  try {
-    // Define data tabel / collection yang akan di query
-    const collection = queryKey[0];
-    // Define API endpoint
-    let endpoint = `${URL}/${collection}`;
-    // Define endpoint jika ada parameter lain (sorting, filter, dll)
-    if (queryKey[1]) {
-      const params = queryKey[1];
-      endpoint = `${URL}/${collection}${params}`;
-    }
-
-    const { data } = await axios.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    const newSiswa = data.map((student) => {
-      return {
-        value: student.nama,
-        label: `${student.nama} (${student.kelas.kelas})`,
-        id: student.id,
-      };
-    });
-    return newSiswa;
-  } catch (error) {
-    console.log(error);
-    return { msg: "Query data failed" };
-  }
-};
-
-export default DaftarPrestasi;
+export default Biaya;
