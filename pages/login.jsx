@@ -20,6 +20,8 @@ import {
   AlertIcon,
   Spinner,
 } from "@chakra-ui/react";
+import { LOGIN } from "../utils/loginQuery";
+import { gqlClient } from "./_app";
 
 const url = process.env.NEXT_PUBLIC_API_URL;
 
@@ -40,10 +42,12 @@ function Login() {
       e.preventDefault();
       setAuth(true);
       setIsLoading(true);
-      const loginInfo = { identifier: username, password: password };
+      const variables = { identifier: username, password: password };
 
-      const login = await axios.post(`${url}/auth/local`, loginInfo);
-      const loginResponse = login.data;
+      // const res = await gqlClient.request(LOGIN, variables);
+      // console.log(res);
+      const res = await axios.post(`${url}/auth/local`, variables);
+      const loginResponse = res.data;
 
       setCookie(null, "jwt", loginResponse.jwt, {
         maxAge: 10 * 60 * 60,
@@ -58,6 +62,7 @@ function Login() {
 
       router.push("/dashboard");
     } catch (error) {
+      console.log(error);
       setAuth(false);
       setIsLoading(false);
     }

@@ -1,11 +1,10 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
-import Moment from "react-moment";
-import { useQuery, useQueryClient } from "react-query";
-import Router, { useRouter } from "next/router";
+import { parseCookies } from "nookies";
+import { useRouter } from "next/router";
 import Head from "next/head";
-import CardWrapper from "../../components/cardWrapper";
 import HapusBiayaAlert from "../../components/biaya/hapusBiayaAlert";
+import CardWrapper from "../../components/cardWrapper";
 import SkeletonLoading from "../../components/skeletonLoading";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
@@ -14,27 +13,20 @@ import {
   ButtonGroup,
   Flex,
   Spacer,
-  InputLeftAddon,
-  InputGroup,
   Heading,
   FormControl,
   FormLabel,
+  InputGroup,
+  InputLeftAddon,
   Input,
   Button,
 } from "@chakra-ui/react";
-import { client } from "../../utils/gql";
-import { DETAIL_BIAYA, DELETE_BIAYA } from "../../utils/biayaQuery";
 
-const useDetailBiayaQuery = () => {
-  return useQuery("bill", async () => {
-    const variables = { studentID: Router.router.query.id };
-    const data = await client.request(DETAIL_BIAYA, variables);
-    return data;
-  });
-};
+const URL = process.env.NEXT_PUBLIC_API_URL;
 
-function DetailPembayaran() {
-  const biayaDetail = useDetailBiayaQuery();
+function DetailBiaya({ biaya }) {
+  console.log(biaya);
+  const router = useRouter();
   const [openAlert, setOpenAlert] = useState(false);
   const onClose = () => setOpenAlert(false);
   const cancelRef = useRef();
@@ -42,15 +34,18 @@ function DetailPembayaran() {
   // EVENT HANDLER FUNCTION
   // Function untuk meng-Handle hapus data pelanggaran
   const deleteHandler = async () => {
-    const variables = { studentID: Router.router.query.id };
-    const res = await client.request(DELETE_BIAYA, variables);
-    Router.router.replace("/biaya");
+    const jwt = parseCookies().jwt;
+    // Delete data dari DB
+    const { data } = await axios.delete(`${URL}/bills/${router.query.id}`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    router.replace("/biaya");
   };
 
-  // error handling
-  if (biayaDetail.isError) console.log("error");
   // loading state
-  if (biayaDetail.isLoading) {
+  if (!biaya) {
     return (
       <>
         <SkeletonLoading title={"Detail Biaya"} />
@@ -58,7 +53,7 @@ function DetailPembayaran() {
     );
   }
 
-  if (biayaDetail.isSuccess) {
+  if (biaya) {
     return (
       <>
         <Head>
@@ -103,7 +98,7 @@ function DetailPembayaran() {
               <FormLabel>Nama</FormLabel>
               <Input
                 type="text"
-                value={`${biayaDetail.data.bill.student.nama} (${biayaDetail.data.bill.student.kelas.kelas})`}
+                value={`${biaya.student.nama} (${biaya.student.kelas.kelas})`}
                 isReadOnly
               />
             </FormControl>
@@ -111,49 +106,29 @@ function DetailPembayaran() {
             <HStack w="full" gridGap="4">
               <FormControl id="semester">
                 <FormLabel>Semester</FormLabel>
-                <Input
-                  type="text"
-                  value={biayaDetail.data.bill.semester}
-                  isReadOnly
-                />
+                <Input type="text" value={biaya.semester} isReadOnly />
               </FormControl>
               <FormControl id="tahun">
                 <FormLabel>Tahun</FormLabel>
-                <Input
-                  type="text"
-                  value={biayaDetail.data.bill.tahun}
-                  isReadOnly
-                />
+                <Input type="text" value={biaya.tahun} isReadOnly />
               </FormControl>
             </HStack>
 
             <FormControl id="keperluan">
               <FormLabel>Keperluan</FormLabel>
-              <Input
-                type="text"
-                value={biayaDetail.data.bill.Keperluan}
-                isReadOnly
-              />
+              <Input type="text" value={biaya.Keperluan} isReadOnly />
             </FormControl>
 
             <FormControl id="tanggal">
               <FormLabel>Tanggal</FormLabel>
 
-              <Input
-                type="text"
-                value={biayaDetail.data.bill.tanggal_pembayaran}
-                isReadOnly
-              />
+              <Input type="text" value={biaya.tanggal_pembayaran} isReadOnly />
             </FormControl>
             <FormControl id="nominal">
               <FormLabel>Nominal</FormLabel>
               <InputGroup>
                 <InputLeftAddon children="Rp" />
-                <Input
-                  type="text"
-                  value={biayaDetail.data.bill.nominal}
-                  isReadOnly
-                />
+                <Input type="text" value={biaya.nominal} isReadOnly />
               </InputGroup>
             </FormControl>
 
@@ -161,21 +136,13 @@ function DetailPembayaran() {
               <FormLabel>Nominal Dibayarkan</FormLabel>
               <InputGroup>
                 <InputLeftAddon children="Rp" />
-                <Input
-                  type="text"
-                  value={biayaDetail.data.bill.nominal_dibayar}
-                  isReadOnly
-                />
+                <Input type="text" value={biaya.nominal_dibayar} isReadOnly />
               </InputGroup>
             </FormControl>
 
             <FormControl id="status">
               <FormLabel>Status</FormLabel>
-              <Input
-                type="text"
-                value={biayaDetail.data.bill.status}
-                isReadOnly
-              />
+              <Input type="text" value={biaya.status} isReadOnly />
             </FormControl>
           </VStack>
         </CardWrapper>
@@ -184,16 +151,16 @@ function DetailPembayaran() {
   }
 }
 
-// export async function getServerSideProps(context) {
-//   const jwt = parseCookies(context).jwt;
-//   const { data } = await axios.get(`${URL}/violations/${context.params.id}`, {
-//     headers: {
-//       Authorization: `Bearer ${jwt}`,
-//     },
-//   });
-//   return {
-//     props: { pelanggaran: data },
-//   };
-// }
+export async function getServerSideProps(context) {
+  const jwt = parseCookies(context).jwt;
+  const biayaData = await axios.get(`${URL}/bills/${context.params.id}`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
+  return {
+    props: { biaya: biayaData.data },
+  };
+}
 
-export default DetailPembayaran;
+export default DetailBiaya;

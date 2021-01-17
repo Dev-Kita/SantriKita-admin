@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, createContext } from "react";
 import { ChakraProvider, extendTheme, CSSReset } from "@chakra-ui/react";
 import { parseCookies } from "nookies";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -19,7 +19,7 @@ export const jwt = parseCookies().jwt;
 const theme = extendTheme(customTheme);
 // react-query & graphql-request init
 const queryClient = new QueryClient();
-export const gqlClient = new GraphQLClient(
+export const gqlConnect = new GraphQLClient(
   endpoint,
   jwt
     ? {
@@ -30,6 +30,8 @@ export const gqlClient = new GraphQLClient(
     : undefined
 );
 
+export const GqlClient = createContext();
+
 function MyApp({ Component, pageProps }) {
   return (
     <>
@@ -38,7 +40,7 @@ function MyApp({ Component, pageProps }) {
           <Fonts />
           <CSSReset />
           <Layout>
-            <Component {...pageProps} />
+            <Component {...pageProps} gqlClient={gqlConnect} />
           </Layout>
         </ChakraProvider>
       </QueryClientProvider>

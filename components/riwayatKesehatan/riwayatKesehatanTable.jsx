@@ -27,32 +27,32 @@ import {
 } from "@chakra-ui/react";
 
 // MAIN COMPONENT
-function BiayaTable({ data }) {
+function RiwayatKesehatanTable({ data }) {
   // console.log(data);
   const router = useRouter();
   // DATA YANG DITAMPILKAN DI TABLE
-  const newData = data.map((biayaData, i) => {
+  const newData = data.map((riwayatKesehatanData, i) => {
     return {
       no: i + 1,
-      nama: biayaData.student.nama,
-      keperluan: biayaData.Keperluan,
+      nama: riwayatKesehatanData.student.nama,
+      penyakit: riwayatKesehatanData.penyakit,
+      jenis: riwayatKesehatanData.jenis,
       tanggal: (
-        <Moment format="DD MMM YYYY">{biayaData.tanggal_pembayaran}</Moment>
+        <Moment format="DD MMM YYYY">
+          {riwayatKesehatanData.tanggal_pembayaran}
+        </Moment>
       ),
-      nominal: `Rp ${biayaData.nominal}`,
-      status: biayaData.status,
-      semester: biayaData.semester,
-      detail: (
-        <NextLink
-          href={{
-            pathname: `${router.pathname}/${biayaData.id}`,
-          }}
-        >
-          <Link color="teal.500" fontWeight="medium">
-            Detail
-          </Link>
-        </NextLink>
-      ),
+      status: riwayatKesehatanData.status ? "Sembuh" : "Belum Sembuh",
+      detail:
+        // <NextLink
+        //   href={{
+        //     pathname: `${router.pathname}/${riwayatKesehatanData.id}`,
+        //   }}
+        // >
+        // <Link color="teal.500" fontWeight="medium">
+        "Detail",
+      // </Link>
+      // </NextLink>
     };
   });
   const rowsData = useMemo(() => newData, [data]);
@@ -60,11 +60,10 @@ function BiayaTable({ data }) {
     () => [
       { Header: "No", accessor: "no" },
       { Header: "Nama", accessor: "nama" },
-      { Header: "Keperluan", accessor: "keperluan" },
+      { Header: "Penyakit", accessor: "penyakit" },
+      { Header: "Jenis", accessor: "jenis" },
       { Header: "Tanggal", accessor: "tanggal" },
-      { Header: "Nominal", accessor: "nominal" },
       { Header: "Status", accessor: "status" },
-      { Header: "Semester", accessor: "semester" },
       { Header: "Detail", accessor: "detail" },
     ],
     []
@@ -91,7 +90,7 @@ function BiayaTable({ data }) {
       <CardWrapper>
         <Flex align="center">
           <Heading fontSize="xl" mb="4" textAlign="center">
-            Daftar Pelanggaran
+            Riwayat Kesehatan
           </Heading>
           <Spacer />
 
@@ -174,7 +173,7 @@ function GlobalFilter({
           setValue(e.target.value);
           onChange(e.target.value);
         }}
-        placeholder={`Nama, Keperluan, atau Status...`}
+        placeholder={`Nama, Penyakit, atau Status...`}
         variant="outline"
         mb="4"
       />
@@ -182,4 +181,4 @@ function GlobalFilter({
   );
 }
 
-export default BiayaTable;
+export default RiwayatKesehatanTable;

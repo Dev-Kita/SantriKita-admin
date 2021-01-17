@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { useQuery, useQueryClient } from "react-query";
+import axios from "axios";
 import Head from "next/head";
-import SkeletonLoading from "../../components/skeletonLoading";
-import BiayaTable from "../../components/biaya/biayaTable.jsx";
-import { AddIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
+import { parseCookies } from "nookies";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import Select from "react-select";
+import SkeletonLoading from "../../components/skeletonLoading";
+import RiwayatKesehatanTable from "../../components/riwayatKesehatan/riwayatKesehatanTable";
+import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
   Flex,
   Spacer,
@@ -26,74 +29,85 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
-import { client } from "../../utils/gql";
-import { ADD_KESEHATAN, ALL_KESEHATAN } from "../../utils/kesehatanQuery";
 
-const useKesehatanQuery = () => {
-  return useQuery(
-    "medicalHistories",
-    async () => {
-      const data = await client.request(ALL_KESEHATAN);
-      return data;
-    },
-    { refetchInterval: 3000 }
-  );
-};
+const URL = process.env.NEXT_PUBLIC_API_URL;
+const jwt = parseCookies().jwt;
 
-function Biaya() {
-  const medicalData = useKesehatanQuery();
+function RiwayatKesehatan() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const riwayatKesehatanData = useQuery(["medical-histories"], fetcher, {
+    refetchInterval: 3000,
+  });
+  const siswaData = useQuery("students", fetcher);
+  console.log(riwayatKesehatanData);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedName, setSelectedName] = useState("");
-  const [tahun, setTahun] = useState(null);
-  const [semester, setSemester] = useState(null);
-  const [keperluan, setKeperluan] = useState("");
-  const [nominal, setNominal] = useState(null);
-  const [nominalDibayar, setNominalDibayar] = useState(null);
+  const [penyakit, setPenyakit] = useState("null");
+  const [jenis, setJenis] = useState("");
+  const [keterangan, setKeterangan] = useState("");
   const [tanggal, setTanggal] = useState("");
   const [status, setStatus] = useState("");
-  const statusList = ["Lunas", "Belum Lunas"];
+  const jenisList = ["Umum", "Parah", "Bawaan"];
+  const statusList = ["Sembuh", "Belum Sembuh"];
 
-  const tambahBiayaHandler = async () => {
-    const variables = {
-      student: selectedName.id,
-      Keperluan: keperluan,
-      semester: Number(semester),
-      tahun: Number(tahun),
-      nominal: Number(nominal),
-      nominal_dibayar: Number(nominalDibayar),
+  const billMutation = useMutation((newMedicalHistory) =>
+    axios.post(`${URL}/medical-histories`, newMedicalHistory, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+
+  const tambahBiayaHandler = () => {
+    billMutation.mutate({
+      penyakit: penyakit,
+      jenis: jenis,
+      status: status === "Sembuh" ? true : false,
       tanggal: tanggal,
-      status: status,
-    };
-
-    const res = await client.request(ADD_BIAYA, variables);
+      keterangan: keterangan,
+      student: { id: selectedName.id },
+    });
+    setSelectedName(null);
+    setStatus("");
+    setJenis("");
     onClose();
   };
 
   // error handling
-  if (medicalData.isError) console.log("error");
+  if (riwayatKesehatanData.isError) {
+    console.log(riwayatKesehatanData.error);
+    return (
+      <Flex justify="center" direction="row">
+        <Button
+          mt="8"
+          mx="auto"
+          onClick={() => router.reload()}
+          variant="solid"
+          colorScheme="teal"
+        >
+          Reload
+        </Button>
+      </Flex>
+    );
+  }
   // loading state
-  if (medicalData.isLoading) {
+  if (riwayatKesehatanData.isLoading) {
     return (
       <>
-        <SkeletonLoading title={"Daftar Biaya"} plusButton={"Biaya"} />
+        <SkeletonLoading
+          title={"Riwayat Kesehatan"}
+          plusButton={"Riwayat Kesehatan"}
+        />
       </>
     );
   }
 
-  if (medicalData.isSuccess) {
-    const newSiswa = medicalData.data.students.map((student) => {
-      return {
-        value: student.nama,
-        label: `${student.nama} (${student.kelas.kelas})`,
-        id: student.id,
-      };
-    });
-    console.table(medicalData.data.medicalHistories);
-
+  if (riwayatKesehatanData.isSuccess) {
     return (
       <>
         <Head>
-          <title>Daftar Biaya | Santri Kita</title>
+          <title>Riwayat Kesehatan | Santri Kita</title>
         </Head>
 
         <Flex mb="4">
@@ -104,7 +118,7 @@ function Biaya() {
             variant="solid"
             colorScheme="teal"
           >
-            Biaya
+            Riwayat Kesehatan
           </Button>
         </Flex>
 
@@ -112,59 +126,49 @@ function Biaya() {
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Tambah Pembayaran</ModalHeader>
+            <ModalHeader>Tambah Riwayat Kesehatan</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <form>
+                {/* Siswa */}
                 <FormControl isRequired>
                   <FormLabel>Siswa</FormLabel>
                   <Select
                     defaultValue={selectedName}
                     onChange={setSelectedName}
-                    options={newSiswa}
+                    options={siswaData.data}
                     isClearable
                     isSearchable
                   />
                 </FormControl>
+                {/* Penyakit */}
                 <FormControl isRequired>
-                  <FormLabel>Keperluan</FormLabel>
+                  <FormLabel>Penyakit</FormLabel>
                   <Input
-                    placeholder="Keperluan"
-                    onChange={(e) => setKeperluan(e.target.value)}
+                    placeholder="Penyakit"
+                    onChange={(e) => setPenyakit(e.target.value)}
                   />
                 </FormControl>
+                {/* Jenis Penyakit */}
                 <FormControl isRequired>
-                  <FormLabel>Semester</FormLabel>
-                  <Input
-                    placeholder="Semester"
-                    type="number"
-                    onChange={(e) => setSemester(e.target.value)}
-                  />
+                  <FormLabel>Kategori</FormLabel>
+                  <Menu>
+                    <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                      {jenis ? jenis : "Kategori"}
+                    </MenuButton>
+                    <MenuList>
+                      {jenisList.map((jenisItem, i) => (
+                        <MenuItem
+                          key={i}
+                          onClick={(e) => setJenis(e.target.innerHTML)}
+                        >
+                          {jenisItem}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
                 </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Tahun</FormLabel>
-                  <Input
-                    placeholder="Tahun"
-                    type="number"
-                    onChange={(e) => setTahun(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Biaya</FormLabel>
-                  <Input
-                    placeholder="Biaya Bulanan"
-                    type="number"
-                    onChange={(e) => setNominal(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Nominal Dibayar</FormLabel>
-                  <Input
-                    placeholder="Nominal Dibayar"
-                    type="numeber"
-                    onChange={(e) => setNominalDibayar(e.target.value)}
-                  />
-                </FormControl>
+                {/* Tanggal */}
                 <FormControl isRequired>
                   <FormLabel>Tanggal</FormLabel>
                   <Input
@@ -172,7 +176,7 @@ function Biaya() {
                     onChange={(e) => setTanggal(e.target.value)}
                   />
                 </FormControl>
-
+                {/* Status */}
                 <FormControl isRequired>
                   <FormLabel>Status</FormLabel>
                   <Menu>
@@ -191,6 +195,14 @@ function Biaya() {
                     </MenuList>
                   </Menu>
                 </FormControl>
+                {/* Keterangan */}
+                <FormControl>
+                  <FormLabel>Keterangan</FormLabel>
+                  <Textarea
+                    placeholder="Keterangan"
+                    onChange={(e) => setKeterangan(e.target.value)}
+                  />
+                </FormControl>
               </form>
             </ModalBody>
 
@@ -203,10 +215,46 @@ function Biaya() {
           </ModalContent>
         </Modal>
 
-        {/* <BiayaTable data={medicalData.data.bills} /> */}
+        <RiwayatKesehatanTable data={riwayatKesehatanData.data} />
       </>
     );
   }
 }
 
-export default Biaya;
+// Function untuk fetch data dari API students
+const fetcher = async ({ queryKey }) => {
+  try {
+    const collection = queryKey[0];
+    let endpoint = `${URL}/${collection}`;
+
+    if (queryKey[1]) {
+      const params = queryKey[1];
+      endpoint = `${URL}/${collection}${params}`;
+    }
+
+    const { data } = await axios.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    let newSiswa = [];
+    if (collection === "students") {
+      newSiswa = data.map((student) => {
+        return {
+          value: student.nama,
+          label: `${student.nama} (${student.kelas.kelas})`,
+          id: student.id,
+        };
+      });
+      return newSiswa;
+    }
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return { msg: "Query data failed" };
+  }
+};
+
+export default RiwayatKesehatan;

@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { useQuery, useQueryClient } from "react-query";
+import axios from "axios";
 import Head from "next/head";
-import SkeletonLoading from "../../components/skeletonLoading";
-import BiayaTable from "../../components/biaya/biayaTable.jsx";
-import { AddIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
+import { parseCookies } from "nookies";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import Select from "react-select";
+import SkeletonLoading from "../../components/skeletonLoading";
+import BiayaTable from "../../components/biaya/biayaTable";
+import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
   Flex,
   Spacer,
@@ -26,22 +29,19 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
-import { gqlClient } from "../_app";
-import { ALL_BIAYA, ADD_BIAYA } from "../../utils/biayaQuery";
 
-const useBiayaQuery = () => {
-  return useQuery(
-    "bills",
-    async () => {
-      const data = await gqlClient.request(ALL_BIAYA);
-      return data;
-    },
-    { refetchInterval: 3000 }
-  );
-};
+const URL = process.env.NEXT_PUBLIC_API_URL;
+const jwt = parseCookies().jwt;
 
 function Biaya() {
-  const biayaData = useBiayaQuery();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const biayaData = useQuery(
+    ["bills", "?_sort=tanggal_pembayaran:DESC"],
+    fetcher,
+    { refetchInterval: 3000 }
+  );
+  const siswaData = useQuery("students", fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedName, setSelectedName] = useState("");
   const [tahun, setTahun] = useState(null);
@@ -53,24 +53,47 @@ function Biaya() {
   const [status, setStatus] = useState("");
   const statusList = ["Lunas", "Belum Lunas"];
 
-  const tambahBiayaHandler = async () => {
-    const variables = {
-      student: selectedName.id,
-      Keperluan: keperluan,
-      semester: Number(semester),
-      tahun: Number(tahun),
-      nominal: Number(nominal),
-      nominal_dibayar: Number(nominalDibayar),
-      tanggal: tanggal,
-      status: status,
-    };
+  const billMutation = useMutation((newBill) =>
+    axios.post(`${URL}/bills`, newBill, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
 
-    const res = await client.request(ADD_BIAYA, variables);
+  const tambahBiayaHandler = () => {
+    billMutation.mutate({
+      Keperluan: keperluan,
+      nominal: nominal,
+      nominal_dibayar: nominalDibayar,
+      status: status,
+      semester: semester,
+      tahun: tahun,
+      tanggal_pembayaran: tanggal,
+      student: { id: selectedName.id },
+    });
+    setSelectedName(null);
+    setStatus("");
     onClose();
   };
 
   // error handling
-  if (biayaData.isError) console.log("error");
+  if (biayaData.isError) {
+    console.log(biayaData.error);
+    return (
+      <Flex justify="center" direction="row">
+        <Button
+          mt="8"
+          mx="auto"
+          onClick={() => router.reload()}
+          variant="solid"
+          colorScheme="teal"
+        >
+          Reload
+        </Button>
+      </Flex>
+    );
+  }
   // loading state
   if (biayaData.isLoading) {
     return (
@@ -81,15 +104,6 @@ function Biaya() {
   }
 
   if (biayaData.isSuccess) {
-    const newSiswa = biayaData.data.students.map((student) => {
-      return {
-        value: student.nama,
-        label: `${student.nama} (${student.kelas.kelas})`,
-        id: student.id,
-      };
-    });
-    // console.table(biayaData.data.bills);
-
     return (
       <>
         <Head>
@@ -121,7 +135,7 @@ function Biaya() {
                   <Select
                     defaultValue={selectedName}
                     onChange={setSelectedName}
-                    options={newSiswa}
+                    options={siswaData.data}
                     isClearable
                     isSearchable
                   />
@@ -203,46 +217,46 @@ function Biaya() {
           </ModalContent>
         </Modal>
 
-        <BiayaTable data={biayaData.data.bills} />
+        <BiayaTable data={biayaData.data} />
       </>
     );
   }
 }
 
 // Function untuk fetch data dari API students
-// const fetcher = async ({ queryKey }) => {
-//   try {
-//     const collection = queryKey[0];
-//     let endpoint = `${URL}/${collection}`;
+const fetcher = async ({ queryKey }) => {
+  try {
+    const collection = queryKey[0];
+    let endpoint = `${URL}/${collection}`;
 
-//     if (queryKey[1]) {
-//       const params = queryKey[1];
-//       endpoint = `${URL}/${collection}${params}`;
-//     }
+    if (queryKey[1]) {
+      const params = queryKey[1];
+      endpoint = `${URL}/${collection}${params}`;
+    }
 
-//     const { data } = await axios.get(endpoint, {
-//       headers: {
-//         Authorization: `Bearer ${jwt}`,
-//       },
-//     });
+    const { data } = await axios.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
 
-//     let const  = [];
-//     if (collection === "students") {
-//       newSiswa = data.map((student) => {
-//         return {
-//           value: student.nama,
-//           label: `${student.nama} (${student.kelas.kelas})`,
-//           id: student.id,
-//         };
-//       });
-//       return newSiswa;
-//     }
+    let newSiswa = [];
+    if (collection === "students") {
+      newSiswa = data.map((student) => {
+        return {
+          value: student.nama,
+          label: `${student.nama} (${student.kelas.kelas})`,
+          id: student.id,
+        };
+      });
+      return newSiswa;
+    }
 
-//     return data;
-//   } catch (error) {
-//     console.log(error);
-//     return { msg: "Query data failed" };
-//   }
-// };
+    return data;
+  } catch (error) {
+    console.error(error);
+    return { msg: "Query data failed" };
+  }
+};
 
 export default Biaya;
