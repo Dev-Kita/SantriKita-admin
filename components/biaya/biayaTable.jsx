@@ -33,7 +33,6 @@ function BiayaTable({ data }) {
   // DATA YANG DITAMPILKAN DI TABLE
   const newData = data.map((biayaData, i) => {
     return {
-      no: i + 1,
       nama: biayaData.student.nama,
       keperluan: biayaData.Keperluan,
       tanggal: (
@@ -58,7 +57,6 @@ function BiayaTable({ data }) {
   const rowsData = useMemo(() => newData, [data]);
   const columns = useMemo(
     () => [
-      { Header: "No", accessor: "no" },
       { Header: "Nama", accessor: "nama" },
       { Header: "Keperluan", accessor: "keperluan" },
       { Header: "Tanggal", accessor: "tanggal" },

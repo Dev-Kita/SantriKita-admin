@@ -27,32 +27,36 @@ import {
 } from "@chakra-ui/react";
 
 // MAIN COMPONENT
-function PelanggaranTable({ data }) {
-  // console.log(data);
+function RiwayatPembelajaranTable({ data }) {
   const router = useRouter();
   // DATA YANG DITAMPILKAN DI TABLE
-  const newData = data.map((pelanggaranData, i) => {
+  const newData = data.map((riwayatPembelajaran, i) => {
     return {
-      nama: pelanggaranData.student.nama,
-      pelanggaran: pelanggaranData.pelanggaran,
-      tanggal: <Moment format="DD MMM YYYY">{pelanggaranData.tanggal}</Moment>,
-      status: pelanggaranData.status,
-      detail: (
-        <NextLink href={`${router.pathname}/${pelanggaranData.id}`}>
-          <Link color="teal.500" fontWeight="medium">
-            Detail
-          </Link>
-        </NextLink>
+      pelajaran: riwayatPembelajaran.pelajaran,
+      pengajar: riwayatPembelajaran.pengajar,
+      kelas: riwayatPembelajaran.classroom.kelas,
+      tanggal: (
+        <Moment format="DD MMM YYYY">{riwayatPembelajaran.tanggal}</Moment>
       ),
+      detail:
+        // <NextLink
+        //   href={{
+        //     pathname: `${router.pathname}/${riwayatKesehatanData.id}`,
+        //   }}
+        // >
+        // <Link color="teal.500" fontWeight="medium">
+        "Detail",
+      // </Link>
+      // </NextLink>
     };
   });
   const rowsData = useMemo(() => newData, [data]);
   const columns = useMemo(
     () => [
-      { Header: "Nama", accessor: "nama" },
-      { Header: "Pelanggaran", accessor: "pelanggaran" },
+      { Header: "Pelajaran", accessor: "pelajaran" },
+      { Header: "Pengajar", accessor: "pengajar" },
+      { Header: "Kelas", accessor: "kelas" },
       { Header: "Tanggal", accessor: "tanggal" },
-      { Header: "Status", accessor: "status" },
       { Header: "Detail", accessor: "detail" },
     ],
     []
@@ -79,7 +83,7 @@ function PelanggaranTable({ data }) {
       <CardWrapper>
         <Flex align="center">
           <Heading fontSize="xl" mb="4" textAlign="center">
-            Daftar Pelanggaran
+            Riwayat Pembelajaran
           </Heading>
           <Spacer />
 
@@ -162,7 +166,7 @@ function GlobalFilter({
           setValue(e.target.value);
           onChange(e.target.value);
         }}
-        placeholder={`Nama, Pelanggaran, atau Status...`}
+        placeholder={`Kelas, Pelajaran, atau Tanggal...`}
         variant="outline"
         mb="4"
       />
@@ -170,4 +174,4 @@ function GlobalFilter({
   );
 }
 
-export default PelanggaranTable;
+export default RiwayatPembelajaranTable;

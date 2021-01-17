@@ -28,7 +28,6 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 function DaftarKelas() {
-  // useSWR Hooks untuk fetch data client-side
   const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher, {
     refetchInterval: 3000,
   });

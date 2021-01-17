@@ -51,7 +51,7 @@ function RiwayatKesehatan() {
   const jenisList = ["Umum", "Parah", "Bawaan"];
   const statusList = ["Sembuh", "Belum Sembuh"];
 
-  const billMutation = useMutation((newMedicalHistory) =>
+  const medicalHistoryMutation = useMutation((newMedicalHistory) =>
     axios.post(`${URL}/medical-histories`, newMedicalHistory, {
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -60,7 +60,7 @@ function RiwayatKesehatan() {
   );
 
   const tambahBiayaHandler = () => {
-    billMutation.mutate({
+    medicalHistoryMutation.mutate({
       penyakit: penyakit,
       jenis: jenis,
       status: status === "Sembuh" ? true : false,

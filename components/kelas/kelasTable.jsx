@@ -32,7 +32,6 @@ function KelasTable({ data }) {
   // DATA YANG DITAMPILKAN DI TABLE
   const newData = data.map((kelasData, i) => {
     return {
-      no: i + 1,
       kelas: kelasData.kelas,
       pembimbing: kelasData.pembimbing,
       detail:
@@ -47,7 +46,6 @@ function KelasTable({ data }) {
   const rowsData = useMemo(() => newData, [data]);
   const columns = useMemo(
     () => [
-      { Header: "No", accessor: "no" },
       { Header: "Kelas", accessor: "kelas" },
       { Header: "Pembimbing", accessor: "pembimbing" },
       { Header: "Detail", accessor: "detail" },

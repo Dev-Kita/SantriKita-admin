@@ -31,7 +31,6 @@ function PrestasiTable({ data }) {
   // DATA YANG DITAMPILKAN DI TABLE
   const newData = data.map((prestasiData, i) => {
     return {
-      no: i + 1,
       nama: prestasiData.student.nama,
       lomba: prestasiData.kegiatan_lomba,
       prestasi: prestasiData.prestasi,
@@ -49,7 +48,6 @@ function PrestasiTable({ data }) {
   const rowsData = useMemo(() => newData, [data]);
   const columns = useMemo(
     () => [
-      { Header: "No", accessor: "no" },
       { Header: "Nama", accessor: "nama" },
       { Header: "Kegiatan / Lomba", accessor: "lomba" },
       { Header: "Prestasi", accessor: "prestasi" },

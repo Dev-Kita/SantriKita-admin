@@ -33,7 +33,6 @@ function RiwayatKesehatanTable({ data }) {
   // DATA YANG DITAMPILKAN DI TABLE
   const newData = data.map((riwayatKesehatanData, i) => {
     return {
-      no: i + 1,
       nama: riwayatKesehatanData.student.nama,
       penyakit: riwayatKesehatanData.penyakit,
       jenis: riwayatKesehatanData.jenis,
@@ -58,7 +57,6 @@ function RiwayatKesehatanTable({ data }) {
   const rowsData = useMemo(() => newData, [data]);
   const columns = useMemo(
     () => [
-      { Header: "No", accessor: "no" },
       { Header: "Nama", accessor: "nama" },
       { Header: "Penyakit", accessor: "penyakit" },
       { Header: "Jenis", accessor: "jenis" },
