@@ -21,12 +21,14 @@ import {
   FaBook,
   FaBriefcaseMedical,
   FaMoneyBillWaveAlt,
+  FaSignOutAlt,
 } from "react-icons/fa";
 
 const sideMenu = [
   { icon: <MdDashboard />, title: "Dashboard", slug: "/dashboard" },
   { icon: <MdSchool />, title: "Daftar Siswa", slug: "/daftarSiswa" },
   { icon: <FaSchool />, title: "Kelas", slug: "/kelas" },
+  { icon: <FaBook />, title: "Silabus", slug: "/silabus" },
   {
     icon: <FaBookOpen />,
     title: "Riwayat Pembelajaran",
@@ -45,15 +47,8 @@ const sideMenu = [
 export default function Sidebar({ children }) {
   const router = useRouter();
 
-  // Logout Handler
-  const logoutHandler = () => {
-    destroyCookie(null, "jwt");
-    destroyCookie(null, "username");
-    router.replace("/login");
-  };
-
   return (
-    <Flex flexDir="row" justifyContent="space-between" bgColor="gray.800">
+    <Flex flexDir="row" justifyContent="space-between" bgColor="teal.700">
       <VStack
         py="8"
         pl="4"
@@ -63,10 +58,10 @@ export default function Sidebar({ children }) {
         align="stretch"
         justify="space-between"
       >
-        <Heading ml="4" fontSize="3xl" color="teal.400">
+        <Heading ml="4" mb="8" fontSize="3xl" color="gray.100">
           SANTRI KITA
         </Heading>
-        <VStack align="stretch" spacing={2}>
+        <VStack align="stretch">
           {sideMenu.map(({ icon, title, slug }, i) => {
             return (
               <NextLink href={slug} key={i}>
@@ -76,10 +71,10 @@ export default function Sidebar({ children }) {
                   w="100%"
                   roundedLeft="md"
                   fontWeight="medium"
-                  bgColor={router.pathname === slug ? "teal.600" : undefined}
-                  color={router.pathname === slug ? "gray.200" : undefined}
+                  bgColor={router.pathname === slug ? "teal.800" : undefined}
+                  color={router.pathname === slug ? "gray.100" : undefined}
                   _hover={{
-                    background: "gray.700",
+                    background: "teal.500",
                     color: "gray.100",
                   }}
                 >
@@ -93,14 +88,7 @@ export default function Sidebar({ children }) {
           })}
         </VStack>
 
-        <Button
-          mx="4"
-          colorScheme="red"
-          variant="solid"
-          onClick={logoutHandler}
-        >
-          Log out
-        </Button>
+        <Spacer />
       </VStack>
 
       <Box w="80%" bgColor="gray.100">

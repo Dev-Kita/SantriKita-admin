@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { parseCookies } from "nookies";
+import { parseCookies, destroyCookie } from "nookies";
+import { ChevronDownIcon } from "@chakra-ui/icons";
+import { FaSignOutAlt } from "react-icons/fa";
 import {
-  Tooltip,
+  HStack,
+  Link,
   Box,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuGroup,
+  MenuItem,
+  Button,
   Text,
   Flex,
   Spacer,
@@ -15,13 +24,20 @@ import {
 
 function Topbar() {
   const [username, setUsername] = useState("username");
-  const { asPath } = useRouter();
-  const link = asPath.split("/");
+  const router = useRouter();
+  const link = router.asPath.split("/");
   const x = link.shift();
 
   useEffect(() => {
     setUsername(parseCookies().username);
   }, []);
+
+  // Logout Handler
+  const logoutHandler = () => {
+    destroyCookie(null, "jwt");
+    destroyCookie(null, "username");
+    router.replace("/login");
+  };
 
   return (
     <Flex bgColor="white" py="4" px="8" align="center">
@@ -40,14 +56,29 @@ function Topbar() {
       </Box>
       <Spacer />
       <Box>
-        <Tooltip hasArrow label={username} bg="gray.300" color="black">
-          <Flex align="center">
-            <Avatar size="sm" name={username} cursor="default" />
-            <Text ml="2" fontWeight="bold">
-              {username}
-            </Text>
-          </Flex>
-        </Tooltip>
+        <Menu>
+          <MenuButton
+            as={Button}
+            rightIcon={<ChevronDownIcon />}
+            background="white"
+          >
+            <Flex align="center">
+              <Avatar size="sm" name={username} cursor="default" />
+              <Text ml="2" fontWeight="bold">
+                {username}
+              </Text>
+            </Flex>
+          </MenuButton>
+          <MenuList>
+            <MenuGroup title="Profile">
+              <MenuItem onClick={logoutHandler}>
+                <HStack>
+                  <p>Log out</p> <FaSignOutAlt />
+                </HStack>
+              </MenuItem>
+            </MenuGroup>
+          </MenuList>
+        </Menu>
       </Box>
     </Flex>
   );

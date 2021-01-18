@@ -3,6 +3,7 @@ import axios from "axios";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
+import SkeletonLoading from "../../components/skeletonLoading";
 import Head from "next/head";
 import Select from "react-select";
 import HapusSiswaAlert from "../../components/daftarSiswa/hapusSiswaAlert";
@@ -14,8 +15,6 @@ import {
   ButtonGroup,
   Flex,
   Spacer,
-  Skeleton,
-  SkeletonText,
   Heading,
   FormControl,
   FormLabel,
@@ -38,7 +37,7 @@ function DetailSiswa({ siswa, daftarKelas }) {
   const [tglLahir, setTglLahir] = useState(siswa.tanggal_lahir);
   const [tahunMasuk, setTahunMasuk] = useState(siswa.tahun_masuk);
   const [tahunKeluar, setTahunKeluar] = useState(siswa.tahun_keluar);
-
+  const [kamar, setKamar] = useState(siswa.kamar);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
@@ -48,6 +47,7 @@ function DetailSiswa({ siswa, daftarKelas }) {
     nama: nama,
     nis: nis,
     kelas: { id: kelas.id },
+    kamar: kamar,
     tanggal_lahir: tglLahir,
     tahun_masuk: tahunMasuk,
     tahun_keluar: tahunKeluar,
@@ -90,16 +90,7 @@ function DetailSiswa({ siswa, daftarKelas }) {
   if (!siswa) {
     return (
       <>
-        <Head>
-          <title>Siswa Detail | Santri Kita</title>
-        </Head>
-
-        <CardWrapper>
-          <VStack align="stretch" spacing={2}>
-            <Skeleton height="20px" mb="4" rounded="md" />
-            <SkeletonText mt="4" noOfLines={4} spacing="4" rounded="full" />
-          </VStack>
-        </CardWrapper>
+        <SkeletonLoading title={"Siswa Detail"} />
       </>
     );
   }
@@ -189,6 +180,15 @@ function DetailSiswa({ siswa, daftarKelas }) {
                   onChange={(e) => setKelas(e.target.value)}
                 />
               )}
+            </FormControl>
+            <FormControl id="kamar">
+              <FormLabel>Kamar</FormLabel>
+              <Input
+                type="text"
+                value={kamar}
+                isReadOnly={!isEditing}
+                onChange={(e) => setKamar(e.target.value)}
+              />
             </FormControl>
             <FormControl id="tglLahir" mt="2">
               <FormLabel>Tanggal Lahir</FormLabel>

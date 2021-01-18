@@ -38,6 +38,7 @@ function DaftarSiswa() {
   const [nama, setNama] = useState("");
   const [nis, setNis] = useState(null);
   const [kelas, setKelas] = useState("");
+  const [kamar, setKamar] = useState("");
   const [tglLahir, setTglLahir] = useState("");
   const [tahunMasuk, setTahunMasuk] = useState(null);
   const [tahunKeluar, setTahunKeluar] = useState(null);
@@ -47,6 +48,7 @@ function DaftarSiswa() {
       nama: nama,
       nis: nis,
       kelas: { id: kelas.id },
+      kamar: kamar,
       tanggal_lahir: tglLahir,
       tahun_masuk: tahunMasuk,
       tahun_keluar: tahunKeluar,
@@ -120,6 +122,13 @@ function DaftarSiswa() {
                     options={kelasData.data}
                     isClearable
                     isSearchable
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Kamar</FormLabel>
+                  <Input
+                    placeholder="Kamar"
+                    onChange={(e) => setKamar(e.target.value)}
                   />
                 </FormControl>
                 <FormControl isRequired>

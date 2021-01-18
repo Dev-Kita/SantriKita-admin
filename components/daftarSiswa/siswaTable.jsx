@@ -36,11 +36,11 @@ function SiswaTable({ data }) {
       nama: siswaData.nama,
       nis: siswaData.nis,
       classroom: siswaData.kelas.kelas,
-      tanggalLahir: (
-        <Moment format="DD MMM YYYY">{siswaData.tanggal_lahir}</Moment>
-      ),
+      kamar: siswaData.kamar,
+      // tanggalLahir: (
+      //   <Moment format="DD MMM YYYY">{siswaData.tanggal_lahir}</Moment>
+      // ),
       tahunMasuk: siswaData.tahun_masuk,
-      tahunKeluar: siswaData.tahun_keluar,
       detail: (
         <NextLink href={`${router.pathname}/${siswaData.id}`}>
           <Link color="teal.500" fontWeight="medium">
@@ -56,9 +56,9 @@ function SiswaTable({ data }) {
       { Header: "Nama", accessor: "nama" },
       { Header: "NIS", accessor: "nis" },
       { Header: "Kelas", accessor: "classroom" },
-      { Header: "Tanggal Lahir", accessor: "tanggalLahir" },
+      { Header: "Kamar", accessor: "kamar" },
+      // { Header: "Tanggal Lahir", accessor: "tanggalLahir" },
       { Header: "Tahun Masuk", accessor: "tahunMasuk" },
-      { Header: "Tahun Keluar", accessor: "tahunKeluar" },
       { Header: "Detail", accessor: "detail" },
     ],
     []
