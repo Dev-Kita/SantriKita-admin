@@ -7,21 +7,39 @@ import {
   Flex,
   Spacer,
   VStack,
+  HStack,
   StackDivider,
   Link,
   Heading,
   Button,
 } from "@chakra-ui/react";
+import { MdDashboard, MdSchool } from "react-icons/md";
+import { GiAchievement, GiPoliceBadge } from "react-icons/gi";
+import {
+  FaSchool,
+  FaBookOpen,
+  FaBook,
+  FaBriefcaseMedical,
+  FaMoneyBillWaveAlt,
+} from "react-icons/fa";
 
 const sideMenu = [
-  { title: "Dashboard", slug: "/dashboard" },
-  { title: "Daftar Siswa", slug: "/daftarSiswa" },
-  { title: "Kelas", slug: "/kelas" },
-  { title: "Riwayat Pembelajaran", slug: "/riwayatPembelajaran" },
-  { title: "Riwayat Kesehatan", slug: "/riwayatKesehatan" },
-  { title: "Biaya", slug: "/biaya" },
-  { title: "Prestasi", slug: "/prestasi" },
-  { title: "Pelanggaran", slug: "/pelanggaran" },
+  { icon: <MdDashboard />, title: "Dashboard", slug: "/dashboard" },
+  { icon: <MdSchool />, title: "Daftar Siswa", slug: "/daftarSiswa" },
+  { icon: <FaSchool />, title: "Kelas", slug: "/kelas" },
+  {
+    icon: <FaBookOpen />,
+    title: "Riwayat Pembelajaran",
+    slug: "/riwayatPembelajaran",
+  },
+  {
+    icon: <FaBriefcaseMedical />,
+    title: "Riwayat Kesehatan",
+    slug: "/riwayatKesehatan",
+  },
+  { icon: <FaMoneyBillWaveAlt />, title: "Biaya", slug: "/biaya" },
+  { icon: <GiAchievement />, title: "Prestasi", slug: "/prestasi" },
+  { icon: <GiPoliceBadge />, title: "Pelanggaran", slug: "/pelanggaran" },
 ];
 
 export default function Sidebar({ children }) {
@@ -49,7 +67,7 @@ export default function Sidebar({ children }) {
           SANTRI KITA
         </Heading>
         <VStack align="stretch" spacing={2}>
-          {sideMenu.map(({ title, slug }, i) => {
+          {sideMenu.map(({ icon, title, slug }, i) => {
             return (
               <NextLink href={slug} key={i}>
                 <Link
@@ -65,7 +83,10 @@ export default function Sidebar({ children }) {
                     color: "gray.100",
                   }}
                 >
-                  {title}
+                  <HStack spacing={4}>
+                    {icon}
+                    <p>{title}</p>
+                  </HStack>
                 </Link>
               </NextLink>
             );
