@@ -55,8 +55,17 @@ function Biaya() {
   const [status, setStatus] = useState("");
   const statusList = ["Lunas", "Belum Lunas"];
 
+  // BIAYA MUTATION
   const billMutation = useMutation((newBill) =>
     axios.post(`${URL}/bills`, newBill, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+  // NOTIF MUTATION
+  const notifMutation = useMutation((newNotif) =>
+    axios.post(`${URL}/notifications`, newNotif, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -74,6 +83,13 @@ function Biaya() {
       tahun: tahun,
       tanggal_pembayaran: tanggal,
       keterangan: keterangan,
+      student: { id: selectedName.id },
+    });
+    notifMutation.mutate({
+      notifikasi: "Pembayaran baru ditambahkan",
+      slug: "biaya",
+      waktu: new Date(),
+      terbaca: false,
       student: { id: selectedName.id },
     });
     setSelectedName(null);

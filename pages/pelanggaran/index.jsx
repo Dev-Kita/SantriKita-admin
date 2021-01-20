@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Head from "next/head";
 import { parseCookies } from "nookies";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient, useMutation } from "react-query";
 import Select from "react-select";
 import SkeletonLoading from "../../components/skeletonLoading";
 import PelanggaranTable from "../../components/pelanggaran/pelanggaranTable";
@@ -50,27 +50,44 @@ function DaftarPelanggaran() {
   const statusList = ["Ringan", "Sedang", "Berat"];
   const [keterangan, setKeterangan] = useState("");
 
+  // MUTATION
+  // PRESTASI MUTATION
+  const violationMutation = useMutation((newViolation) =>
+    axios.post(`${URL}/violations`, newViolation, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+  // NOTIF MUTATION
+  const notifMutation = useMutation((newNotif) =>
+    axios.post(`${URL}/notifications`, newNotif, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+
   // EVENT HANDLER FUNCTION
-  const tambahPelanggaranHadler = async () => {
-    try {
-      const newPelanggaran = {
-        pelanggaran: pelanggaran,
-        keterangan: keterangan,
-        tanggal: tanggal,
-        status: statusPelanggaran,
-        student: { id: selectedName.id },
-      };
-      const { data } = await axios.post(`${URL}/violations`, newPelanggaran, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      setSelectedName(null);
-      setStatusPelanggaran("");
-      onClose();
-    } catch (error) {
-      console.log(error);
-    }
+  const tambahPelanggaranHandler = () => {
+    violationMutation.mutate({
+      pelanggaran: pelanggaran,
+      keterangan: keterangan,
+      tanggal: tanggal,
+      status: statusPelanggaran,
+      student: { id: selectedName.id },
+    });
+    notifMutation.mutate({
+      notifikasi: "Pelanggaran baru ditambahkan",
+      slug: "pelanggaran",
+      waktu: new Date(),
+      terbaca: false,
+      student: { id: selectedName.id },
+    });
+
+    setSelectedName(null);
+    setStatusPelanggaran("");
+    onClose();
   };
 
   // RENDER HALAMAN JSX
@@ -174,7 +191,7 @@ function DaftarPelanggaran() {
               <Button
                 colorScheme="teal"
                 mr={3}
-                onClick={tambahPelanggaranHadler}
+                onClick={tambahPelanggaranHandler}
               >
                 Simpan
               </Button>

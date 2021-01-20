@@ -51,8 +51,17 @@ function RiwayatKesehatan() {
   const jenisList = ["Umum", "Parah", "Bawaan"];
   const statusList = ["Sembuh", "Belum Sembuh"];
 
+  // KESEHATAN MUTATION
   const medicalHistoryMutation = useMutation((newMedicalHistory) =>
     axios.post(`${URL}/medical-histories`, newMedicalHistory, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+  // NOTIF MUTATION
+  const notifMutation = useMutation((newNotif) =>
+    axios.post(`${URL}/notifications`, newNotif, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -68,6 +77,14 @@ function RiwayatKesehatan() {
       keterangan: keterangan,
       student: { id: selectedName.id },
     });
+    notifMutation.mutate({
+      notifikasi: "Riwayat Kesehatan baru ditambahkan",
+      slug: "riwayatKesehatan",
+      waktu: new Date(),
+      terbaca: false,
+      student: { id: selectedName.id },
+    });
+
     setSelectedName(null);
     setStatus("");
     setJenis("");

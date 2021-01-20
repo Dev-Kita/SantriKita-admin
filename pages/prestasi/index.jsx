@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Head from "next/head";
 import { parseCookies } from "nookies";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient, useMutation } from "react-query";
 import Select from "react-select";
 import SkeletonLoading from "../../components/skeletonLoading";
 import PrestasiTable from "../../components/prestasi/prestasiTable";
@@ -44,27 +44,44 @@ function DaftarPrestasi() {
   const [tahun, setTahun] = useState("");
   const [keterangan, setKeterangan] = useState("");
 
+  // MUTATION
+  // PRESTASI MUTATION
+  const achievementMutation = useMutation((newAchievement) =>
+    axios.post(`${URL}/achievements`, newAchievement, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+  // NOTIF MUTATION
+  const notifMutation = useMutation((newNotif) =>
+    axios.post(`${URL}/notifications`, newNotif, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+
   // EVENT HANDLER FUNCTION
-  const tambahPrestasiHadler = async () => {
-    try {
-      const newPrestasi = {
-        kegiatan_lomba: lomba,
-        prestasi: prestasi,
-        lingkup: lingkup,
-        tahun: tahun,
-        keterangan: keterangan,
-        student: { id: selectedName.id },
-      };
-      const { data } = await axios.post(`${URL}/achievements`, newPrestasi, {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      });
-      setSelectedName(null);
-      onClose();
-    } catch (error) {
-      console.log(error);
-    }
+  const tambahPrestasiHadler = () => {
+    achievementMutation.mutate({
+      kegiatan_lomba: lomba,
+      prestasi: prestasi,
+      lingkup: lingkup,
+      tahun: tahun,
+      keterangan: keterangan,
+      student: { id: selectedName.id },
+    });
+    notifMutation.mutate({
+      notifikasi: "Prestasi baru ditambahkan",
+      slug: "prestasi",
+      waktu: new Date(),
+      terbaca: false,
+      student: { id: selectedName.id },
+    });
+
+    setSelectedName(null);
+    onClose();
   };
 
   // RENDER HALAMAN JSX
