@@ -28,7 +28,7 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 function DaftarKelas() {
-  const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher, {
+  const kelasData = useQuery(["classrooms", "?_sort=kelas:desc"], fetcher, {
     refetchInterval: 3000,
   });
   const { isOpen, onOpen, onClose } = useDisclosure();

@@ -34,13 +34,14 @@ function KelasTable({ data }) {
     return {
       kelas: kelasData.kelas,
       pembimbing: kelasData.pembimbing,
-      detail:
-        // <NextLink href={`${router.pathname}/${kelasData.id}`}>
-        //   <Link color="teal.500" fontWeight="medium">
-        //     Detail
-        //   </Link>
-        // </NextLink>
-        "Detail",
+      detail: (
+        <NextLink href={`${router.pathname}/${kelasData.id}`}>
+          <Link color="teal.500" fontWeight="medium">
+            Detail
+          </Link>
+        </NextLink>
+      ),
+      // "Detail",
     };
   });
   const rowsData = useMemo(() => newData, [data]);

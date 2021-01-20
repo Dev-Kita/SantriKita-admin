@@ -42,16 +42,17 @@ function RiwayatKesehatanTable({ data }) {
         </Moment>
       ),
       status: riwayatKesehatanData.status ? "Sembuh" : "Belum Sembuh",
-      detail:
-        // <NextLink
-        //   href={{
-        //     pathname: `${router.pathname}/${riwayatKesehatanData.id}`,
-        //   }}
-        // >
-        // <Link color="teal.500" fontWeight="medium">
-        "Detail",
-      // </Link>
-      // </NextLink>
+      detail: (
+        <NextLink
+          href={{
+            pathname: `${router.pathname}/${riwayatKesehatanData.id}`,
+          }}
+        >
+          <Link color="teal.500" fontWeight="medium">
+            "Detail",
+          </Link>
+        </NextLink>
+      ),
     };
   });
   const rowsData = useMemo(() => newData, [data]);

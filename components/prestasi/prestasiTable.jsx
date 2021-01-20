@@ -36,13 +36,14 @@ function PrestasiTable({ data }) {
       prestasi: prestasiData.prestasi,
       lingkup: prestasiData.lingkup,
       tahun: prestasiData.tahun,
-      detail:
-        // <NextLink href={`${router.pathname}/${prestasiData.id}`}>
-        //   <Link color="teal.500" fontWeight="medium">
-        //     Detail
-        //   </Link>
-        // </NextLink>
-        "Detail",
+      detail: (
+        <NextLink href={`${router.pathname}/${prestasiData.id}`}>
+          <Link color="teal.500" fontWeight="medium">
+            Detail
+          </Link>
+        </NextLink>
+      ),
+      // "Detail",
     };
   });
   const rowsData = useMemo(() => newData, [data]);

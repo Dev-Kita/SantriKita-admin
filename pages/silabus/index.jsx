@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { parseCookies } from "nookies";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import Select from "react-select";
+import makeAnimated from "react-select/animated";
 import SkeletonLoading from "../../components/skeletonLoading";
 import SilabusTable from "../../components/silabus/silabusTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
@@ -33,6 +34,7 @@ import { animateVisualElement } from "framer-motion";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
+const animatedComponents = makeAnimated();
 
 function Silabus() {
   const queryClient = useQueryClient();
@@ -40,7 +42,7 @@ function Silabus() {
   const silabusData = useQuery(["silabuses"], fetcher, {
     refetchInterval: 3000,
   });
-  // console.log(silabusData.data);
+  console.log(silabusData.data);
   const kelasData = useQuery("classrooms", fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedClass, setSelectedClass] = useState("");
@@ -134,6 +136,8 @@ function Silabus() {
                     defaultValue={selectedClass}
                     onChange={setSelectedClass}
                     options={kelasData.data}
+                    closeMenuOnSelect={false}
+                    components={animatedComponents}
                     isMulti
                     isClearable
                     isSearchable

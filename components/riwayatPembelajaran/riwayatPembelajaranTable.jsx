@@ -38,16 +38,17 @@ function RiwayatPembelajaranTable({ data }) {
       tanggal: (
         <Moment format="DD MMM YYYY">{riwayatPembelajaran.tanggal}</Moment>
       ),
-      detail:
-        // <NextLink
-        //   href={{
-        //     pathname: `${router.pathname}/${riwayatKesehatanData.id}`,
-        //   }}
-        // >
-        // <Link color="teal.500" fontWeight="medium">
-        "Detail",
-      // </Link>
-      // </NextLink>
+      detail: (
+        <NextLink
+          href={{
+            pathname: `${router.pathname}/${riwayatKesehatanData.id}`,
+          }}
+        >
+          <Link color="teal.500" fontWeight="medium">
+            "Detail",
+          </Link>
+        </NextLink>
+      ),
     };
   });
   const rowsData = useMemo(() => newData, [data]);

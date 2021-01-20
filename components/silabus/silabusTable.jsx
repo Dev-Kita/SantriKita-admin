@@ -44,28 +44,29 @@ function SilabusTable({ data }) {
     // console.log(silabusKelas);
     return {
       pelajaran: silabus.pelajaran,
+      kelas: kelas,
       bab: silabus.bab,
       KD: silabus.kompetensi_dasar,
-      kelas: kelas,
-      detail:
-        // <NextLink
-        //   href={{
-        //     pathname: `${router.pathname}/${silabus.id}`,
-        //   }}
-        // >
-        // <Link color="teal.500" fontWeight="medium">
-        "Detail",
-      // </Link>
-      // </NextLink>
+      detail: (
+        <NextLink
+          href={{
+            pathname: `${router.pathname}/${silabus.id}`,
+          }}
+        >
+          <Link color="teal.500" fontWeight="medium">
+            Detail
+          </Link>
+        </NextLink>
+      ),
     };
   });
   const rowsData = useMemo(() => newData, [data]);
   const columns = useMemo(
     () => [
       { Header: "Pelajaran", accessor: "pelajaran" },
+      { Header: "Kelas", accessor: "kelas" },
       { Header: "BAB", accessor: "bab" },
       { Header: "Kompetensi Dasar", accessor: "KD" },
-      { Header: "Kelas", accessor: "kelas" },
       { Header: "Detail", accessor: "detail" },
     ],
     []
@@ -139,7 +140,9 @@ function SilabusTable({ data }) {
               return (
                 <Tr {...row.getRowProps()}>
                   {row.cells.map((cell) => (
-                    <Td {...cell.getCellProps()}>{cell.render("Cell")}</Td>
+                    <Td overflow="auto" {...cell.getCellProps()}>
+                      {cell.render("Cell")}
+                    </Td>
                   ))}
                 </Tr>
               );
