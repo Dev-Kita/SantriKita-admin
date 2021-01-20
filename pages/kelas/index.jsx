@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient, useMutation } from "react-query";
 import axios from "axios";
 import Head from "next/head";
 import SkeletonLoading from "../../components/skeletonLoading";
@@ -7,6 +7,7 @@ import { parseCookies } from "nookies";
 import KelasTable from "../../components/kelas/kelasTable";
 import { AddIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   VStack,
   Flex,
   Spacer,
@@ -28,6 +29,7 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 function DaftarKelas() {
+  const toast = useToast();
   const kelasData = useQuery(["classrooms", "?_sort=kelas:desc"], fetcher, {
     refetchInterval: 3000,
   });
@@ -35,18 +37,32 @@ function DaftarKelas() {
   const [kelas, setKelas] = useState("");
   const [pembimbing, setPembimbing] = useState("");
 
-  const tambahKelasHadler = async () => {
-    const newKelasData = {
-      kelas: kelas,
-      pembimbing: pembimbing,
-    };
-    const { data } = await axios.post(`${URL}/classrooms`, newKelasData, {
+  // SISWA MUTATION
+  const kelasMutation = useMutation((newKelas) =>
+    axios.post(`${URL}/classrooms`, newKelas, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
+    })
+  );
+
+  // HANDLER SUBMIT TAMBAH SISWA
+  const tambahKelasHadler = () => {
+    kelasMutation.mutate({
+      kelas: kelas,
+      pembimbing: pembimbing,
     });
+
+    // setSelectedClass(null);
     onClose();
-    // console.log(data);
+    toast({
+      position: "bottom-right",
+      title: "Data Kelas Dibuat.",
+      description: "Data kelas baru telah berhasil dibuat.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // error handling

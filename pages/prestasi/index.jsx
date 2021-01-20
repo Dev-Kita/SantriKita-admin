@@ -8,6 +8,7 @@ import SkeletonLoading from "../../components/skeletonLoading";
 import PrestasiTable from "../../components/prestasi/prestasiTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   Flex,
   Spacer,
   Button,
@@ -30,6 +31,7 @@ const jwt = parseCookies().jwt;
 
 // COMPONENT UTAMA
 function DaftarPrestasi() {
+  const toast = useToast();
   // const queryClient = useQueryClient();
   // DEKLARASI HOOKS DAN VARIABEL
   const prestasiData = useQuery(["achievements", "?_sort=tahun:ASC"], fetcher, {
@@ -82,6 +84,14 @@ function DaftarPrestasi() {
 
     setSelectedName(null);
     onClose();
+    toast({
+      position: "bottom-right",
+      title: "Data Prestasi Dibuat.",
+      description: "Data prestasi baru telah berhasil dibuat.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // RENDER HALAMAN JSX

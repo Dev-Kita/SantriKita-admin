@@ -10,6 +10,7 @@ import SkeletonLoading from "../../components/skeletonLoading";
 import SilabusTable from "../../components/silabus/silabusTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   Flex,
   Spacer,
   Button,
@@ -37,12 +38,13 @@ const jwt = parseCookies().jwt;
 const animatedComponents = makeAnimated();
 
 function Silabus() {
+  const toast = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
   const silabusData = useQuery(["silabuses"], fetcher, {
     refetchInterval: 3000,
   });
-  console.log(silabusData.data);
+  // console.log(silabusData.data);
   const kelasData = useQuery("classrooms", fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedClass, setSelectedClass] = useState("");
@@ -74,6 +76,14 @@ function Silabus() {
 
     setSelectedClass(null);
     onClose();
+    toast({
+      position: "bottom-right",
+      title: "Data Silabus Dibuat.",
+      description: "Data silabus baru telah berhasil dibuat.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // error handling

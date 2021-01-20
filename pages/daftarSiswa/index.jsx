@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient, useMutation } from "react-query";
 import axios from "axios";
 import Head from "next/head";
 import Select from "react-select";
@@ -8,6 +8,7 @@ import { parseCookies } from "nookies";
 import SiswaTable from "../../components/daftarSiswa/siswaTable";
 import { AddIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   VStack,
   Flex,
   Spacer,
@@ -29,6 +30,7 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 function DaftarSiswa() {
+  const toast = useToast();
   // useSWR Hooks untuk fetch data client-side
   const siswaData = useQuery(["students", "?_sort=tahun_masuk:asc"], fetcher, {
     refetchInterval: 3000,
@@ -43,8 +45,18 @@ function DaftarSiswa() {
   const [tahunMasuk, setTahunMasuk] = useState(null);
   const [tahunKeluar, setTahunKeluar] = useState(null);
 
-  const tambahSiswaHadler = async () => {
-    const newSiswaData = {
+  // SISWA MUTATION
+  const siswaMutation = useMutation((newSiswa) =>
+    axios.post(`${URL}/students`, newSiswa, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+
+  // HANDLER SUBMIT TAMBAH SISWA
+  const tambahSiswaHadler = () => {
+    siswaMutation.mutate({
       nama: nama,
       nis: nis,
       kelas: { id: kelas.id },
@@ -52,14 +64,18 @@ function DaftarSiswa() {
       tanggal_lahir: tglLahir,
       tahun_masuk: tahunMasuk,
       tahun_keluar: tahunKeluar,
-    };
-    const { data } = await axios.post(`${URL}/students`, newSiswaData, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
     });
+
+    // setSelectedClass(null);
     onClose();
-    // console.log(data);
+    toast({
+      position: "bottom-right",
+      title: "Data Siswa Dibuat.",
+      description: "Data siswa baru telah berhasil dibuat.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // error handling

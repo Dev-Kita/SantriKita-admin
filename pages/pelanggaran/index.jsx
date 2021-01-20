@@ -8,6 +8,7 @@ import SkeletonLoading from "../../components/skeletonLoading";
 import PelanggaranTable from "../../components/pelanggaran/pelanggaranTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   Flex,
   Spacer,
   Button,
@@ -34,6 +35,7 @@ const jwt = parseCookies().jwt;
 
 // COMPONENT UTAMA
 function DaftarPelanggaran() {
+  const toast = useToast();
   // const queryClient = useQueryClient();
   // DEKLARASI HOOKS DAN VARIABEL
   const pelanggaranData = useQuery(
@@ -88,6 +90,14 @@ function DaftarPelanggaran() {
     setSelectedName(null);
     setStatusPelanggaran("");
     onClose();
+    toast({
+      position: "bottom-right",
+      title: "Data Pelanggaran Dibuat.",
+      description: "Data pelanggaran baru telah berhasil dibuat.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // RENDER HALAMAN JSX

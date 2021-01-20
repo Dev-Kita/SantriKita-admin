@@ -9,6 +9,7 @@ import SkeletonLoading from "../../components/skeletonLoading";
 import BiayaTable from "../../components/biaya/biayaTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   Flex,
   Spacer,
   Button,
@@ -34,6 +35,7 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 function Biaya() {
+  const toast = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
   const biayaData = useQuery(
@@ -95,6 +97,14 @@ function Biaya() {
     setSelectedName(null);
     setStatus("");
     onClose();
+    toast({
+      position: "bottom-right",
+      title: "Data Pembayaran Dibuat.",
+      description: "Data pembayaran baru telah berhasil dibuat.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // error handling

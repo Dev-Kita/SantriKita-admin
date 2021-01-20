@@ -9,6 +9,7 @@ import SkeletonLoading from "../../components/skeletonLoading";
 import RiwayatPembelajaranTable from "../../components/riwayatPembelajaran/riwayatPembelajaranTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   Flex,
   Spacer,
   Button,
@@ -34,6 +35,7 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 function RiwayatPembelajaran() {
+  const toast = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
   const riwayatPembelajaranData = useQuery(["lesson-histories"], fetcher, {
@@ -65,6 +67,14 @@ function RiwayatPembelajaran() {
     });
     setSelectedClass(null);
     onClose();
+    toast({
+      position: "bottom-right",
+      title: "Data Riwayat Belajar Dibuat.",
+      description: "Data riwayat belajar baru telah berhasil dibuat.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // error handling

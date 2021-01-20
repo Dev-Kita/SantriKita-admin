@@ -9,6 +9,7 @@ import SkeletonLoading from "../../components/skeletonLoading";
 import RiwayatKesehatanTable from "../../components/riwayatKesehatan/riwayatKesehatanTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   Flex,
   Spacer,
   Button,
@@ -34,6 +35,7 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 function RiwayatKesehatan() {
+  const toast = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
   const riwayatKesehatanData = useQuery(["medical-histories"], fetcher, {
@@ -89,6 +91,14 @@ function RiwayatKesehatan() {
     setStatus("");
     setJenis("");
     onClose();
+    toast({
+      position: "bottom-right",
+      title: "Data Riwayat Kesehatan Dibuat.",
+      description: "Data riwayat kesehatan baru telah berhasil dibuat.",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // error handling
