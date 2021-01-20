@@ -72,8 +72,8 @@ function Topbar() {
           <MenuList>
             <MenuGroup title="Profile">
               <MenuItem onClick={logoutHandler}>
-                <HStack>
-                  <p>Log out</p> <FaSignOutAlt />
+                <HStack color="red.500">
+                  <Text>Log out</Text> <FaSignOutAlt />
                 </HStack>
               </MenuItem>
             </MenuGroup>

@@ -59,7 +59,7 @@ function RiwayatKesehatan() {
     })
   );
 
-  const tambahBiayaHandler = () => {
+  const tambahKesehatanHandler = () => {
     medicalHistoryMutation.mutate({
       penyakit: penyakit,
       jenis: jenis,
@@ -207,7 +207,11 @@ function RiwayatKesehatan() {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} onClick={tambahBiayaHandler}>
+              <Button
+                colorScheme="teal"
+                mr={3}
+                onClick={tambahKesehatanHandler}
+              >
                 Simpan
               </Button>
               <Button onClick={onClose}>Batal</Button>

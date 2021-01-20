@@ -55,7 +55,7 @@ function RiwayatPembelajaran() {
     })
   );
 
-  const tambahBiayaHandler = () => {
+  const tambahRiwayatBelajarHandler = () => {
     lessonHistoryMutation.mutate({
       pelajaran: pelajaran,
       pengajar: pengajar,
@@ -170,7 +170,11 @@ function RiwayatPembelajaran() {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} onClick={tambahBiayaHandler}>
+              <Button
+                colorScheme="teal"
+                mr={3}
+                onClick={tambahRiwayatBelajarHandler}
+              >
                 Simpan
               </Button>
               <Button onClick={onClose}>Batal</Button>
