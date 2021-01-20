@@ -49,7 +49,9 @@ function Biaya() {
   const [keperluan, setKeperluan] = useState("");
   const [nominal, setNominal] = useState(null);
   const [nominalDibayar, setNominalDibayar] = useState(null);
+  const [sisaPembayaran, setSisaPembayaran] = useState(null);
   const [tanggal, setTanggal] = useState("");
+  const [keterangan, setKeterangan] = useState("");
   const [status, setStatus] = useState("");
   const statusList = ["Lunas", "Belum Lunas"];
 
@@ -63,13 +65,15 @@ function Biaya() {
 
   const tambahBiayaHandler = () => {
     billMutation.mutate({
-      Keperluan: keperluan,
+      keperluan: keperluan,
       nominal: nominal,
       nominal_dibayar: nominalDibayar,
+      sisa_pembayaran: sisaPembayaran,
       status: status,
       semester: semester,
       tahun: tahun,
       tanggal_pembayaran: tanggal,
+      keterangan: keterangan,
       student: { id: selectedName.id },
     });
     setSelectedName(null);
@@ -166,7 +170,7 @@ function Biaya() {
                 <FormControl isRequired>
                   <FormLabel>Biaya</FormLabel>
                   <Input
-                    placeholder="Biaya Bulanan"
+                    placeholder="Biaya"
                     type="number"
                     onChange={(e) => setNominal(e.target.value)}
                   />
@@ -175,8 +179,16 @@ function Biaya() {
                   <FormLabel>Nominal Dibayar</FormLabel>
                   <Input
                     placeholder="Nominal Dibayar"
-                    type="numeber"
+                    type="number"
                     onChange={(e) => setNominalDibayar(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Sisa Pembayaran</FormLabel>
+                  <Input
+                    placeholder="Sisa Pembayaran"
+                    type="number"
+                    onChange={(e) => setSisaPembayaran(e.target.value)}
                   />
                 </FormControl>
                 <FormControl isRequired>
@@ -204,6 +216,14 @@ function Biaya() {
                       ))}
                     </MenuList>
                   </Menu>
+                </FormControl>
+                {/* Keterangan */}
+                <FormControl>
+                  <FormLabel>Keterangan</FormLabel>
+                  <Textarea
+                    placeholder="Keterangan"
+                    onChange={(e) => setKeterangan(e.target.value)}
+                  />
                 </FormControl>
               </form>
             </ModalBody>

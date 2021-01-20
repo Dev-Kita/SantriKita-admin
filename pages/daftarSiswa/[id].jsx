@@ -3,6 +3,7 @@ import axios from "axios";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
+import Image from "next/image";
 import SkeletonLoading from "../../components/skeletonLoading";
 import Head from "next/head";
 import Select from "react-select";
@@ -12,6 +13,7 @@ import NextLink from "next/link";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   VStack,
+  Text,
   ButtonGroup,
   Flex,
   Spacer,
@@ -31,6 +33,7 @@ function DetailSiswa({ siswa, daftarKelas }) {
   const selKelas = daftarKelas.filter((k) => k.value === siswa.kelas.kelas);
   // console.log(daftarKelas);
   // console.log(siswa);
+  const [photo, setPhoto] = useState(siswa.photo.formats.small.url);
   const [nama, setNama] = useState(siswa.nama);
   const [nis, setNis] = useState(siswa.nis);
   const [kelas, setKelas] = useState(selKelas[0]);
@@ -144,6 +147,28 @@ function DetailSiswa({ siswa, daftarKelas }) {
           />
 
           <form onSubmit={editHandler}>
+            <Flex alignItems="center">
+              <FormLabel mr="4">Photo : </FormLabel>
+              <Image
+                src={photo}
+                alt="Profile Photo"
+                width={150}
+                height={150}
+                layout="intrinsic"
+              />
+              <Spacer />
+              {isEditing ? (
+                <input
+                  type="file"
+                  id="photo"
+                  name="photo"
+                  onChange={(e) => console.log(e.target.files[0])}
+                />
+              ) : (
+                <Spacer />
+              )}
+              <Spacer />
+            </Flex>
             <FormControl id="name">
               <FormLabel>Nama</FormLabel>
               <Input

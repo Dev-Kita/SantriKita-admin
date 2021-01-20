@@ -66,7 +66,7 @@ function DetailBiaya({ biaya }) {
               size="sm"
               leftIcon={<ArrowBackIcon />}
               variant="solid"
-              onClick={() => Router.router.back()}
+              onClick={() => router.back()}
             >
               Kembali
             </Button>
@@ -116,7 +116,7 @@ function DetailBiaya({ biaya }) {
 
             <FormControl id="keperluan">
               <FormLabel>Keperluan</FormLabel>
-              <Input type="text" value={biaya.Keperluan} isReadOnly />
+              <Input type="text" value={biaya.keperluan} isReadOnly />
             </FormControl>
 
             <FormControl id="tanggal">

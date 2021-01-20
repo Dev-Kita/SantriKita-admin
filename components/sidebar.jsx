@@ -48,15 +48,20 @@ export default function Sidebar({ children }) {
   const router = useRouter();
 
   return (
-    <Flex flexDir="row" justifyContent="space-between" bgColor="teal.700">
+    <Flex flexDir="row" justifyContent="space-between">
       <VStack
         py="8"
         pl="4"
+        bgColor="teal.700"
         w="20%"
-        h="100vh"
+        h="100%"
         color="gray.200"
         align="stretch"
         justify="space-between"
+        overflowX="hidden"
+        overflowY="auto"
+        position="fixed"
+        zIndex={1}
       >
         <Heading ml="4" mb="8" fontSize="3xl" color="gray.100">
           SANTRI KITA
@@ -91,7 +96,7 @@ export default function Sidebar({ children }) {
         <Spacer />
       </VStack>
 
-      <Box w="80%" bgColor="gray.100">
+      <Box ml="20%" minH="100vh" w="80%" bgColor="gray.100">
         {children}
       </Box>
     </Flex>

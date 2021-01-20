@@ -34,7 +34,7 @@ function BiayaTable({ data }) {
   const newData = data.map((biayaData, i) => {
     return {
       nama: biayaData.student.nama,
-      keperluan: biayaData.Keperluan,
+      keperluan: biayaData.keperluan,
       tanggal: (
         <Moment format="DD MMM YYYY">{biayaData.tanggal_pembayaran}</Moment>
       ),
