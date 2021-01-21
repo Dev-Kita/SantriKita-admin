@@ -7,6 +7,7 @@ import HapusPelanggaranAlert from "../../components/pelanggaran/hapusPelanggaran
 import CardWrapper from "../../components/cardWrapper";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   VStack,
   ButtonGroup,
   Flex,
@@ -25,6 +26,7 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 
 function DetailPelanggaran({ pelanggaran }) {
   const router = useRouter();
+  const toast = useToast();
   const [openAlert, setOpenAlert] = useState(false);
   const onClose = () => setOpenAlert(false);
   const cancelRef = useRef();
@@ -43,6 +45,14 @@ function DetailPelanggaran({ pelanggaran }) {
       }
     );
     router.replace("/pelanggaran");
+    toast({
+      position: "bottom-right",
+      title: "Data Pelanggaran Dihapus.",
+      description: "Data pelanggaran telah berhasil dihapus.",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   if (!pelanggaran) {

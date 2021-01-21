@@ -12,6 +12,7 @@ import CardWrapper from "../../components/cardWrapper";
 import NextLink from "next/link";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
+  useToast,
   VStack,
   Text,
   ButtonGroup,
@@ -30,6 +31,7 @@ const jwt = parseCookies().jwt;
 // KKOMPONEN UTAMA
 function DetailSiswa({ siswa, daftarKelas }) {
   const router = useRouter();
+  const toast = useToast();
   const selKelas = daftarKelas.filter((k) => k.value === siswa.kelas.kelas);
   // console.log(daftarKelas);
   // console.log(siswa);
@@ -65,6 +67,14 @@ function DetailSiswa({ siswa, daftarKelas }) {
       },
     });
     router.replace("/daftarSiswa");
+    toast({
+      position: "bottom-right",
+      title: "Data Siswa Dihapus.",
+      description: "Data siswa telah berhasil dihapus.",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
   // Function untuk menghandle edit data siswa
