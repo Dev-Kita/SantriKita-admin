@@ -136,17 +136,6 @@ function DetailSiswa({ siswa, daftarKelas }) {
         },
       }
     );
-
-    // setIsLoading(false);
-    // setIsEditing(false);
-    // toast({
-    //   position: "bottom-right",
-    //   title: "Data Siswa Diubah.",
-    //   description: "Data siswa telah berhasil diedit.",
-    //   status: "success",
-    //   duration: 5000,
-    //   isClosable: true,
-    // });
   };
 
   if (!siswa) {
