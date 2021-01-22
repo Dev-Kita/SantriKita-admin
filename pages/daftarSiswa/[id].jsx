@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
-import { useQuery } from "react-query";
+import { useQuery, useMutation } from "react-query";
 import Image from "next/image";
 import SkeletonLoading from "../../components/skeletonLoading";
 import Head from "next/head";
@@ -10,11 +10,16 @@ import Select from "react-select";
 import HapusSiswaAlert from "../../components/daftarSiswa/hapusSiswaAlert";
 import CardWrapper from "../../components/cardWrapper";
 import NextLink from "next/link";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import {
   useToast,
-  VStack,
-  Text,
+  Wrap,
+  WrapItem,
+  Box,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   ButtonGroup,
   Flex,
   Spacer,
@@ -35,9 +40,12 @@ function DetailSiswa({ siswa, daftarKelas }) {
   const selKelas = daftarKelas.filter((k) => k.value === siswa.kelas.kelas);
   // console.log(daftarKelas);
   // console.log(siswa);
-  const [photo, setPhoto] = useState(siswa.photo.formats.small.url);
+  const [photo, setPhoto] = useState(
+    siswa.photo.formats.small.url || undefined
+  );
   const [nama, setNama] = useState(siswa.nama);
   const [nis, setNis] = useState(siswa.nis);
+  const [JK, setJK] = useState(siswa.jenis_kelamin);
   const [kelas, setKelas] = useState(selKelas[0]);
   const [tglLahir, setTglLahir] = useState(siswa.tanggal_lahir);
   const [tahunMasuk, setTahunMasuk] = useState(siswa.tahun_masuk);
@@ -48,6 +56,7 @@ function DetailSiswa({ siswa, daftarKelas }) {
   const [openAlert, setOpenAlert] = useState(false);
   const onClose = () => setOpenAlert(false);
   const cancelRef = useRef();
+  const jkList = ["Laki-laki", "Perempuan"];
   const siswaInfo = {
     nama: nama,
     nis: nis,
@@ -58,46 +67,86 @@ function DetailSiswa({ siswa, daftarKelas }) {
     tahun_keluar: tahunKeluar,
   };
 
-  // Function untuk meng-Handle hapus data siswa
-  const deleteHandler = async () => {
-    // Delete data dari DB
-    const { data } = await axios.delete(`${URL}/students/${router.query.id}`, {
+  // UPDATE SISWA MUTATION
+  const editSiswaMutation = useMutation((newSiswa) =>
+    axios.put(`${URL}/students/${newSiswa.id}`, newSiswa.data, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
-    });
-    router.replace("/daftarSiswa");
-    toast({
-      position: "bottom-right",
-      title: "Data Siswa Dihapus.",
-      description: "Data siswa telah berhasil dihapus.",
-      status: "error",
-      duration: 5000,
-      isClosable: true,
+    })
+  );
+  // DELETE SISWA MUTATION
+  const deleteSiswaMutation = useMutation((siswaID) =>
+    axios.delete(`${URL}/students/${siswaID}`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+
+  // Function untuk meng-Handle hapus data siswa
+  const deleteHandler = () => {
+    // Delete data dari DB
+    deleteSiswaMutation.mutate(router.query.id, {
+      onSuccess: (data) => {
+        router.replace("/daftarSiswa");
+        toast({
+          position: "bottom-right",
+          title: "Data Siswa Dihapus.",
+          description: "Data siswa telah berhasil dihapus.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
     });
   };
 
   // Function untuk menghandle edit data siswa
   const editHandler = async (e) => {
-    try {
-      e.preventDefault();
-      setIsLoading(true);
-      const jwt = parseCookies().jwt;
-      const { data } = await axios.put(
-        `${URL}/students/${router.query.id}`,
-        siswaInfo,
-        {
-          headers: {
-            Authorization: `Bearer ${jwt}`,
-          },
-        }
-      );
-      console.log(data);
-      setIsLoading(false);
-      setIsEditing(false);
-    } catch (error) {
-      console.log(error);
-    }
+    e.preventDefault();
+    setIsLoading(true);
+
+    editSiswaMutation.mutate(
+      {
+        id: router.query.id,
+        data: {
+          nama: nama,
+          nis: nis,
+          jenis_kelamin: JK,
+          kelas: { id: kelas.id },
+          kamar: kamar,
+          tanggal_lahir: tglLahir,
+          tahun_masuk: tahunMasuk,
+          tahun_keluar: tahunKeluar,
+        },
+      },
+      {
+        onSuccess: (data) => {
+          setIsLoading(false);
+          setIsEditing(false);
+          toast({
+            position: "bottom-right",
+            title: "Data Siswa Diubah.",
+            description: "Data siswa telah berhasil diedit.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+        },
+      }
+    );
+
+    // setIsLoading(false);
+    // setIsEditing(false);
+    // toast({
+    //   position: "bottom-right",
+    //   title: "Data Siswa Diubah.",
+    //   description: "Data siswa telah berhasil diedit.",
+    //   status: "success",
+    //   duration: 5000,
+    //   isClosable: true,
+    // });
   };
 
   if (!siswa) {
@@ -159,13 +208,26 @@ function DetailSiswa({ siswa, daftarKelas }) {
           <form onSubmit={editHandler}>
             <Flex alignItems="center">
               <FormLabel mr="4">Photo : </FormLabel>
-              <Image
-                src={photo}
-                alt="Profile Photo"
-                width={150}
-                height={150}
-                layout="intrinsic"
-              />
+              <Wrap>
+                <WrapItem
+                  boxShadow="base"
+                  overflow="hidden"
+                  rounded="100px"
+                  border="2px"
+                  borderColor="gray.500"
+                  bg="white"
+                  lineHeight="0"
+                >
+                  <Image
+                    src={photo}
+                    alt="Profile Photo"
+                    width={150}
+                    height={150}
+                    layout="intrinsic"
+                  />
+                </WrapItem>
+              </Wrap>
+
               <Spacer />
               {isEditing ? (
                 <input
@@ -187,6 +249,33 @@ function DetailSiswa({ siswa, daftarKelas }) {
                 isReadOnly={!isEditing}
                 onChange={(e) => setNama(e.target.value)}
               />
+            </FormControl>
+            <FormControl mt="2">
+              <FormLabel>Jenis Kelamin</FormLabel>
+              {isEditing ? (
+                <Menu>
+                  <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                    {JK ? JK : "Jenis Kelamin"}
+                  </MenuButton>
+                  <MenuList>
+                    {jkList.map((jkItem, i) => (
+                      <MenuItem
+                        key={i}
+                        onClick={(e) => setJK(e.target.innerHTML)}
+                      >
+                        {jkItem}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+              ) : (
+                <Input
+                  type="text"
+                  value={JK}
+                  isReadOnly
+                  onChange={(e) => setJK(e.target.value)}
+                />
+              )}
             </FormControl>
             <FormControl id="nis" mt="2">
               <FormLabel>NIS</FormLabel>
@@ -269,6 +358,15 @@ function DetailSiswa({ siswa, daftarKelas }) {
               </Flex>
             ) : undefined}
           </form>
+
+          <style jsx>
+            {`
+              .image {
+                border: 1px solid red;
+                border-radius: 25px;
+              }
+            `}
+          </style>
         </CardWrapper>
       </>
     );

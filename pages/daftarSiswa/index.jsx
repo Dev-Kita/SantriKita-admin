@@ -6,11 +6,15 @@ import Select from "react-select";
 import SkeletonLoading from "../../components/skeletonLoading";
 import { parseCookies } from "nookies";
 import SiswaTable from "../../components/daftarSiswa/siswaTable";
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import {
   useToast,
   VStack,
   Flex,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   Spacer,
   Button,
   useDisclosure,
@@ -30,6 +34,7 @@ const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 function DaftarSiswa() {
+  const queryClient = useQueryClient();
   const toast = useToast();
   // useSWR Hooks untuk fetch data client-side
   const siswaData = useQuery(["students", "?_sort=tahun_masuk:asc"], fetcher, {
@@ -37,17 +42,28 @@ function DaftarSiswa() {
   });
   const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [userID, setUserID] = useState(0);
   const [nama, setNama] = useState("");
   const [nis, setNis] = useState(null);
   const [kelas, setKelas] = useState("");
   const [kamar, setKamar] = useState("");
+  const [jKelamin, setJKelamin] = useState("");
   const [tglLahir, setTglLahir] = useState("");
   const [tahunMasuk, setTahunMasuk] = useState(null);
   const [tahunKeluar, setTahunKeluar] = useState(null);
+  const jkList = ["Laki-laki", "Perempuan"];
 
   // SISWA MUTATION
-  const siswaMutation = useMutation((newSiswa) =>
-    axios.post(`${URL}/students`, newSiswa, {
+  const siswaMutation = useMutation((newSiswa) => {
+    return axios.post(`${URL}/students`, newSiswa, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+  });
+  // USER MUTATION
+  const userMutation = useMutation((newUser) =>
+    axios.post(`${URL}/auth/local/register`, newUser, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -56,26 +72,56 @@ function DaftarSiswa() {
 
   // HANDLER SUBMIT TAMBAH SISWA
   const tambahSiswaHadler = () => {
-    siswaMutation.mutate({
-      nama: nama,
-      nis: nis,
-      kelas: { id: kelas.id },
-      kamar: kamar,
-      tanggal_lahir: tglLahir,
-      tahun_masuk: tahunMasuk,
-      tahun_keluar: tahunKeluar,
-    });
-
-    // setSelectedClass(null);
+    userMutation.reset();
+    // Tambah User Baru
+    userMutation.mutate(
+      {
+        username: nis,
+        email: `siswa${nis}@gmail.com`,
+        password: `${nis}${tahunMasuk}`,
+      },
+      {
+        onError: (error) => console.log(error),
+        onSuccess: (data, variables) => {
+          // Query Invalidations
+          // queryCache.invalidateQueries("students");
+          console.log(data);
+          console.log(variables);
+          console.log(data.data.user.id);
+          // Ketika berhasil menambah user, tambah siswa baru
+          siswaMutation.mutate(
+            {
+              nama: nama,
+              jenis_kelamin: jKelamin,
+              nis: nis,
+              kelas: { id: kelas.id },
+              kamar: kamar,
+              tanggal_lahir: tglLahir,
+              tahun_masuk: tahunMasuk,
+              tahun_keluar: tahunKeluar,
+              photo: { id: 2 },
+              // user: { id: data.data.user.id },
+            },
+            {
+              onSuccess: (data) => {
+                // Ketika berhasil tambah siswa baru, tampilkan toast
+                toast({
+                  position: "bottom-right",
+                  title: "Data Siswa Dibuat.",
+                  description: "Data siswa baru telah berhasil dibuat.",
+                  status: "success",
+                  duration: 5000,
+                  isClosable: true,
+                });
+                console.log(data);
+              },
+            }
+          );
+        },
+      }
+    );
     onClose();
-    toast({
-      position: "bottom-right",
-      title: "Data Siswa Dibuat.",
-      description: "Data siswa baru telah berhasil dibuat.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+    // setSelectedClass(null);
   };
 
   // error handling
@@ -121,6 +167,24 @@ function DaftarSiswa() {
                     placeholder="Name"
                     onChange={(e) => setNama(e.target.value)}
                   />
+                </FormControl>
+                <FormControl isRequired>
+                  <FormLabel>Jenis Kelamin</FormLabel>
+                  <Menu>
+                    <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                      {jKelamin ? jKelamin : "Jenis Kelamin"}
+                    </MenuButton>
+                    <MenuList>
+                      {jkList.map((jkItem, i) => (
+                        <MenuItem
+                          key={i}
+                          onClick={(e) => setJKelamin(e.target.innerHTML)}
+                        >
+                          {jkItem}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
                 </FormControl>
                 <FormControl isRequired>
                   <FormLabel>NIS</FormLabel>

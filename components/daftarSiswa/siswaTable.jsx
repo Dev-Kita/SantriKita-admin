@@ -36,6 +36,7 @@ function SiswaTable({ data }) {
       nama: siswaData.nama,
       nis: siswaData.nis,
       classroom: siswaData.kelas.kelas,
+      jk: siswaData.jenis_kelamin,
       kamar: siswaData.kamar,
       // tanggalLahir: (
       //   <Moment format="DD MMM YYYY">{siswaData.tanggal_lahir}</Moment>
@@ -56,6 +57,7 @@ function SiswaTable({ data }) {
       { Header: "Nama", accessor: "nama" },
       { Header: "NIS", accessor: "nis" },
       { Header: "Kelas", accessor: "classroom" },
+      { Header: "Jen Kelamin", accessor: "jk" },
       { Header: "Kamar", accessor: "kamar" },
       // { Header: "Tanggal Lahir", accessor: "tanggalLahir" },
       { Header: "Tahun Masuk", accessor: "tahunMasuk" },
