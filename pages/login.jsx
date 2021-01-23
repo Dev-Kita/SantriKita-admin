@@ -31,11 +31,6 @@ function Login() {
   const [auth, setAuth] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    // Prefetch halaman dashboard
-    router.prefetch("/dashboard");
-  }, []);
-
   const loginMutation = useMutation((loginInfo) =>
     axios.post(`${URL}/auth/local`, loginInfo)
   );
