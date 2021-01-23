@@ -41,7 +41,7 @@ function DaftarPelanggaran() {
   const pelanggaranData = useQuery(
     ["violations", "?_sort=tanggal:DESC"],
     pelanggaranFetcher,
-    { refetchInterval: 3000 }
+    { refetchInterval: 500 }
   );
   const siswaData = useQuery("students", siswaFetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -81,7 +81,7 @@ function DaftarPelanggaran() {
     });
     notifMutation.mutate({
       notifikasi: "Pelanggaran baru ditambahkan",
-      slug: "pelanggaran",
+      slug: "Pelanggaran",
       waktu: new Date(),
       terbaca: false,
       student: { id: selectedName.id },

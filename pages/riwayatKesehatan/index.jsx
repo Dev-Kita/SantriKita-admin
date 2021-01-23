@@ -39,7 +39,7 @@ function RiwayatKesehatan() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const riwayatKesehatanData = useQuery(["medical-histories"], fetcher, {
-    refetchInterval: 3000,
+    refetchInterval: 500,
   });
   const siswaData = useQuery("students", fetcher);
   console.log(riwayatKesehatanData);
@@ -81,7 +81,7 @@ function RiwayatKesehatan() {
     });
     notifMutation.mutate({
       notifikasi: "Riwayat Kesehatan baru ditambahkan",
-      slug: "riwayatKesehatan",
+      slug: "Kesehatan",
       waktu: new Date(),
       terbaca: false,
       student: { id: selectedName.id },

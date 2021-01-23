@@ -39,7 +39,7 @@ function RiwayatPembelajaran() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const riwayatPembelajaranData = useQuery(["lesson-histories"], fetcher, {
-    refetchInterval: 3000,
+    refetchInterval: 500,
   });
   const kelasData = useQuery("classrooms", fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();

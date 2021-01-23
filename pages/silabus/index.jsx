@@ -42,7 +42,7 @@ function Silabus() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const silabusData = useQuery(["silabuses"], fetcher, {
-    refetchInterval: 3000,
+    refetchInterval: 500,
   });
   // console.log(silabusData.data);
   const kelasData = useQuery("classrooms", fetcher);

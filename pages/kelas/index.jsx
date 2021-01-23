@@ -31,7 +31,7 @@ const jwt = parseCookies().jwt;
 function DaftarKelas() {
   const toast = useToast();
   const kelasData = useQuery(["classrooms", "?_sort=kelas:desc"], fetcher, {
-    refetchInterval: 3000,
+    refetchInterval: 500,
   });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [kelas, setKelas] = useState("");

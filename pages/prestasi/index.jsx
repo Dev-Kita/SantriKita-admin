@@ -35,7 +35,7 @@ function DaftarPrestasi() {
   // const queryClient = useQueryClient();
   // DEKLARASI HOOKS DAN VARIABEL
   const prestasiData = useQuery(["achievements", "?_sort=tahun:ASC"], fetcher, {
-    refetchInterval: 3000,
+    refetchInterval: 500,
   });
   const siswaData = useQuery("students", fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -76,7 +76,7 @@ function DaftarPrestasi() {
     });
     notifMutation.mutate({
       notifikasi: "Prestasi baru ditambahkan",
-      slug: "prestasi",
+      slug: "Prestasi",
       waktu: new Date(),
       terbaca: false,
       student: { id: selectedName.id },

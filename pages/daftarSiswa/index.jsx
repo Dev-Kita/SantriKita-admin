@@ -38,7 +38,7 @@ function DaftarSiswa() {
   const toast = useToast();
   // useSWR Hooks untuk fetch data client-side
   const siswaData = useQuery(["students", "?_sort=tahun_masuk:asc"], fetcher, {
-    refetchInterval: 3000,
+    refetchInterval: 500,
   });
   const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();

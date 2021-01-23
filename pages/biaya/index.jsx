@@ -41,7 +41,7 @@ function Biaya() {
   const biayaData = useQuery(
     ["bills", "?_sort=tanggal_pembayaran:DESC"],
     fetcher,
-    { refetchInterval: 3000 }
+    { refetchInterval: 500 }
   );
   const siswaData = useQuery("students", fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -89,7 +89,7 @@ function Biaya() {
     });
     notifMutation.mutate({
       notifikasi: "Pembayaran baru ditambahkan",
-      slug: "biaya",
+      slug: "Biaya",
       waktu: new Date(),
       terbaca: false,
       student: { id: selectedName.id },
