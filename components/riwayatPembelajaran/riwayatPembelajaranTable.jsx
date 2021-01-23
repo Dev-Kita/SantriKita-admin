@@ -41,11 +41,11 @@ function RiwayatPembelajaranTable({ data }) {
       detail: (
         <NextLink
           href={{
-            pathname: `${router.pathname}/${riwayatKesehatanData.id}`,
+            pathname: `${router.pathname}/${riwayatPembelajaran.id}`,
           }}
         >
           <Link color="teal.500" fontWeight="medium">
-            "Detail",
+            Detail
           </Link>
         </NextLink>
       ),

@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
+import { useMutation } from "react-query";
 import SkeletonLoading from "../../components/skeletonLoading";
 import Head from "next/head";
 import Select from "react-select";
@@ -57,52 +58,34 @@ function SilabusDetail({ silabuses, daftarKelas }) {
   const onClose = () => setOpenAlert(false);
   const cancelRef = useRef();
 
-  // const silabusesInfo = {
-  //   pelajaran: pelajaran,
-  //   kompetensi_dasar: KD,
-  //   bab: bab,
-  //   keterangan: keterangan,
-  // };
-
-  // Function untuk meng-Handle hapus data siswa
-  const deleteHandler = async () => {
-    // Delete data dari DB
-    const { data } = await axios.delete(`${URL}/silabuses/${router.query.id}`, {
+  // DELETE SILABUS MUTATION
+  const deleteSilabusMutation = useMutation((silabusID) =>
+    axios.delete(`${URL}/silabuses/${silabusID}`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
-    });
-    router.replace("/silabus");
-    toast({
-      position: "bottom-right",
-      title: "Data Silabus Dihapus.",
-      description: "Data silabus telah berhasil dihapus.",
-      status: "error",
-      duration: 5000,
-      isClosable: true,
+    })
+  );
+
+  // Function untuk meng-Handle hapus data SILABSUS
+  const deleteHandler = () => {
+    deleteSilabusMutation.mutate(router.query.id, {
+      onSuccess: (data) => {
+        router.replace("/silabus");
+        toast({
+          position: "bottom-right",
+          title: "Data Silabus Dihapus.",
+          description: "Data silabus telah berhasil dihapus.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
     });
   };
 
   // Function untuk menghandle edit data siswa
   const editHandler = async (e) => {
-    // try {
-    //   e.preventDefault();
-    //   setIsLoading(true);
-    //   const jwt = parseCookies().jwt;
-    //   const { data } = await axios.put(
-    //     `${URL}/silabuses/${router.query.id}`,
-    //     silabusesInfo,
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${jwt}`,
-    //       },
-    //     }
-    //   );
-    //   console.log(data);
-    //   setIsLoading(false);
-    //   setIsEditing(false);
-    // } catch (error) {
-    //   console.log(error);
     // }
   };
 
@@ -243,38 +226,6 @@ function SilabusDetail({ silabuses, daftarKelas }) {
     );
   }
 }
-
-// Function untuk fetch data dari API students
-const fetcher = async ({ queryKey }) => {
-  try {
-    const collection = queryKey[0];
-    let endpoint = `${URL}/${collection}`;
-
-    if (queryKey[1]) {
-      const params = queryKey[1];
-      endpoint = `${URL}/${collection}${params}`;
-    }
-
-    const { data } = await axios.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-
-    let newKelas = [];
-    if (collection === "classrooms") {
-      newKelas = data.map((kelas) => {
-        return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
-      });
-      return newKelas;
-    }
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    return { msg: "Query data failed" };
-  }
-};
 
 // PRE-RENDER DATA INDIVIDUAL SILABUS
 export async function getServerSideProps(context) {

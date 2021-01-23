@@ -3,17 +3,16 @@ import axios from "axios";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { useMutation } from "react-query";
 import HapusPelanggaranAlert from "../../components/pelanggaran/hapusPelanggaranAlert";
+import SkeletonLoading from "../../components/skeletonLoading";
 import CardWrapper from "../../components/cardWrapper";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   useToast,
-  VStack,
   ButtonGroup,
   Flex,
   Spacer,
-  Skeleton,
-  SkeletonText,
   Heading,
   FormControl,
   FormLabel,
@@ -23,6 +22,7 @@ import {
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
+const jwt = parseCookies().jwt;
 
 function DetailPelanggaran({ pelanggaran }) {
   const router = useRouter();
@@ -31,43 +31,36 @@ function DetailPelanggaran({ pelanggaran }) {
   const onClose = () => setOpenAlert(false);
   const cancelRef = useRef();
 
-  // EVENT HANDLER FUNCTION
-  // Function untuk meng-Handle hapus data pelanggaran
-  const deleteHandler = async () => {
-    const jwt = parseCookies().jwt;
-    // Delete data dari DB
-    const { data } = await axios.delete(
-      `${URL}/violations/${router.query.id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
-    router.replace("/pelanggaran");
-    toast({
-      position: "bottom-right",
-      title: "Data Pelanggaran Dihapus.",
-      description: "Data pelanggaran telah berhasil dihapus.",
-      status: "error",
-      duration: 5000,
-      isClosable: true,
+  // DELETE SILABUS MUTATION
+  const deletePelanggaranMutation = useMutation((pelanggaranID) =>
+    axios.delete(`${URL}/violations/${pelanggaranID}`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+
+  // Function untuk meng-Handle hapus data SILABSUS
+  const deleteHandler = () => {
+    deletePelanggaranMutation.mutate(router.query.id, {
+      onSuccess: (data) => {
+        router.replace("/pelanggaran");
+        toast({
+          position: "bottom-right",
+          title: "Data Pelanggaran Dihapus.",
+          description: "Data pelanggaran telah berhasil dihapus.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
     });
   };
 
   if (!pelanggaran) {
     return (
       <>
-        <Head>
-          <title>Siswa Detail | Santri Kita</title>
-        </Head>
-
-        <CardWrapper>
-          <VStack align="stretch" spacing={2}>
-            <Skeleton height="20px" mb="4" rounded="md" />
-            <SkeletonText mt="4" noOfLines={4} spacing="4" rounded="full" />
-          </VStack>
-        </CardWrapper>
+        <SkeletonLoading title={"Detail Pelanggaran"} />
       </>
     );
   }
@@ -76,7 +69,7 @@ function DetailPelanggaran({ pelanggaran }) {
     return (
       <>
         <Head>
-          <title>Siswa Detail | Santri Kita</title>
+          <title>Pelanggaran Detail | Santri Kita</title>
         </Head>
 
         <CardWrapper>
@@ -90,7 +83,7 @@ function DetailPelanggaran({ pelanggaran }) {
               Kembali
             </Button>
             <Spacer />
-            <Heading fontSize="xl">Siswa Detail</Heading>
+            <Heading fontSize="xl">Pelanggaran Detail</Heading>
             <Spacer />
             <ButtonGroup>
               <Button

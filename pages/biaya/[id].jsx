@@ -2,12 +2,15 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
+import { useMutation } from "react-query";
 import Head from "next/head";
 import HapusBiayaAlert from "../../components/biaya/hapusBiayaAlert";
 import CardWrapper from "../../components/cardWrapper";
 import SkeletonLoading from "../../components/skeletonLoading";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
+  useToast,
+  Textarea,
   VStack,
   HStack,
   ButtonGroup,
@@ -23,25 +26,39 @@ import {
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
+const jwt = parseCookies().jwt;
 
 function DetailBiaya({ biaya }) {
-  console.log(biaya);
+  const toast = useToast();
   const router = useRouter();
   const [openAlert, setOpenAlert] = useState(false);
   const onClose = () => setOpenAlert(false);
   const cancelRef = useRef();
 
-  // EVENT HANDLER FUNCTION
-  // Function untuk meng-Handle hapus data pelanggaran
-  const deleteHandler = async () => {
-    const jwt = parseCookies().jwt;
-    // Delete data dari DB
-    const { data } = await axios.delete(`${URL}/bills/${router.query.id}`, {
+  // DELETE SILABUS MUTATION
+  const deletePembayaranMutation = useMutation((pembayaranID) =>
+    axios.delete(`${URL}/bills/${pembayaranID}`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
+    })
+  );
+
+  // Function untuk meng-Handle hapus data SILABSUS
+  const deleteHandler = () => {
+    deletePembayaranMutation.mutate(router.query.id, {
+      onSuccess: (data) => {
+        router.replace("/biaya");
+        toast({
+          position: "bottom-right",
+          title: "Data Pembayaran Dihapus.",
+          description: "Data Pembayaran telah berhasil dihapus.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      },
     });
-    router.replace("/biaya");
   };
 
   // loading state
@@ -140,9 +157,22 @@ function DetailBiaya({ biaya }) {
               </InputGroup>
             </FormControl>
 
+            <FormControl id="siswaPembayaran">
+              <FormLabel>Sisa Pembayaran</FormLabel>
+              <InputGroup>
+                <InputLeftAddon children="Rp" />
+                <Input type="text" value={biaya.sisa_pembayaran} isReadOnly />
+              </InputGroup>
+            </FormControl>
+
             <FormControl id="status">
               <FormLabel>Status</FormLabel>
               <Input type="text" value={biaya.status} isReadOnly />
+            </FormControl>
+
+            <FormControl id="tahunMasuk" mt="2">
+              <FormLabel>Keterangan</FormLabel>
+              <Textarea type="text" value={biaya.keterangan} isReadOnly />
             </FormControl>
           </VStack>
         </CardWrapper>

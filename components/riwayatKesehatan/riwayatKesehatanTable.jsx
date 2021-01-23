@@ -49,7 +49,7 @@ function RiwayatKesehatanTable({ data }) {
           }}
         >
           <Link color="teal.500" fontWeight="medium">
-            "Detail",
+            Detail
           </Link>
         </NextLink>
       ),
