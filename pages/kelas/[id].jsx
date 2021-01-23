@@ -2,21 +2,17 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
-import { useQuery, useMutation } from "react-query";
+import { useMutation } from "react-query";
 import SkeletonLoading from "../../components/skeletonLoading";
 import Head from "next/head";
-import Select from "react-select";
 import HapusKelasAlert from "../../components/kelas/hapusKelasAlert";
 import KelasSiswaTable from "../../components/kelas/kelasSiswaTable";
 import KelasSilabusTable from "../../components/kelas/kelasSilabusTable";
 import CardWrapper from "../../components/cardWrapper";
 import NextLink from "next/link";
-import { ArrowBackIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   useToast,
-  Wrap,
-  WrapItem,
-  Box,
   ButtonGroup,
   Flex,
   Spacer,

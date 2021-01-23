@@ -1,6 +1,4 @@
 import React, { useState, useMemo } from "react";
-import NextLink from "next/link";
-import Moment from "react-moment";
 import {
   useTable,
   useSortBy,
@@ -34,8 +32,6 @@ function KelasSiswaTable({ data, kelas }) {
     return {
       nama: student.nama,
       nis: student.nis,
-
-      // "Detail",
     };
   });
   const rowsData = useMemo(() => newData, [data]);

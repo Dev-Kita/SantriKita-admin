@@ -4,6 +4,7 @@ import NextLink from "next/link";
 import { setCookie } from "nookies";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { useMutation } from "react-query";
 import {
   Link,
   FormControl,
@@ -20,10 +21,8 @@ import {
   AlertIcon,
   Spinner,
 } from "@chakra-ui/react";
-import { LOGIN } from "../utils/loginQuery";
-import { gqlClient } from "./_app";
 
-const url = process.env.NEXT_PUBLIC_API_URL;
+const URL = process.env.NEXT_PUBLIC_API_URL;
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -37,35 +36,43 @@ function Login() {
     router.prefetch("/dashboard");
   }, []);
 
-  const submitHandler = async (e) => {
-    try {
-      e.preventDefault();
-      setAuth(true);
-      setIsLoading(true);
-      const variables = { identifier: username, password: password };
+  const loginMutation = useMutation((loginInfo) =>
+    axios.post(`${URL}/auth/local`, loginInfo)
+  );
 
-      // const res = await gqlClient.request(LOGIN, variables);
-      // console.log(res);
-      const res = await axios.post(`${url}/auth/local`, variables);
-      const loginResponse = res.data;
+  const submitHandler = (e) => {
+    e.preventDefault();
+    setAuth(true);
+    setIsLoading(true);
 
-      setCookie(null, "jwt", loginResponse.jwt, {
-        maxAge: 10 * 60 * 60,
-        path: "/",
-      });
-      setCookie(null, "username", loginResponse.user.username, {
-        maxAge: 10 * 60 * 60,
-        path: "/",
-      });
-      setAuth(true);
-      setIsLoading(false);
+    loginMutation.mutate(
+      { identifier: username, password: password },
+      {
+        // Error Handling Salah UName / PassWd
+        onError: (error) => {
+          console.log(error);
+          setAuth(false);
+          setIsLoading(false);
+        },
+        // Success Handling UName / PassWd benar
+        onSuccess: (data) => {
+          const loginResponse = data.data;
 
-      router.push("/dashboard");
-    } catch (error) {
-      console.log(error);
-      setAuth(false);
-      setIsLoading(false);
-    }
+          setCookie(null, "jwt", loginResponse.jwt, {
+            maxAge: 10 * 60 * 60,
+            path: "/",
+          });
+          setCookie(null, "username", loginResponse.user.username, {
+            maxAge: 10 * 60 * 60,
+            path: "/",
+          });
+
+          setAuth(true);
+          setIsLoading(false);
+          router.push("/dashboard");
+        },
+      }
+    );
   };
 
   return (
