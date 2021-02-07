@@ -4,12 +4,21 @@ import { parseCookies } from "nookies";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Router from "next/router";
 import Head from "next/head";
+import NProgress from "nprogress";
 // import { endpoint } from "../utils/gql";
 import { GraphQLClient } from "graphql-request";
 
 import Layout from "../components/layout";
 import { customTheme } from "../components/customStyles/theme";
 import { Fonts } from "../components/customStyles/Font";
+
+// INIT NPROGRESS
+Router.events.on("routeChangeStart", (url) => {
+  console.log(`Loading: ${url}`);
+  NProgress.start();
+});
+Router.events.on("routeChangeComplete", () => NProgress.done());
+Router.events.on("routeChangeError", () => NProgress.done());
 
 // INIT GRAPHQL
 export const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/graphql`;
@@ -35,6 +44,9 @@ export const GqlClient = createContext();
 function MyApp({ Component, pageProps }) {
   return (
     <>
+      <Head>
+        <link rel="stylesheet" type="text/css" href="/nprogress.css" />
+      </Head>
       <QueryClientProvider client={queryClient}>
         <ChakraProvider theme={theme}>
           <Fonts />

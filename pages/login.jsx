@@ -109,35 +109,29 @@ function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </FormControl>
-              <Button type="submit" mt="2" colorScheme="teal" variant="solid">
+              <Button
+                type="submit"
+                mt="2"
+                colorScheme="teal"
+                variant="solid"
+                isLoading={isLoading}
+                loadingText="Loging in"
+              >
                 Log in
               </Button>
             </Flex>
           </form>
 
-          {isLoading ? (
-            <Box justifyContent="center">
-              <Spinner
-                thickness="4px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="teal.500"
-              />
-            </Box>
-          ) : undefined}
-
-          {auth ? undefined : (
-            <Alert status="error" rounded="md">
-              <AlertIcon />
-              <AlertTitle>Wrong username or password</AlertTitle>
-              <CloseButton
-                position="absolute"
-                right="8px"
-                top="8px"
-                onClick={() => setAuth(true)}
-              />
-            </Alert>
-          )}
+          <Alert status="error" rounded="md" display={auth ? "none" : "flex"}>
+            <AlertIcon />
+            <AlertTitle>Wrong username or password</AlertTitle>
+            <CloseButton
+              position="absolute"
+              right="8px"
+              top="8px"
+              onClick={() => setAuth(true)}
+            />
+          </Alert>
         </Flex>
       </Flex>
     </>
