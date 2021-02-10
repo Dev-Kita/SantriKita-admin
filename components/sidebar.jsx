@@ -14,7 +14,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { MdDashboard, MdSchool } from "react-icons/md";
-import { GiAchievement, GiPoliceBadge } from "react-icons/gi";
+import { GiAchievement, GiPoliceBadge, GiTeacher } from "react-icons/gi";
 import {
   FaSchool,
   FaBookOpen,
@@ -22,17 +22,28 @@ import {
   FaBriefcaseMedical,
   FaMoneyBillWaveAlt,
   FaSignOutAlt,
+  FaChalkboardTeacher,
 } from "react-icons/fa";
 
 const sideMenu = [
   { icon: <MdDashboard />, title: "Dashboard", slug: "/dashboard" },
-  { icon: <MdSchool />, title: "Daftar Siswa", slug: "/daftarSiswa" },
   { icon: <FaSchool />, title: "Kelas", slug: "/kelas" },
   { icon: <FaBook />, title: "Silabus", slug: "/silabus" },
+  { icon: <MdSchool />, title: "Daftar Siswa", slug: "/daftarSiswa" },
+  {
+    icon: <FaChalkboardTeacher />,
+    title: "Daftar Guru & Ustad",
+    slug: "/daftarGuru",
+  },
   {
     icon: <FaBookOpen />,
-    title: "Riwayat Pembelajaran",
-    slug: "/riwayatPembelajaran",
+    title: "Aktivitas Siswa",
+    slug: "/aktivitasSiswa",
+  },
+  {
+    icon: <GiTeacher />,
+    title: "Aktivitas Guru & Ustad",
+    slug: "/aktivitasGuru",
   },
   {
     icon: <FaBriefcaseMedical />,

@@ -42,7 +42,6 @@ function DaftarSiswa() {
   });
   const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [userID, setUserID] = useState(0);
   const [nama, setNama] = useState("");
   const [nis, setNis] = useState(null);
   const [kelas, setKelas] = useState("");
@@ -84,7 +83,7 @@ function DaftarSiswa() {
         onError: (error) => console.log(error),
         onSuccess: (data, variables) => {
           // Query Invalidations
-          // queryCache.invalidateQueries("students");
+          queryClient.invalidateQueries("students");
           console.log(data);
           console.log(variables);
           console.log(data.data.user.id);

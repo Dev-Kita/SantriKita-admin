@@ -34,11 +34,11 @@ import {
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
-function RiwayatPembelajaran() {
+function AktivitasSiswa() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const riwayatPembelajaranData = useQuery(["lesson-histories"], fetcher, {
+  const aktivitasSiswaData = useQuery(["lesson-histories"], fetcher, {
     refetchInterval: 500,
   });
   const kelasData = useQuery("classrooms", fetcher);
@@ -78,8 +78,8 @@ function RiwayatPembelajaran() {
   };
 
   // error handling
-  if (riwayatPembelajaranData.isError) {
-    console.log(riwayatPembelajaranData.error);
+  if (aktivitasSiswaData.isError) {
+    console.log(aktivitasSiswaData.error);
     return (
       <Flex justify="center" direction="row">
         <Button
@@ -95,7 +95,7 @@ function RiwayatPembelajaran() {
     );
   }
   // loading state
-  if (riwayatPembelajaranData.isLoading) {
+  if (aktivitasSiswaData.isLoading) {
     return (
       <>
         <SkeletonLoading
@@ -106,7 +106,7 @@ function RiwayatPembelajaran() {
     );
   }
 
-  if (riwayatPembelajaranData.isSuccess) {
+  if (aktivitasSiswaData.isSuccess) {
     return (
       <>
         <Head>
@@ -192,7 +192,7 @@ function RiwayatPembelajaran() {
           </ModalContent>
         </Modal>
 
-        <RiwayatPembelajaranTable data={riwayatPembelajaranData.data} />
+        <RiwayatPembelajaranTable data={aktivitasSiswaData.data} />
       </>
     );
   }
@@ -234,4 +234,4 @@ const fetcher = async ({ queryKey }) => {
   }
 };
 
-export default RiwayatPembelajaran;
+export default AktivitasSiswa;
