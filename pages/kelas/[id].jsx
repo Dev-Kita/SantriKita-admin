@@ -22,24 +22,26 @@ import {
   Input,
   Button,
 } from "@chakra-ui/react";
+import Select from "react-select";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
 // KKOMPONEN UTAMA
-function KelasDetail({ kelasData }) {
+function KelasDetail({ kelasData, allGuru, guruTersedia }) {
   const router = useRouter();
   const toast = useToast();
-  console.log(kelasData);
-
+  console.log(allGuru);
+  console.log(guruTersedia);
+  const selGuru = allGuru.filter((g) => g.value === kelasData.teacher?.nama);
+  console.log(selGuru);
   const [kelas, setKelas] = useState(kelasData.kelas);
-  const [pembimbing, setPembimbing] = useState(kelasData.pembimbing);
+  const [pembimbing, setPembimbing] = useState(selGuru[0] || { id: null });
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
   const onClose = () => setOpenAlert(false);
   const cancelRef = useRef();
-  const jkList = ["Laki-laki", "Perempuan"];
 
   // UPDATE KELAS MUTATION
   const editKelasMutation = useMutation((newKelas) =>
@@ -86,10 +88,11 @@ function KelasDetail({ kelasData }) {
         id: router.query.id,
         data: {
           kelas: kelas,
-          pembimbing: pembimbing,
+          teacher: pembimbing.id,
         },
       },
       {
+        onError: (error) => console.log(error),
         onSuccess: (data) => {
           setIsLoading(false);
           setIsEditing(false);
@@ -171,12 +174,22 @@ function KelasDetail({ kelasData }) {
             </FormControl>
             <FormControl id="pembimbing">
               <FormLabel>Pembimbing</FormLabel>
-              <Input
-                type="text"
-                value={pembimbing}
-                isReadOnly={!isEditing}
-                onChange={(e) => setPembimbing(e.target.value)}
-              />
+              {isEditing ? (
+                <Select
+                  defaultValue={pembimbing}
+                  onChange={setPembimbing}
+                  options={guruTersedia}
+                  isClearable
+                  isSearchable
+                />
+              ) : (
+                <Input
+                  type="text"
+                  value={pembimbing?.label || "-"}
+                  isReadOnly
+                  onChange={(e) => setPembimbing(e.target.value)}
+                />
+              )}
             </FormControl>
 
             {isEditing ? (
@@ -215,8 +228,37 @@ export async function getServerSideProps(context) {
     },
   });
 
+  const guruData = await axios.get(`${URL}/teachers`, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
+
+  let allGuru = [];
+  allGuru = guruData.data?.map((guru) => {
+    return { value: guru.nama, label: guru.nama, id: guru.id };
+  });
+  allGuru.unshift({ value: "-", label: "-", id: null });
+
+  let newGuru = [];
+  // console.log(data);
+  let guruTersedia = guruData.data?.filter((g) => g.classroom === null);
+  newGuru = guruTersedia.map((guru) => {
+    return { value: guru.nama, label: guru.nama, id: guru.id };
+  });
+  newGuru.unshift({
+    value: kelasData.data.teacher?.nama || "-",
+    label: kelasData.data.teacher?.nama || "-",
+    id: kelasData.data.teacher?.id || null,
+  });
+  newGuru.unshift({ value: "-", label: "-", id: null });
+
   return {
-    props: { kelasData: kelasData.data },
+    props: {
+      kelasData: kelasData.data,
+      allGuru: allGuru,
+      guruTersedia: newGuru,
+    },
   };
 }
 

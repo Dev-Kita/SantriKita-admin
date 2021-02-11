@@ -33,7 +33,7 @@ function KelasTable({ data }) {
   const newData = data.map((kelasData, i) => {
     return {
       kelas: kelasData.kelas,
-      pembimbing: kelasData.pembimbing,
+      pembimbing: kelasData.teacher?.nama || "-",
       detail: (
         <NextLink href={`${router.pathname}/${kelasData.id}`}>
           <Link color="teal.500" fontWeight="medium">

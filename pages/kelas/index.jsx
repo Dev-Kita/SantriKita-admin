@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "react-query";
 import axios from "axios";
 import Head from "next/head";
+import Select from "react-select";
 import SkeletonLoading from "../../components/skeletonLoading";
 import { parseCookies } from "nookies";
 import KelasTable from "../../components/kelas/kelasTable";
@@ -31,11 +32,14 @@ const jwt = parseCookies().jwt;
 function DaftarKelas() {
   const toast = useToast();
   const kelasData = useQuery(["classrooms", "?_sort=kelas:desc"], fetcher, {
-    refetchInterval: 500,
+    refetchInterval: 1000,
   });
+  const guruData = useQuery(["teachers", "?_sort=nama:asc"], fetcher);
+  console.log(kelasData.data);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [kelas, setKelas] = useState("");
-  const [pembimbing, setPembimbing] = useState("");
+  const [pembimbing, setPembimbing] = useState();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // SISWA MUTATION
   const kelasMutation = useMutation((newKelas) =>
@@ -48,21 +52,31 @@ function DaftarKelas() {
 
   // HANDLER SUBMIT TAMBAH SISWA
   const tambahKelasHadler = () => {
-    kelasMutation.mutate({
-      kelas: kelas,
-      pembimbing: pembimbing,
-    });
+    setIsSubmitting(true);
+    kelasMutation.mutate(
+      {
+        kelas: kelas,
+        teacher: pembimbing.id || null,
+      },
+      {
+        onError: (error) => console.log(error),
+        onSuccess: (data) => {
+          console.log(data);
+          toast({
+            position: "bottom-right",
+            title: "Data Kelas Dibuat.",
+            description: "Data kelas baru telah berhasil dibuat.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+          setIsSubmitting(false);
+        },
+      }
+    );
 
     // setSelectedClass(null);
     onClose();
-    toast({
-      position: "bottom-right",
-      title: "Data Kelas Dibuat.",
-      description: "Data kelas baru telah berhasil dibuat.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
   };
 
   // error handling
@@ -111,9 +125,11 @@ function DaftarKelas() {
                 </FormControl>
                 <FormControl>
                   <FormLabel>Pembimbing</FormLabel>
-                  <Input
-                    placeholder="Pembimbing"
-                    onChange={(e) => setPembimbing(e.target.value)}
+                  <Select
+                    onChange={setPembimbing}
+                    options={guruData.data}
+                    isClearable
+                    isSearchable
                   />
                 </FormControl>
               </form>
@@ -123,7 +139,9 @@ function DaftarKelas() {
               <Button colorScheme="teal" mr={3} onClick={tambahKelasHadler}>
                 Simpan
               </Button>
-              <Button onClick={onClose}>Batal</Button>
+              <Button isLoading={isSubmitting} onClick={onClose}>
+                Batal
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
@@ -136,20 +154,31 @@ function DaftarKelas() {
 
 // Function untuk fetch data dari API students
 const fetcher = async ({ queryKey }) => {
+  const collection = queryKey[0];
+  let endpoint = `${URL}/${collection}`;
+
+  if (queryKey[1]) {
+    const filter = queryKey[1];
+    endpoint = `${URL}/${collection}${filter}`;
+  }
+
   try {
-    const collection = queryKey[0];
-    let endpoint = `${URL}/${collection}`;
-
-    if (queryKey[1]) {
-      const params = queryKey[1];
-      endpoint = `${URL}/${collection}${params}`;
-    }
-
     const { data } = await axios.get(endpoint, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
     });
+
+    let newGuru = [];
+    if (collection === "teachers") {
+      // console.log(data);
+      let guruTersedia = data.filter((g) => g.classroom === null);
+      newGuru = guruTersedia.map((guru) => {
+        return { value: guru.nama, label: guru.nama, id: guru.id };
+      });
+      newGuru.unshift({ value: "-", label: "-", id: null });
+      return newGuru;
+    }
 
     return data;
   } catch (error) {

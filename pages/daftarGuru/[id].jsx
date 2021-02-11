@@ -42,8 +42,7 @@ function DetailGuru({ guru, daftarKelas }) {
   const selKelas = daftarKelas.filter(
     (k) => k.value === (guru.classroom?.kelas || "-")
   );
-  console.log(guru);
-  console.log(daftarKelas);
+
   const [nama, setNama] = useState(guru.nama);
   const [alamat, setAlamat] = useState(guru.alamat);
   const [kelas, setKelas] = useState(selKelas[0]);

@@ -228,7 +228,7 @@ const fetcher = async ({ queryKey }) => {
       newKelas = data.map((kelas) => {
         return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
       });
-      newKelas.unshift({ value: "-", label: "-", id: undefined });
+      newKelas.unshift({ value: "-", label: "-", id: null });
       return newKelas;
     }
 
