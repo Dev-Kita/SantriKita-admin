@@ -107,8 +107,15 @@ function DaftarGuru() {
                   {
                     onError: (error) => console.log(error),
                     onSuccess: (data) => {
+                      toast({
+                        position: "bottom-right",
+                        title: "Data Guru Dibuat.",
+                        description: "Data Guru baru telah berhasil dibuat.",
+                        status: "success",
+                        duration: 5000,
+                        isClosable: true,
+                      });
                       console.log(data.data);
-                      onClose();
                     },
                   }
                 );
@@ -118,6 +125,7 @@ function DaftarGuru() {
         },
       }
     );
+    onClose();
   };
 
   // error handling

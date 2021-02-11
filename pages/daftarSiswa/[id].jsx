@@ -15,7 +15,6 @@ import {
   useToast,
   Wrap,
   WrapItem,
-  Box,
   Menu,
   MenuButton,
   MenuList,
@@ -28,6 +27,8 @@ import {
   FormLabel,
   Input,
   Button,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
@@ -185,6 +186,12 @@ function DetailSiswa({ siswa, daftarKelas }) {
               </Button>
             </ButtonGroup>
           </Flex>
+
+          <Alert status="warning" mb="2" rounded="lg">
+            <AlertIcon />
+            Perubahan pada data guru tidak akan berpengaruh ke akun guru
+            terkait!
+          </Alert>
 
           {/* KONFIRMASI HAPUS SISWA */}
           <HapusSiswaAlert
