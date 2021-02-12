@@ -6,7 +6,7 @@ import { parseCookies } from "nookies";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import Select from "react-select";
 import SkeletonLoading from "../../components/skeletonLoading";
-import RiwayatPembelajaranTable from "../../components/riwayatPembelajaran/riwayatPembelajaranTable";
+import AktivitasSiswaTable from "../../components/aktivitasSiswa/aktivitasSiswaTable";
 import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
 import {
   useToast,
@@ -29,52 +29,96 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  HStack,
+  SimpleGrid,
 } from "@chakra-ui/react";
+import makeAnimated from "react-select/animated";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
+
+const animatedComponents = makeAnimated();
 
 function AktivitasSiswa() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const aktivitasSiswaData = useQuery(["lesson-histories"], fetcher, {
-    refetchInterval: 500,
-  });
-  const kelasData = useQuery("classrooms", fetcher);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedClass, setSelectedClass] = useState("");
-  const [pelajaran, setPelajaran] = useState("null");
-  const [pengajar, setPengajar] = useState("");
-  const [keterangan, setKeterangan] = useState("");
-  const [tanggal, setTanggal] = useState("");
 
-  const lessonHistoryMutation = useMutation((newLessonHistory) =>
-    axios.post(`${URL}/lesson-histories`, newLessonHistory, {
+  const aktivitasSiswaData = useQuery(["student-aktivities"], fetcher);
+  const mapelData = useQuery("lessons", fetcher);
+  const guruData = useQuery("teachers", fetcher);
+  const siswaData = useQuery("students", fetcher);
+  console.log(aktivitasSiswaData.data);
+
+  const kategoriList = [
+    {
+      value: "setoran",
+      label: "Setoran",
+    },
+    {
+      value: "pelajaran",
+      label: "Pelajaran",
+    },
+    {
+      value: "dll",
+      label: "Lainnya",
+    },
+  ];
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  // const [selectedClass, setSelectedClass] = useState("");
+  const [title, setTitle] = useState("");
+  const [mapel, setMapel] = useState("");
+  const [pengajar, setPengajar] = useState("");
+  const [siswa, setSiswa] = useState("");
+  const [keterangan, setKeterangan] = useState("");
+  const [kategori, setKategori] = useState("");
+  const [tanggal, setTanggal] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const studentAktivityMutation = useMutation((newStudentAktivity) =>
+    axios.post(`${URL}/student-aktivities`, newStudentAktivity, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
     })
   );
 
-  const tambahRiwayatBelajarHandler = () => {
-    lessonHistoryMutation.mutate({
-      pelajaran: pelajaran,
-      pengajar: pengajar,
-      tanggal: tanggal,
-      keterangan: keterangan,
-      classroom: { id: selectedClass.id },
-    });
-    setSelectedClass(null);
-    onClose();
-    toast({
-      position: "bottom-right",
-      title: "Data Riwayat Belajar Dibuat.",
-      description: "Data riwayat belajar baru telah berhasil dibuat.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+  const tambahAktivitasSiswaHandler = () => {
+    setIsSubmitting(true);
+    const selSiswa = siswa.map((s) => s.id);
+
+    studentAktivityMutation.mutate(
+      {
+        title: title,
+        lesson: mapel.id,
+        teacher: pengajar.id,
+        kategori: kategori.value,
+        students: selSiswa,
+        tanggal: tanggal,
+        keterangan: keterangan,
+      },
+      {
+        onError: (error) => console.log(error),
+        onSuccess: (data) => {
+          console.log(data.data);
+          setMapel("");
+          setPengajar("");
+          setSiswa("");
+          setKategori("");
+          onClose();
+          setIsSubmitting(false);
+          toast({
+            position: "bottom-right",
+            title: "Data Aktivitas Siswa Dibuat.",
+            description: "Data aktivitas siswa baru telah berhasil dibuat.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+        },
+      }
+    );
   };
 
   // error handling
@@ -99,8 +143,8 @@ function AktivitasSiswa() {
     return (
       <>
         <SkeletonLoading
-          title={"Riwayat Pembelajaran"}
-          plusButton={"Riwayat Pembelajaran"}
+          title={"Aktivitas Siswa"}
+          plusButton={"Aktivitas Siswa"}
         />
       </>
     );
@@ -110,7 +154,7 @@ function AktivitasSiswa() {
     return (
       <>
         <Head>
-          <title>Riwayat Pembelajaran | Santri Kita</title>
+          <title>Aktivitas Siswa | Santri Kita</title>
         </Head>
 
         <Flex mb="4">
@@ -121,61 +165,91 @@ function AktivitasSiswa() {
             variant="solid"
             colorScheme="teal"
           >
-            Riwayat Pembelajaran
+            Aktivitas Siswa
           </Button>
         </Flex>
 
         {/* MODAL FORM TAMBAH PELANGGARAN */}
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal size="xl" isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
-            <ModalHeader>Tambah Riwayat Pembelajaran</ModalHeader>
+            <ModalHeader>Tambah Aktivitas Siswa</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <form>
-                {/* Siswa */}
-                <FormControl isRequired>
-                  <FormLabel>Kelas</FormLabel>
-                  <Select
-                    defaultValue={selectedClass}
-                    onChange={setSelectedClass}
-                    options={kelasData.data}
-                    isClearable
-                    isSearchable
-                  />
-                </FormControl>
-                {/* Pelajaran */}
-                <FormControl isRequired>
-                  <FormLabel>Pelajaran</FormLabel>
-                  <Input
-                    placeholder="Pelajaran"
-                    onChange={(e) => setPelajaran(e.target.value)}
-                  />
-                </FormControl>
-                {/* Pengajar */}
-                <FormControl isRequired>
-                  <FormLabel>Pengajar</FormLabel>
-                  <Input
-                    placeholder="Pengajar"
-                    onChange={(e) => setPengajar(e.target.value)}
-                  />
-                </FormControl>
-                {/* Tanggal */}
-                <FormControl isRequired>
-                  <FormLabel>Tanggal</FormLabel>
-                  <Input
-                    type="date"
-                    onChange={(e) => setTanggal(e.target.value)}
-                  />
-                </FormControl>
-                {/* Keterangan */}
-                <FormControl>
-                  <FormLabel>Keterangan</FormLabel>
-                  <Textarea
-                    placeholder="Keterangan"
-                    onChange={(e) => setKeterangan(e.target.value)}
-                  />
-                </FormControl>
+                <SimpleGrid columns={2} spacing={3}>
+                  {/* Mapel */}
+                  <FormControl isRequired mt="2">
+                    <FormLabel>Mapel</FormLabel>
+                    <Select
+                      defaultValue={mapel}
+                      onChange={setMapel}
+                      options={mapelData.data}
+                      isClearable
+                      isSearchable
+                    />
+                  </FormControl>
+                  {/* Title */}
+                  <FormControl isRequired mt="2">
+                    <FormLabel>Pelajaran</FormLabel>
+                    <Input
+                      placeholder="Pelajaran"
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </FormControl>
+                  {/* Pengajar */}
+                  <FormControl isRequired mt="2">
+                    <FormLabel>Pengajar</FormLabel>
+                    <Select
+                      defaultValue={pengajar}
+                      onChange={setPengajar}
+                      options={guruData.data}
+                      isClearable
+                      isSearchable
+                    />
+                  </FormControl>
+                  {/* Kategori */}
+                  <FormControl isRequired mt="2">
+                    <FormLabel>Kategori</FormLabel>
+                    <Select
+                      defaultValue={kategori}
+                      onChange={setKategori}
+                      options={kategoriList}
+                      isClearable
+                      isSearchable
+                    />
+                  </FormControl>
+                  {/* Siswa */}
+                  <FormControl isRequired mt="2">
+                    <FormLabel>Siswa</FormLabel>
+                    <Select
+                      defaultValue={siswa}
+                      onChange={setSiswa}
+                      options={siswaData.data}
+                      closeMenuOnSelect={false}
+                      components={animatedComponents}
+                      isClearable
+                      isSearchable
+                      isMulti
+                    />
+                  </FormControl>
+                  {/* Tanggal */}
+                  <FormControl isRequired mt="2">
+                    <FormLabel>Tanggal</FormLabel>
+                    <Input
+                      type="date"
+                      onChange={(e) => setTanggal(e.target.value)}
+                    />
+                  </FormControl>
+                  {/* Keterangan */}
+                  <FormControl>
+                    <FormLabel>Keterangan</FormLabel>
+                    <Textarea
+                      placeholder="Keterangan"
+                      onChange={(e) => setKeterangan(e.target.value)}
+                    />
+                  </FormControl>
+                </SimpleGrid>
               </form>
             </ModalBody>
 
@@ -183,7 +257,8 @@ function AktivitasSiswa() {
               <Button
                 colorScheme="teal"
                 mr={3}
-                onClick={tambahRiwayatBelajarHandler}
+                isLoading={isSubmitting}
+                onClick={tambahAktivitasSiswaHandler}
               >
                 Simpan
               </Button>
@@ -192,7 +267,7 @@ function AktivitasSiswa() {
           </ModalContent>
         </Modal>
 
-        <RiwayatPembelajaranTable data={aktivitasSiswaData.data} />
+        <AktivitasSiswaTable data={aktivitasSiswaData.data} />
       </>
     );
   }
@@ -215,16 +290,44 @@ const fetcher = async ({ queryKey }) => {
       },
     });
 
-    let newClassrooms = [];
-    if (collection === "classrooms") {
-      newClassrooms = data.map((classroom) => {
+    let newLessons = [];
+    let newTeachers = [];
+    let newStudents = [];
+
+    // Rekontruksi Mapel
+    if (collection === "lessons") {
+      newLessons = data.map((lesson) => {
         return {
-          value: classroom.kelas,
-          label: `${classroom.kelas}`,
-          id: classroom.id,
+          value: lesson.nama,
+          label: `${lesson.nama}`,
+          id: lesson.id,
         };
       });
-      return newClassrooms;
+      return newLessons;
+    }
+
+    // Rekontruksi Guru
+    if (collection === "teachers") {
+      newTeachers = data.map((lesson) => {
+        return {
+          value: lesson.nama,
+          label: `${lesson.nama}`,
+          id: lesson.id,
+        };
+      });
+      return newTeachers;
+    }
+
+    // Rekontruksi Siswa
+    if (collection === "students") {
+      newStudents = data.map((lesson) => {
+        return {
+          value: lesson.nama,
+          label: `${lesson.nama}`,
+          id: lesson.id,
+        };
+      });
+      return newStudents;
     }
 
     return data;
