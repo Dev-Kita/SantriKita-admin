@@ -42,6 +42,8 @@ function DaftarGuru() {
   const [alamat, setAlamat] = useState("");
   const [kelas, setKelas] = useState("");
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // GURU MUTATION
   const guruMutation = useMutation((newGuru) =>
     axios.post(`${URL}/teachers`, newGuru, {
@@ -70,6 +72,7 @@ function DaftarGuru() {
   );
 
   const tambahGuruHandler = () => {
+    setIsSubmitting(true);
     const uniqueNama = nama.split(" ").join("").toLowerCase();
     userMutation.reset();
 
@@ -107,6 +110,8 @@ function DaftarGuru() {
                   {
                     onError: (error) => console.log(error),
                     onSuccess: (data) => {
+                      onClose();
+                      setIsSubmitting(false);
                       toast({
                         position: "bottom-right",
                         title: "Data Guru Dibuat.",
@@ -125,7 +130,6 @@ function DaftarGuru() {
         },
       }
     );
-    onClose();
   };
 
   // error handling
@@ -194,7 +198,12 @@ function DaftarGuru() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="teal" mr={3} onClick={tambahGuruHandler}>
+            <Button
+              colorScheme="teal"
+              mr={3}
+              isLoading={setIsSubmitting}
+              onClick={tambahGuruHandler}
+            >
               Simpan
             </Button>
             <Button onClick={onClose}>Batal</Button>

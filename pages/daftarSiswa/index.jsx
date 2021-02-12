@@ -52,6 +52,8 @@ function DaftarSiswa() {
   const [tahunKeluar, setTahunKeluar] = useState(null);
   const jkList = ["Laki-laki", "Perempuan"];
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // SISWA MUTATION
   const siswaMutation = useMutation((newSiswa) => {
     return axios.post(`${URL}/students`, newSiswa, {
@@ -69,8 +71,18 @@ function DaftarSiswa() {
     })
   );
 
+  // UPDATE USER MUTATION
+  const updateUserMutation = useMutation((newUser) =>
+    axios.put(`${URL}/users/${newUser.id}`, newUser.data, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+
   // HANDLER SUBMIT TAMBAH SISWA
   const tambahSiswaHadler = () => {
+    setIsSubmitting(true);
     userMutation.reset();
     // Tambah User Baru
     userMutation.mutate(
@@ -81,13 +93,11 @@ function DaftarSiswa() {
       },
       {
         onError: (error) => console.log(error),
-        onSuccess: (data, variables) => {
+        onSuccess: (data) => {
           // Query Invalidations
           queryClient.invalidateQueries("students");
-          console.log(data);
-          console.log(variables);
-          console.log(data.data.user.id);
-          // Ketika berhasil menambah user, tambah siswa baru
+          console.log(data.data);
+          const uid = Number(data.data?.user?.id);
           siswaMutation.mutate(
             {
               nama: nama,
@@ -98,28 +108,45 @@ function DaftarSiswa() {
               tanggal_lahir: tglLahir,
               tahun_masuk: tahunMasuk,
               tahun_keluar: tahunKeluar,
-              photo: { id: 2 },
-              // user: { id: data.data.user.id },
+              photo: { id: 1 },
             },
             {
+              onError: (error) => console.log(error),
               onSuccess: (data) => {
-                // Ketika berhasil tambah siswa baru, tampilkan toast
-                toast({
-                  position: "bottom-right",
-                  title: "Data Siswa Dibuat.",
-                  description: "Data siswa baru telah berhasil dibuat.",
-                  status: "success",
-                  duration: 5000,
-                  isClosable: true,
-                });
-                console.log(data);
+                console.log(data.data);
+                queryClient.invalidateQueries("students");
+                const sid = data.data?.id;
+                updateUserMutation.mutate(
+                  {
+                    id: uid,
+                    data: {
+                      role: 4,
+                      student: sid,
+                    },
+                  },
+                  {
+                    onError: (error) => console.log(error),
+                    onSuccess: (data) => {
+                      console.log(data.data);
+                      onClose();
+                      setIsSubmitting(false);
+                      toast({
+                        position: "bottom-right",
+                        title: "Data Siswa Dibuat.",
+                        description: "Data siswa baru telah berhasil dibuat.",
+                        status: "success",
+                        duration: 5000,
+                        isClosable: true,
+                      });
+                    },
+                  }
+                );
               },
             }
           );
         },
       }
     );
-    onClose();
     // setSelectedClass(null);
   };
 
@@ -235,7 +262,12 @@ function DaftarSiswa() {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} onClick={tambahSiswaHadler}>
+              <Button
+                colorScheme="teal"
+                mr={3}
+                isLoading={isSubmitting}
+                onClick={tambahSiswaHadler}
+              >
                 Simpan
               </Button>
               <Button onClick={onClose}>Batal</Button>
