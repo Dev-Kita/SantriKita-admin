@@ -27,32 +27,15 @@ import {
 } from "@chakra-ui/react";
 
 // MAIN COMPONENT
-function SilabusTable({ data }) {
+function MapelTable({ data }) {
   const router = useRouter();
-
   // DATA YANG DITAMPILKAN DI TABLE
-  const newData = data.map((silabus, i) => {
-    // data kelas tiap silabus diambil, dimasukan satu array
-    const silabusKelas = silabus.classrooms.map((kelasData) => {
-      const x = [];
-      x.push(kelasData.kelas);
-      return x;
-    });
-    // array kumpulan kelas dijadikan satu string
-    const kelas = silabusKelas.join(", ");
-
-    // console.log(silabusKelas);
+  const newData = data.map((mapelData, i) => {
     return {
-      pelajaran: silabus.pelajaran,
-      kelas: kelas,
-      bab: silabus.bab,
-      KD: silabus.kompetensi_dasar,
+      mapel: mapelData.nama,
+      isBukuSetoran: mapelData.isBukuSetoran ? "Ya" : "Tidak",
       detail: (
-        <NextLink
-          href={{
-            pathname: `${router.pathname}/${silabus.id}`,
-          }}
-        >
+        <NextLink href={`${router.pathname}/mapel/${mapelData.id}`}>
           <Link color="teal.500" fontWeight="medium">
             Detail
           </Link>
@@ -63,10 +46,8 @@ function SilabusTable({ data }) {
   const rowsData = useMemo(() => newData, [data]);
   const columns = useMemo(
     () => [
-      { Header: "Pelajaran", accessor: "pelajaran" },
-      { Header: "Kelas", accessor: "kelas" },
-      { Header: "BAB", accessor: "bab" },
-      { Header: "Kompetensi Dasar", accessor: "KD" },
+      { Header: "Mapel", accessor: "mapel" },
+      { Header: "Buku Setoran", accessor: "isBukuSetoran" },
       { Header: "Detail", accessor: "detail" },
     ],
     []
@@ -93,7 +74,7 @@ function SilabusTable({ data }) {
       <CardWrapper>
         <Flex align="center">
           <Heading fontSize="xl" mb="4" textAlign="center">
-            Silabus
+            Daftar Kelas
           </Heading>
           <Spacer />
 
@@ -140,9 +121,7 @@ function SilabusTable({ data }) {
               return (
                 <Tr {...row.getRowProps()}>
                   {row.cells.map((cell) => (
-                    <Td overflow="auto" {...cell.getCellProps()}>
-                      {cell.render("Cell")}
-                    </Td>
+                    <Td {...cell.getCellProps()}>{cell.render("Cell")}</Td>
                   ))}
                 </Tr>
               );
@@ -178,7 +157,7 @@ function GlobalFilter({
           setValue(e.target.value);
           onChange(e.target.value);
         }}
-        placeholder={`Kelas, Pelajaran, atau Tanggal...`}
+        placeholder={`Kelas atau Pembimbing...`}
         variant="outline"
         mb="4"
       />
@@ -186,4 +165,4 @@ function GlobalFilter({
   );
 }
 
-export default SilabusTable;
+export default MapelTable;

@@ -32,6 +32,7 @@ import {
   MenuItem,
 } from "@chakra-ui/react";
 import { animateVisualElement } from "framer-motion";
+import Mapel from "../../components/silabus/mapel.jsx";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
@@ -52,6 +53,7 @@ function Silabus() {
   const [KD, setKD] = useState("");
   const [keterangan, setKeterangan] = useState("");
   const [bab, setBab] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const silabusMutation = useMutation((newsilabus) =>
     axios.post(`${URL}/silabuses`, newsilabus, {
@@ -62,28 +64,37 @@ function Silabus() {
   );
 
   const tambahSilabusHandler = () => {
+    setIsSubmitting(true);
     let submitClass = selectedClass.map((abc) => {
       return { id: abc.id };
     });
 
-    silabusMutation.mutate({
-      pelajaran: pelajaran,
-      kompetensi_dasar: KD,
-      bab: bab,
-      keterangan: keterangan,
-      classrooms: submitClass,
-    });
+    silabusMutation.mutate(
+      {
+        pelajaran: pelajaran,
+        kompetensi_dasar: KD,
+        bab: bab,
+        keterangan: keterangan,
+        classrooms: submitClass,
+      },
+      {
+        onError: (error) => console.log(error),
+        onSuccess: (data) => {
+          setSelectedClass(null);
+          onClose();
+          setIsSubmitting(false);
 
-    setSelectedClass(null);
-    onClose();
-    toast({
-      position: "bottom-right",
-      title: "Data Silabus Dibuat.",
-      description: "Data silabus baru telah berhasil dibuat.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+          toast({
+            position: "bottom-right",
+            title: "Data Silabus Dibuat.",
+            description: "Data silabus baru telah berhasil dibuat.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+        },
+      }
+    );
   };
 
   // error handling
@@ -189,7 +200,12 @@ function Silabus() {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} onClick={tambahSilabusHandler}>
+              <Button
+                colorScheme="teal"
+                mr={3}
+                isLoading={isSubmitting}
+                onClick={tambahSilabusHandler}
+              >
                 Simpan
               </Button>
               <Button onClick={onClose}>Batal</Button>
@@ -198,6 +214,8 @@ function Silabus() {
         </Modal>
 
         <SilabusTable data={silabusData.data} />
+
+        <Mapel />
       </>
     );
   }
