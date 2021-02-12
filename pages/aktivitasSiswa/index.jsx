@@ -101,6 +101,7 @@ function AktivitasSiswa() {
       {
         onError: (error) => console.log(error),
         onSuccess: (data) => {
+          queryClient.invalidateQueries("student-aktivities");
           console.log(data.data);
           setMapel("");
           setPengajar("");

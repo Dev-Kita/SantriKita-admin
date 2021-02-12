@@ -24,29 +24,44 @@ import {
   Input,
   Heading,
   Link,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Button,
+  UnorderedList,
+  ListItem,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 // MAIN COMPONENT
 function RiwayatPembelajaranTable({ data }) {
   const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   // DATA YANG DITAMPILKAN DI TABLE
+  let studentList;
   const newData = data.map((aktivitasSiswa, i) => {
+    studentList = aktivitasSiswa.students?.map((student) => student.nama);
     return {
       title: aktivitasSiswa.title,
       lesson: aktivitasSiswa.lesson.nama,
       pengajar: aktivitasSiswa.teacher.nama,
       tanggal: <Moment format="DD MMM YYYY">{aktivitasSiswa.tanggal}</Moment>,
-      detail:
-        // <NextLink
-        //   href={{
-        //     pathname: `${router.pathname}/${aktivitasSiswa.id}`,
-        //   }}
-        // >
-        //   <Link color="teal.500" fontWeight="medium">
-        //     Detail
-        //   </Link>
-        // </NextLink>
-        "Detail",
+      detail: (
+        <NextLink
+          href={{
+            pathname: `${router.pathname}/${aktivitasSiswa.id}`,
+          }}
+        >
+          <Link color="teal.500" fontWeight="medium">
+            Detail
+          </Link>
+        </NextLink>
+      ),
+      // "Detail",
     };
   });
   const rowsData = useMemo(() => newData, [data]);
@@ -55,6 +70,7 @@ function RiwayatPembelajaranTable({ data }) {
       { Header: "Pelajaran", accessor: "title" },
       { Header: "Mapel", accessor: "lesson" },
       { Header: "Pengajar", accessor: "pengajar" },
+      // { Header: "Siswa", accessor: "siswa" },
       { Header: "Tanggal", accessor: "tanggal" },
       { Header: "Detail", accessor: "detail" },
     ],

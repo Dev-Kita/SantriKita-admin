@@ -1,12 +1,13 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
+import moment from "moment";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/router";
 import { useMutation } from "react-query";
 import SkeletonLoading from "../../components/skeletonLoading";
 import Head from "next/head";
 import makeAnimated from "react-select/animated";
-import HapusRBelajarAlert from "../../components/riwayatPembelajaran/hapusRBelajarAlert";
+import HapusStudentActivityAlert from "../../components/aktivitasSiswa/hapusStudentActivityAlert";
 import CardWrapper from "../../components/cardWrapper";
 import NextLink from "next/link";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -21,6 +22,8 @@ import {
   Input,
   Button,
   Textarea,
+  UnorderedList,
+  ListItem,
 } from "@chakra-ui/react";
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
@@ -28,7 +31,7 @@ const jwt = parseCookies().jwt;
 const animatedComponents = makeAnimated();
 
 // KKOMPONEN UTAMA
-function RiwayatBelajarDetail({ riwayatBelajar }) {
+function StudentAktivityDetail({ studentActivities }) {
   const toast = useToast();
   const router = useRouter();
 
@@ -39,8 +42,8 @@ function RiwayatBelajarDetail({ riwayatBelajar }) {
   const cancelRef = useRef();
 
   // DELETE SILABUS MUTATION
-  const deleteRiwayatBelajarMutation = useMutation((riwayatBelajarID) =>
-    axios.delete(`${URL}/lesson-histories/${riwayatBelajarID}`, {
+  const deleteStudentAktivityMutation = useMutation((riwayatBelajarID) =>
+    axios.delete(`${URL}/student-aktivities/${riwayatBelajarID}`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -49,14 +52,18 @@ function RiwayatBelajarDetail({ riwayatBelajar }) {
 
   // Function untuk meng-Handle hapus data SILABSUS
   const deleteHandler = () => {
-    deleteRiwayatBelajarMutation.mutate(router.query.id, {
+    setIsLoading(true);
+    deleteStudentAktivityMutation.mutate(router.query.id, {
+      onError: (erorr) => console.log(error),
       onSuccess: (data) => {
-        router.replace("/riwayatPembelajaran");
+        console.log(data.data);
+        setIsLoading(false);
+        router.replace("/aktivitasSiswa");
         toast({
           position: "bottom-right",
-          title: "Data Riwayat Belajar Dihapus.",
-          description: "Data riwayat pembelajaran telah berhasil dihapus.",
-          status: "error",
+          title: "Data Aktivitas Siswa Dihapus.",
+          description: "Data aktivitas siswa telah berhasil dihapus.",
+          status: "success",
           duration: 5000,
           isClosable: true,
         });
@@ -69,30 +76,30 @@ function RiwayatBelajarDetail({ riwayatBelajar }) {
     // }
   };
 
-  if (!riwayatBelajar) {
+  if (!studentActivities) {
     return (
       <>
-        <SkeletonLoading title={"Riwayat Belajar Detail"} />
+        <SkeletonLoading title={"Aktivitas Siswa Detail"} />
       </>
     );
   }
 
-  if (riwayatBelajar) {
+  if (studentActivities) {
     return (
       <>
         <Head>
-          <title>Riwayat Belajar Detail | Santri Kita</title>
+          <title>Aktivitas Siswa Detail | Santri Kita</title>
         </Head>
 
         <CardWrapper>
           <Flex gridGap="4" my="4" align="center">
-            <NextLink href="/riwayatPembelajaran">
+            <NextLink href="/aktivitasSiswa">
               <Button size="sm" leftIcon={<ArrowBackIcon />} variant="solid">
                 Kembali
               </Button>
             </NextLink>
             <Spacer />
-            <Heading fontSize="xl">Riwayat Belajar Detail</Heading>
+            <Heading fontSize="xl">Aktivitas Siswa Detail</Heading>
             <Spacer />
             <ButtonGroup>
               <Button
@@ -107,39 +114,69 @@ function RiwayatBelajarDetail({ riwayatBelajar }) {
           </Flex>
 
           {/* KONFIRMASI HAPUS SISWA */}
-          <HapusRBelajarAlert
+          <HapusStudentActivityAlert
             deleteHandler={deleteHandler}
             openAlert={openAlert}
             cancelRef={cancelRef}
             onClose={onClose}
+            isLoading={isLoading}
           />
 
           <form onSubmit={editHandler}>
-            <FormControl id="kelas" mt="2">
-              <FormLabel>Kelas</FormLabel>
+            <FormControl id="kelas" mt="4">
+              <FormLabel>Mapel</FormLabel>
               <Input
                 type="text"
-                value={riwayatBelajar.classroom.kelas}
+                value={studentActivities.lesson.nama}
                 isReadOnly
               />
             </FormControl>
-            <FormControl id="nis" mt="2">
+            <FormControl id="nis" mt="4">
               <FormLabel>Pelajaran</FormLabel>
-              <Input type="text" value={riwayatBelajar.pelajaran} isReadOnly />
+              <Input type="text" value={studentActivities.title} isReadOnly />
             </FormControl>
-            <FormControl id="pengajar" mt="2">
+            <FormControl id="pengajar" mt="4">
               <FormLabel>Pengajar</FormLabel>
-              <Input type="text" value={riwayatBelajar.pengajar} isReadOnly />
+              <Input
+                type="text"
+                value={studentActivities.teacher.nama}
+                isReadOnly
+              />
             </FormControl>
-            <FormControl id="tanggal" mt="2">
+            <FormControl id="kategori" mt="4">
+              <FormLabel>Siswa</FormLabel>
+              <UnorderedList>
+                {studentActivities.students.map((student) => (
+                  <ListItem ml="4" key={student.id}>
+                    {student.nama}
+                  </ListItem>
+                ))}
+              </UnorderedList>
+            </FormControl>
+            <FormControl id="kategori" mt="4">
+              <FormLabel>Kategori</FormLabel>
+              <Input
+                textTransform="capitalize"
+                type="text"
+                value={studentActivities.kategori}
+                isReadOnly
+              />
+            </FormControl>
+            <FormControl id="tanggal" mt="4">
               <FormLabel>Tanggal</FormLabel>
-              <Input type="text" value={riwayatBelajar.tanggal} isReadOnly />
+              <Input
+                type="text"
+                value={moment(studentActivities.tanggal)
+                  .format("dddd, DD MMMM YYYY")
+                  .toString()}
+                isReadOnly
+              />
             </FormControl>
-            <FormControl id="tahunMasuk" mt="2">
+            <FormControl id="tahunMasuk" mt="4">
               <FormLabel>Keterangan</FormLabel>
               <Textarea
                 type="text"
-                value={riwayatBelajar.keterangan}
+                value={studentActivities.keterangan}
                 isReadOnly
               />
             </FormControl>
@@ -170,7 +207,7 @@ function RiwayatBelajarDetail({ riwayatBelajar }) {
 export async function getServerSideProps(context) {
   const jwt = parseCookies(context).jwt;
   const pembelajaranData = await axios.get(
-    `${URL}/lesson-histories/${context.params.id}`,
+    `${URL}/student-aktivities/${context.params.id}`,
     {
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -179,8 +216,8 @@ export async function getServerSideProps(context) {
   );
 
   return {
-    props: { riwayatBelajar: pembelajaranData.data },
+    props: { studentActivities: pembelajaranData.data },
   };
 }
 
-export default RiwayatBelajarDetail;
+export default StudentAktivityDetail;
