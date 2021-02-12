@@ -42,11 +42,11 @@ function Silabus() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const silabusData = useQuery(["silabuses"], fetcher, {
+  const silabusData = useQuery(["silabuses"], silabusFetcher, {
     refetchInterval: 500,
   });
   // console.log(silabusData.data);
-  const kelasData = useQuery("classrooms", fetcher);
+  const kelasData = useQuery("classrooms", silabusFetcher);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedClass, setSelectedClass] = useState("");
   const [pelajaran, setPelajaran] = useState("null");
@@ -222,7 +222,7 @@ function Silabus() {
 }
 
 // Function untuk fetch data dari API classrooms
-const fetcher = async ({ queryKey }) => {
+const silabusFetcher = async ({ queryKey }) => {
   try {
     const collection = queryKey[0];
     let endpoint = `${URL}/${collection}`;

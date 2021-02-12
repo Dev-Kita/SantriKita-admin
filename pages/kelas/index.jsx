@@ -31,14 +31,13 @@ const jwt = parseCookies().jwt;
 
 function DaftarKelas() {
   const toast = useToast();
-  const kelasData = useQuery(["classrooms", "?_sort=kelas:desc"], fetcher, {
-    refetchInterval: 1000,
-  });
-  const guruData = useQuery(["teachers", "?_sort=nama:asc"], fetcher);
-  console.log(kelasData.data);
+  const queryClient = useQueryClient();
+  const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], kelasFetcher);
+  const guruData = useQuery(["teachers", "?_sort=nama:asc"], kelasFetcher);
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [kelas, setKelas] = useState("");
-  const [pembimbing, setPembimbing] = useState();
+  const [pembimbing, setPembimbing] = useState({ id: null });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // SISWA MUTATION
@@ -56,12 +55,15 @@ function DaftarKelas() {
     kelasMutation.mutate(
       {
         kelas: kelas,
-        teacher: pembimbing.id || null,
+        teacher: pembimbing.id,
       },
       {
         onError: (error) => console.log(error),
         onSuccess: (data) => {
+          queryClient.invalidateQueries("classrooms");
           console.log(data);
+          onClose();
+          setIsSubmitting(false);
           toast({
             position: "bottom-right",
             title: "Data Kelas Dibuat.",
@@ -70,13 +72,11 @@ function DaftarKelas() {
             duration: 5000,
             isClosable: true,
           });
-          setIsSubmitting(false);
         },
       }
     );
 
     // setSelectedClass(null);
-    onClose();
   };
 
   // error handling
@@ -136,12 +136,15 @@ function DaftarKelas() {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} onClick={tambahKelasHadler}>
+              <Button
+                colorScheme="teal"
+                mr={3}
+                isLoading={isSubmitting}
+                onClick={tambahKelasHadler}
+              >
                 Simpan
               </Button>
-              <Button isLoading={isSubmitting} onClick={onClose}>
-                Batal
-              </Button>
+              <Button onClick={onClose}>Batal</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
@@ -153,7 +156,7 @@ function DaftarKelas() {
 }
 
 // Function untuk fetch data dari API students
-const fetcher = async ({ queryKey }) => {
+const kelasFetcher = async ({ queryKey }) => {
   const collection = queryKey[0];
   let endpoint = `${URL}/${collection}`;
 

@@ -36,14 +36,16 @@ const jwt = parseCookies().jwt;
 // COMPONENT UTAMA
 function DaftarPelanggaran() {
   const toast = useToast();
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   // DEKLARASI HOOKS DAN VARIABEL
   const pelanggaranData = useQuery(
     ["violations", "?_sort=tanggal:DESC"],
-    pelanggaranFetcher,
-    { refetchInterval: 500 }
+    pelanggaranFetcher
   );
+
   const siswaData = useQuery("students", siswaFetcher);
+
+  const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedName, setSelectedName] = useState(null);
   const [pelanggaran, setPelanggaran] = useState("");
@@ -72,32 +74,41 @@ function DaftarPelanggaran() {
 
   // EVENT HANDLER FUNCTION
   const tambahPelanggaranHandler = () => {
-    violationMutation.mutate({
-      pelanggaran: pelanggaran,
-      keterangan: keterangan,
-      tanggal: tanggal,
-      status: statusPelanggaran,
-      student: { id: selectedName.id },
-    });
-    notifMutation.mutate({
-      notifikasi: "Pelanggaran baru ditambahkan",
-      slug: "Pelanggaran",
-      waktu: new Date(),
-      terbaca: false,
-      student: { id: selectedName.id },
-    });
-
-    setSelectedName(null);
-    setStatusPelanggaran("");
-    onClose();
-    toast({
-      position: "bottom-right",
-      title: "Data Pelanggaran Dibuat.",
-      description: "Data pelanggaran baru telah berhasil dibuat.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+    setIsLoading(true);
+    violationMutation.mutate(
+      {
+        pelanggaran: pelanggaran,
+        keterangan: keterangan,
+        tanggal: tanggal,
+        status: statusPelanggaran,
+        student: { id: selectedName.id },
+      },
+      {
+        onError: (error) => console.log(erorr),
+        onSuccess: (data) => {
+          queryClient.invalidateQueries("violations");
+          setSelectedName(null);
+          setStatusPelanggaran("");
+          onClose();
+          setIsLoading(false);
+          toast({
+            position: "bottom-right",
+            title: "Data Pelanggaran Dibuat.",
+            description: "Data pelanggaran baru telah berhasil dibuat.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+          notifMutation.mutate({
+            notifikasi: "Pelanggaran baru ditambahkan",
+            slug: "Pelanggaran",
+            waktu: new Date(),
+            terbaca: false,
+            student: { id: selectedName.id },
+          });
+        },
+      }
+    );
   };
 
   // RENDER HALAMAN JSX
@@ -201,6 +212,7 @@ function DaftarPelanggaran() {
               <Button
                 colorScheme="teal"
                 mr={3}
+                isLoading={isLoading}
                 onClick={tambahPelanggaranHandler}
               >
                 Simpan

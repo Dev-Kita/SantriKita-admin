@@ -37,10 +37,17 @@ function DaftarSiswa() {
   const queryClient = useQueryClient();
   const toast = useToast();
   // useSWR Hooks untuk fetch data client-side
-  const siswaData = useQuery(["students", "?_sort=tahun_masuk:asc"], fetcher, {
-    refetchInterval: 500,
-  });
-  const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
+  const siswaData = useQuery(
+    ["students", "?_sort=tahun_masuk:asc"],
+    daftarSiswaFetcher,
+    {
+      refetchInterval: 500,
+    }
+  );
+  const kelasData = useQuery(
+    ["classrooms", "?_sort=kelas:asc"],
+    daftarSiswaFetcher
+  );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [nama, setNama] = useState("");
   const [nis, setNis] = useState(null);
@@ -282,7 +289,7 @@ function DaftarSiswa() {
 }
 
 // Function untuk fetch data dari API students
-const fetcher = async ({ queryKey }) => {
+const daftarSiswaFetcher = async ({ queryKey }) => {
   try {
     const collection = queryKey[0];
     let endpoint = `${URL}/${collection}`;

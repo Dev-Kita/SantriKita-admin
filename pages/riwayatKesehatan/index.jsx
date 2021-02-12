@@ -38,11 +38,13 @@ function RiwayatKesehatan() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const riwayatKesehatanData = useQuery(["medical-histories"], fetcher, {
-    refetchInterval: 500,
-  });
-  const siswaData = useQuery("students", fetcher);
-  console.log(riwayatKesehatanData);
+  const riwayatKesehatanData = useQuery(
+    ["medical-histories"],
+    medicHistoryFetcher
+  );
+  const siswaData = useQuery("students", medicHistoryFetcher);
+
+  const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedName, setSelectedName] = useState("");
   const [penyakit, setPenyakit] = useState("null");
@@ -71,34 +73,43 @@ function RiwayatKesehatan() {
   );
 
   const tambahKesehatanHandler = () => {
-    medicalHistoryMutation.mutate({
-      penyakit: penyakit,
-      jenis: jenis,
-      status: status === "Sembuh" ? true : false,
-      tanggal: tanggal,
-      keterangan: keterangan,
-      student: { id: selectedName.id },
-    });
-    notifMutation.mutate({
-      notifikasi: "Riwayat Kesehatan baru ditambahkan",
-      slug: "Kesehatan",
-      waktu: new Date(),
-      terbaca: false,
-      student: { id: selectedName.id },
-    });
-
-    setSelectedName(null);
-    setStatus("");
-    setJenis("");
-    onClose();
-    toast({
-      position: "bottom-right",
-      title: "Data Riwayat Kesehatan Dibuat.",
-      description: "Data riwayat kesehatan baru telah berhasil dibuat.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+    setIsLoading(true);
+    medicalHistoryMutation.mutate(
+      {
+        penyakit: penyakit,
+        jenis: jenis,
+        status: status === "Sembuh" ? true : false,
+        tanggal: tanggal,
+        keterangan: keterangan,
+        student: { id: selectedName.id },
+      },
+      {
+        onError: (error) => console.log(error),
+        onSuccess: (data) => {
+          queryClient.invalidateQueries("medical-histories");
+          setSelectedName(null);
+          setStatus("");
+          setJenis("");
+          onClose();
+          setIsLoading(false);
+          toast({
+            position: "bottom-right",
+            title: "Data Riwayat Kesehatan Dibuat.",
+            description: "Data riwayat kesehatan baru telah berhasil dibuat.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+          notifMutation.mutate({
+            notifikasi: "Riwayat Kesehatan baru ditambahkan",
+            slug: "Kesehatan",
+            waktu: new Date(),
+            terbaca: false,
+            student: { id: selectedName.id },
+          });
+        },
+      }
+    );
   };
 
   // error handling
@@ -238,6 +249,7 @@ function RiwayatKesehatan() {
                 colorScheme="teal"
                 mr={3}
                 onClick={tambahKesehatanHandler}
+                isLoading={isLoading}
               >
                 Simpan
               </Button>
@@ -253,7 +265,7 @@ function RiwayatKesehatan() {
 }
 
 // Function untuk fetch data dari API students
-const fetcher = async ({ queryKey }) => {
+const medicHistoryFetcher = async ({ queryKey }) => {
   try {
     const collection = queryKey[0];
     let endpoint = `${URL}/${collection}`;

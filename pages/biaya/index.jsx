@@ -40,10 +40,12 @@ function Biaya() {
   const router = useRouter();
   const biayaData = useQuery(
     ["bills", "?_sort=tanggal_pembayaran:DESC"],
-    fetcher,
-    { refetchInterval: 500 }
+    biayaFetcher
   );
-  const siswaData = useQuery("students", fetcher);
+
+  const siswaData = useQuery("students", biayaFetcher);
+
+  const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedName, setSelectedName] = useState("");
   const [tahun, setTahun] = useState(null);
@@ -75,36 +77,46 @@ function Biaya() {
   );
 
   const tambahBiayaHandler = () => {
-    billMutation.mutate({
-      keperluan: keperluan,
-      nominal: nominal,
-      nominal_dibayar: nominalDibayar,
-      sisa_pembayaran: sisaPembayaran,
-      status: status,
-      semester: semester,
-      tahun: tahun,
-      tanggal_pembayaran: tanggal,
-      keterangan: keterangan,
-      student: { id: selectedName.id },
-    });
-    notifMutation.mutate({
-      notifikasi: "Pembayaran baru ditambahkan",
-      slug: "Biaya",
-      waktu: new Date(),
-      terbaca: false,
-      student: { id: selectedName.id },
-    });
-    setSelectedName(null);
-    setStatus("");
-    onClose();
-    toast({
-      position: "bottom-right",
-      title: "Data Pembayaran Dibuat.",
-      description: "Data pembayaran baru telah berhasil dibuat.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+    setIsLoading(true);
+    billMutation.mutate(
+      {
+        keperluan: keperluan,
+        nominal: nominal,
+        nominal_dibayar: nominalDibayar,
+        sisa_pembayaran: sisaPembayaran,
+        status: status,
+        semester: semester,
+        tahun: tahun,
+        tanggal_pembayaran: tanggal,
+        keterangan: keterangan,
+        student: { id: selectedName.id },
+      },
+      {
+        onError: (error) => console.log(error),
+        onSuccess: (data) => {
+          queryClient.invalidateQueries("bills");
+          setSelectedName(null);
+          setStatus("");
+          onClose();
+          setIsLoading(false);
+          toast({
+            position: "bottom-right",
+            title: "Data Pembayaran Dibuat.",
+            description: "Data pembayaran baru telah berhasil dibuat.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+          notifMutation.mutate({
+            notifikasi: "Pembayaran baru ditambahkan",
+            slug: "Biaya",
+            waktu: new Date(),
+            terbaca: false,
+            student: { id: selectedName.id },
+          });
+        },
+      }
+    );
   };
 
   // error handling
@@ -270,7 +282,7 @@ function Biaya() {
 }
 
 // Function untuk fetch data dari API students
-const fetcher = async ({ queryKey }) => {
+const biayaFetcher = async ({ queryKey }) => {
   try {
     const collection = queryKey[0];
     let endpoint = `${URL}/${collection}`;

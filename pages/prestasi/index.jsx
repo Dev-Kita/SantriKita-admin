@@ -32,12 +32,15 @@ const jwt = parseCookies().jwt;
 // COMPONENT UTAMA
 function DaftarPrestasi() {
   const toast = useToast();
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   // DEKLARASI HOOKS DAN VARIABEL
-  const prestasiData = useQuery(["achievements", "?_sort=tahun:ASC"], fetcher, {
-    refetchInterval: 500,
-  });
-  const siswaData = useQuery("students", fetcher);
+  const prestasiData = useQuery(
+    ["achievements", "?_sort=tahun:ASC"],
+    prestasiFetcher
+  );
+  const siswaData = useQuery("students", prestasiFetcher);
+
+  const [isLoading, setIsLoading] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedName, setSelectedName] = useState(null);
   const [lomba, setLomba] = useState("");
@@ -66,32 +69,42 @@ function DaftarPrestasi() {
 
   // EVENT HANDLER FUNCTION
   const tambahPrestasiHadler = () => {
-    achievementMutation.mutate({
-      kegiatan_lomba: lomba,
-      prestasi: prestasi,
-      lingkup: lingkup,
-      tahun: tahun,
-      keterangan: keterangan,
-      student: { id: selectedName.id },
-    });
-    notifMutation.mutate({
-      notifikasi: "Prestasi baru ditambahkan",
-      slug: "Prestasi",
-      waktu: new Date(),
-      terbaca: false,
-      student: { id: selectedName.id },
-    });
+    setIsLoading(true);
 
-    setSelectedName(null);
-    onClose();
-    toast({
-      position: "bottom-right",
-      title: "Data Prestasi Dibuat.",
-      description: "Data prestasi baru telah berhasil dibuat.",
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+    achievementMutation.mutate(
+      {
+        kegiatan_lomba: lomba,
+        prestasi: prestasi,
+        lingkup: lingkup,
+        tahun: tahun,
+        keterangan: keterangan,
+        student: { id: selectedName.id },
+      },
+      {
+        onError: (error) => console.log(error),
+        onSuccess: (data) => {
+          queryClient.invalidateQueries("achievements");
+          setSelectedName(null);
+          onClose();
+          setIsLoading(false);
+          toast({
+            position: "bottom-right",
+            title: "Data Prestasi Dibuat.",
+            description: "Data prestasi baru telah berhasil dibuat.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+          notifMutation.mutate({
+            notifikasi: "Prestasi baru ditambahkan",
+            slug: "Prestasi",
+            waktu: new Date(),
+            terbaca: false,
+            student: { id: selectedName.id },
+          });
+        },
+      }
+    );
   };
 
   // RENDER HALAMAN JSX
@@ -185,7 +198,12 @@ function DaftarPrestasi() {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme="teal" mr={3} onClick={tambahPrestasiHadler}>
+              <Button
+                colorScheme="teal"
+                mr={3}
+                onClick={tambahPrestasiHadler}
+                isLoading={isLoading}
+              >
                 Simpan
               </Button>
               <Button onClick={onClose}>Batal</Button>
@@ -202,7 +220,7 @@ function DaftarPrestasi() {
 
 // FETCH DATA
 // Function untuk fetch data dari API students
-const fetcher = async ({ queryKey }) => {
+const prestasiFetcher = async ({ queryKey }) => {
   try {
     const collection = queryKey[0];
     let endpoint = `${URL}/${collection}`;

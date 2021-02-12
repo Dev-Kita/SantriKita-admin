@@ -34,10 +34,11 @@ function DaftarGuru() {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
-  const guruData = useQuery("teachers", fetcher, {
-    refetchInterval: 2000,
-  });
+  const kelasData = useQuery(
+    ["classrooms", "?_sort=kelas:asc"],
+    daftarGuruFetcher
+  );
+  const guruData = useQuery("teachers", daftarGuruFetcher);
   const [nama, setNama] = useState("");
   const [alamat, setAlamat] = useState("");
   const [kelas, setKelas] = useState("");
@@ -110,6 +111,7 @@ function DaftarGuru() {
                   {
                     onError: (error) => console.log(error),
                     onSuccess: (data) => {
+                      queryClient.invalidateQueries("teachers");
                       onClose();
                       setIsSubmitting(false);
                       toast({
@@ -201,7 +203,7 @@ function DaftarGuru() {
             <Button
               colorScheme="teal"
               mr={3}
-              isLoading={setIsSubmitting}
+              isLoading={isSubmitting}
               onClick={tambahGuruHandler}
             >
               Simpan
@@ -216,7 +218,7 @@ function DaftarGuru() {
 
 export default DaftarGuru;
 
-const fetcher = async ({ queryKey }) => {
+const daftarGuruFetcher = async ({ queryKey }) => {
   const collection = queryKey[0];
   let endpoint = `${URL}/${collection}`;
 

@@ -44,10 +44,13 @@ function AktivitasSiswa() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const aktivitasSiswaData = useQuery(["student-aktivities"], fetcher);
-  const mapelData = useQuery("lessons", fetcher);
-  const guruData = useQuery("teachers", fetcher);
-  const siswaData = useQuery("students", fetcher);
+  const aktivitasSiswaData = useQuery(
+    ["student-aktivities"],
+    aktivitasSiswaFetcher
+  );
+  const mapelData = useQuery("lessons", aktivitasSiswaFetcher);
+  const guruData = useQuery("teachers", aktivitasSiswaFetcher);
+  const siswaData = useQuery("students", aktivitasSiswaFetcher);
   console.log(aktivitasSiswaData.data);
 
   const kategoriList = [
@@ -275,7 +278,7 @@ function AktivitasSiswa() {
 }
 
 // Function untuk fetch data dari API classrooms
-const fetcher = async ({ queryKey }) => {
+const aktivitasSiswaFetcher = async ({ queryKey }) => {
   try {
     const collection = queryKey[0];
     let endpoint = `${URL}/${collection}`;
