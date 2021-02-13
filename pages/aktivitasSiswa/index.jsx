@@ -96,7 +96,7 @@ function AktivitasSiswa() {
     studentAktivityMutation.mutate(
       {
         siswa_title: title,
-        siswa_title: `Mengajar ${title}`,
+        guru_title: `Mengajar ${title}`,
         lesson: mapel.id,
         teacher: pengajar.id,
         kategori: kategori.value,
