@@ -81,6 +81,13 @@ function AktivitasSiswa() {
       },
     })
   );
+  const teacherAktivityMutation = useMutation((newGuruAktivity) =>
+    axios.post(`${URL}/teacher-activities`, newGuruAktivity, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
 
   const tambahAktivitasSiswaHandler = () => {
     setIsSubmitting(true);
@@ -88,7 +95,8 @@ function AktivitasSiswa() {
 
     studentAktivityMutation.mutate(
       {
-        title: title,
+        siswa_title: title,
+        siswa_title: `Mengajar ${title}`,
         lesson: mapel.id,
         teacher: pengajar.id,
         kategori: kategori.value,
@@ -100,7 +108,6 @@ function AktivitasSiswa() {
         onError: (error) => console.log(error),
         onSuccess: (data) => {
           queryClient.invalidateQueries("student-aktivities");
-          console.log(data.data);
           setMapel("");
           setPengajar("");
           setSiswa("");
@@ -109,7 +116,7 @@ function AktivitasSiswa() {
           setIsSubmitting(false);
           toast({
             position: "bottom-right",
-            title: "Data Aktivitas Siswa Dibuat.",
+            title: "Data Aktivitas Berhasil Dibuat.",
             description: "Data aktivitas siswa baru telah berhasil dibuat.",
             status: "success",
             duration: 5000,

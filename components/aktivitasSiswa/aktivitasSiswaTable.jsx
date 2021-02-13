@@ -46,7 +46,7 @@ function RiwayatPembelajaranTable({ data }) {
   const newData = data.map((aktivitasSiswa, i) => {
     studentList = aktivitasSiswa.students?.map((student) => student.nama);
     return {
-      title: aktivitasSiswa.title,
+      title: aktivitasSiswa.siswa_title,
       lesson: aktivitasSiswa.lesson.nama,
       pengajar: aktivitasSiswa.teacher.nama,
       tanggal: <Moment format="DD MMM YYYY">{aktivitasSiswa.tanggal}</Moment>,
@@ -98,7 +98,7 @@ function RiwayatPembelajaranTable({ data }) {
       <CardWrapper>
         <Flex align="center">
           <Heading fontSize="xl" mb="4" textAlign="center">
-            Riwayat Pembelajaran
+            Aktivitas Siswa
           </Heading>
           <Spacer />
 

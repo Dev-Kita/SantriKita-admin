@@ -87,6 +87,8 @@ function DaftarGuru() {
       {
         onError: (error) => console.log(error),
         onSuccess: (data) => {
+          console.log(data.data);
+
           queryClient.invalidateQueries("teachers");
           const uid = Number(data.data?.user?.id);
           guruMutation.mutate(
@@ -98,6 +100,8 @@ function DaftarGuru() {
             {
               onError: (error) => console.log(error),
               onSuccess: (data) => {
+                console.log(data.data);
+
                 queryClient.invalidateQueries("teachers");
                 const gid = data.data?.id;
                 updateUserMutation.mutate(
@@ -111,6 +115,8 @@ function DaftarGuru() {
                   {
                     onError: (error) => console.log(error),
                     onSuccess: (data) => {
+                      console.log(data.data);
+
                       queryClient.invalidateQueries("teachers");
                       onClose();
                       setIsSubmitting(false);

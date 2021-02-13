@@ -41,11 +41,6 @@ const sideMenu = [
     slug: "/aktivitasSiswa",
   },
   {
-    icon: <GiTeacher />,
-    title: "Aktivitas Guru & Ustad",
-    slug: "/aktivitasGuru",
-  },
-  {
     icon: <FaBriefcaseMedical />,
     title: "Riwayat Kesehatan",
     slug: "/riwayatKesehatan",
