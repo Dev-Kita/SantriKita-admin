@@ -135,6 +135,7 @@ function DaftarSiswa() {
                     onError: (error) => console.log(error),
                     onSuccess: (data) => {
                       console.log(data.data);
+                      queryClient.invalidateQueries("students");
                       onClose();
                       setIsSubmitting(false);
                       toast({

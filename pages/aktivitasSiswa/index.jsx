@@ -25,11 +25,6 @@ import {
   FormLabel,
   Textarea,
   Input,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  HStack,
   SimpleGrid,
 } from "@chakra-ui/react";
 import makeAnimated from "react-select/animated";

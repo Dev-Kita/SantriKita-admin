@@ -85,19 +85,38 @@ function DetailSiswa({ siswa, daftarKelas }) {
     })
   );
 
+  // DELETE USER MUTATION
+  const deleteUserMutation = useMutation((userID) =>
+    axios.delete(`${URL}/users/${userID}`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+  );
+
   // Function untuk meng-Handle hapus data siswa
   const deleteHandler = () => {
+    setIsLoading(true);
     // Delete data dari DB
     deleteSiswaMutation.mutate(router.query.id, {
       onSuccess: (data) => {
-        router.replace("/daftarSiswa");
-        toast({
-          position: "bottom-right",
-          title: "Data Siswa Dihapus.",
-          description: "Data siswa telah berhasil dihapus.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
+        console.log(data.data);
+        const uid = data.data.user.id;
+        deleteUserMutation.mutate(uid, {
+          onError: (error) => console.log(error),
+          onSuccess: (data) => {
+            console.log(data.data);
+            router.replace("/daftarSiswa");
+            setIsLoading(false);
+            toast({
+              position: "bottom-right",
+              title: "Data Siswa Dihapus.",
+              description: "Data siswa telah berhasil dihapus.",
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+            });
+          },
         });
       },
     });
@@ -187,9 +206,9 @@ function DetailSiswa({ siswa, daftarKelas }) {
             </ButtonGroup>
           </Flex>
 
-          <Alert status="warning" mb="2" rounded="lg">
+          <Alert status="warning" mb="4" rounded="lg">
             <AlertIcon />
-            Perubahan pada data guru tidak akan berpengaruh ke akun guru
+            Perubahan pada data siswa tidak akan berpengaruh ke akun siswa
             terkait!
           </Alert>
 
@@ -199,6 +218,7 @@ function DetailSiswa({ siswa, daftarKelas }) {
             openAlert={openAlert}
             cancelRef={cancelRef}
             onClose={onClose}
+            isLoading={isLoading}
           />
 
           <form onSubmit={editHandler}>
@@ -237,7 +257,7 @@ function DetailSiswa({ siswa, daftarKelas }) {
               )}
               <Spacer />
             </Flex>
-            <FormControl id="name">
+            <FormControl id="name" mt="2">
               <FormLabel>Nama</FormLabel>
               <Input
                 type="text"
@@ -301,7 +321,7 @@ function DetailSiswa({ siswa, daftarKelas }) {
                 />
               )}
             </FormControl>
-            <FormControl id="kamar">
+            <FormControl id="kamar" mt="2">
               <FormLabel>Kamar</FormLabel>
               <Input
                 type="text"

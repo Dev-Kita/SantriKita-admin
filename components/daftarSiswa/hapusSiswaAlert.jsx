@@ -9,7 +9,13 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-function HapusSiswaAlert({ deleteHandler, openAlert, cancelRef, onClose }) {
+function HapusSiswaAlert({
+  deleteHandler,
+  openAlert,
+  cancelRef,
+  onClose,
+  isLoading,
+}) {
   return (
     <AlertDialog
       isOpen={openAlert}
@@ -30,7 +36,12 @@ function HapusSiswaAlert({ deleteHandler, openAlert, cancelRef, onClose }) {
             <Button ref={cancelRef} onClick={onClose}>
               Batal
             </Button>
-            <Button colorScheme="red" ml={3} onClick={deleteHandler}>
+            <Button
+              colorScheme="red"
+              ml={3}
+              onClick={deleteHandler}
+              isLoading={isLoading}
+            >
               Hapus
             </Button>
           </AlertDialogFooter>
