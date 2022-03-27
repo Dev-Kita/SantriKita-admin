@@ -31,27 +31,28 @@ import {
 function SiswaTable({ data }) {
   const router = useRouter();
   // DATA YANG DITAMPILKAN DI TABLE
-  const newData = data.map((siswaData, i) => {
-    return {
-      nama: siswaData.nama,
-      nis: siswaData.nis,
-      classroom: siswaData.kelas.kelas,
-      jk: siswaData.jenis_kelamin,
-      kamar: siswaData.kamar,
-      // tanggalLahir: (
-      //   <Moment format="DD MMM YYYY">{siswaData.tanggal_lahir}</Moment>
-      // ),
-      tahunMasuk: siswaData.tahun_masuk,
-      detail: (
-        <NextLink href={`${router.pathname}/${siswaData.id}`}>
-          <Link color="teal.500" fontWeight="medium">
-            Detail
-          </Link>
-        </NextLink>
-      ),
-    };
-  });
-  const rowsData = useMemo(() => newData, [data]);
+  const rowsData = useMemo(() => {
+    return data.map((siswaData, i) => {
+      return {
+        nama: siswaData.nama,
+        nis: siswaData.nis,
+        classroom: siswaData.kelas.kelas,
+        jk: siswaData.jenis_kelamin,
+        kamar: siswaData.kamar,
+        // tanggalLahir: (
+        //   <Moment format="DD MMM YYYY">{siswaData.tanggal_lahir}</Moment>
+        // ),
+        tahunMasuk: siswaData.tahun_masuk,
+        detail: (
+          <NextLink href={`${router.pathname}/${siswaData.id}`}>
+            <Link color="teal.500" fontWeight="medium">
+              Detail
+            </Link>
+          </NextLink>
+        ),
+      };
+    });
+  }, [data]);
   const columns = useMemo(
     () => [
       { Header: "Nama", accessor: "nama" },

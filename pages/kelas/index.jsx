@@ -3,7 +3,7 @@ import { useQuery, useQueryClient, useMutation } from "react-query";
 import axios from "axios";
 import Head from "next/head";
 import Select from "react-select";
-import SkeletonLoading from "../../components/skeletonLoading";
+// import SkeletonLoading from "../../components/skeletonLoading";
 import { parseCookies } from "nookies";
 import KelasTable from "../../components/kelas/kelasTable";
 import { AddIcon } from "@chakra-ui/icons";
@@ -68,7 +68,7 @@ function DaftarKelas(props) {
       {
         onError: (error) => console.log(error),
         onSuccess: (data) => {
-          queryClient.invalidateQueries("classrooms");
+          queryClient.invalidateQueries(["classrooms", "?_sort=kelas:asc"]);
           console.log(data);
           onClose();
           setIsSubmitting(false);
@@ -86,20 +86,6 @@ function DaftarKelas(props) {
 
     // setSelectedClass(null);
   };
-
-  // error handling
-  // if (kelasData.isError) {
-  //   console.log(error);
-  //   return <div>error</div>;
-  // }
-  // // loading state
-  // if (kelasData.isLoading) {
-  //   return (
-  //     <>
-  //       <SkeletonLoading title={"Daftar Kelas"} plusButton={"Kelas"} />
-  //     </>
-  //   );
-  // }
 
   return (
     <>

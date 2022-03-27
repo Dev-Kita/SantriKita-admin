@@ -33,20 +33,19 @@ import {
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
-function DaftarSiswa() {
+function DaftarSiswa(props) {
   const queryClient = useQueryClient();
   const toast = useToast();
-  // useSWR Hooks untuk fetch data client-side
+  // usequery Hooks untuk fetch data client-side
   const siswaData = useQuery(
     ["students", "?_sort=tahun_masuk:asc"],
-    daftarSiswaFetcher,
-    {
-      refetchInterval: 500,
-    }
+    ({ queryKey }) => fetcher(queryKey, jwt),
+    { initialData: props.siswa }
   );
   const kelasData = useQuery(
     ["classrooms", "?_sort=kelas:asc"],
-    daftarSiswaFetcher
+    ({ queryKey }) => fetcher(queryKey, jwt),
+    { enabled: !!props.siswa }
   );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [nama, setNama] = useState("");
@@ -62,28 +61,22 @@ function DaftarSiswa() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // SISWA MUTATION
-  const siswaMutation = useMutation((newSiswa) => {
-    return axios.post(`${URL}/students`, newSiswa, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-  });
+  const siswaMutation = useMutation((newSiswa) =>
+    axios.post(`${URL}/students`, newSiswa, {
+      headers: { Authorization: `Bearer ${jwt}` },
+    })
+  );
   // USER MUTATION
   const userMutation = useMutation((newUser) =>
     axios.post(`${URL}/auth/local/register`, newUser, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+      headers: { Authorization: `Bearer ${jwt}` },
     })
   );
 
   // UPDATE USER MUTATION
   const updateUserMutation = useMutation((newUser) =>
     axios.put(`${URL}/users/${newUser.id}`, newUser.data, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+      headers: { Authorization: `Bearer ${jwt}` },
     })
   );
 
@@ -102,7 +95,7 @@ function DaftarSiswa() {
         onError: (error) => console.log(error),
         onSuccess: (data) => {
           // Query Invalidations
-          queryClient.invalidateQueries("students");
+          // queryClient.invalidateQueries("students");
           console.log(data.data);
           const uid = Number(data.data?.user?.id);
           siswaMutation.mutate(
@@ -121,7 +114,10 @@ function DaftarSiswa() {
               onError: (error) => console.log(error),
               onSuccess: (data) => {
                 console.log(data.data);
-                queryClient.invalidateQueries("students");
+                queryClient.invalidateQueries([
+                  "students",
+                  "?_sort=tahun_masuk:asc",
+                ]);
                 const sid = data.data?.id;
                 updateUserMutation.mutate(
                   {
@@ -135,7 +131,7 @@ function DaftarSiswa() {
                     onError: (error) => console.log(error),
                     onSuccess: (data) => {
                       console.log(data.data);
-                      queryClient.invalidateQueries("students");
+                      // queryClient.invalidateQueries("students");
                       onClose();
                       setIsSubmitting(false);
                       toast({
@@ -158,167 +154,153 @@ function DaftarSiswa() {
     // setSelectedClass(null);
   };
 
-  // error handling
-  if (siswaData.isError) console.log(error);
-  // loading state
-  if (siswaData.isLoading) {
-    return (
-      <>
-        <SkeletonLoading title={"Daftar Siswa"} plusButton={"Siswa"} />
-      </>
-    );
-  }
+  return (
+    <>
+      <Head>
+        <title>Daftar Siswa | Santri Kita</title>
+      </Head>
 
-  if (siswaData.isSuccess) {
-    return (
-      <>
-        <Head>
-          <title>Daftar Siswa | Santri Kita</title>
-        </Head>
+      <Flex mb="4">
+        <Spacer />
+        <Button
+          leftIcon={<AddIcon />}
+          onClick={onOpen}
+          variant="solid"
+          colorScheme="teal"
+        >
+          Siswa
+        </Button>
+      </Flex>
 
-        <Flex mb="4">
-          <Spacer />
-          <Button
-            leftIcon={<AddIcon />}
-            onClick={onOpen}
-            variant="solid"
-            colorScheme="teal"
-          >
-            Siswa
-          </Button>
-        </Flex>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Tambah Siswa</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <form>
+              <FormControl isRequired>
+                <FormLabel>Nama</FormLabel>
+                <Input
+                  placeholder="Name"
+                  onChange={(e) => setNama(e.target.value)}
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Jenis Kelamin</FormLabel>
+                <Menu>
+                  <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                    {jKelamin ? jKelamin : "Jenis Kelamin"}
+                  </MenuButton>
+                  <MenuList>
+                    {jkList.map((jkItem, i) => (
+                      <MenuItem
+                        key={i}
+                        onClick={(e) => setJKelamin(e.target.innerHTML)}
+                      >
+                        {jkItem}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>NIS</FormLabel>
+                <Input
+                  placeholder="NIS"
+                  type="number"
+                  onChange={(e) => setNis(e.target.value)}
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Kelas</FormLabel>
+                <Select
+                  defaultValue={kelas}
+                  onChange={setKelas}
+                  options={kelasData.data || []}
+                  isClearable
+                  isSearchable
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Kamar</FormLabel>
+                <Input
+                  placeholder="Kamar"
+                  onChange={(e) => setKamar(e.target.value)}
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Tanggal Lahir</FormLabel>
+                <Input
+                  type="date"
+                  onChange={(e) => setTglLahir(e.target.value)}
+                />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Tahun Masuk</FormLabel>
+                <Input
+                  type="number"
+                  onChange={(e) => setTahunMasuk(e.target.value)}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Tahun Keluar</FormLabel>
+                <Input
+                  type="number"
+                  onChange={(e) => setTahunKeluar(e.target.value)}
+                />
+              </FormControl>
+            </form>
+          </ModalBody>
 
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Tambah Siswa</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <form>
-                <FormControl isRequired>
-                  <FormLabel>Nama</FormLabel>
-                  <Input
-                    placeholder="Name"
-                    onChange={(e) => setNama(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Jenis Kelamin</FormLabel>
-                  <Menu>
-                    <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                      {jKelamin ? jKelamin : "Jenis Kelamin"}
-                    </MenuButton>
-                    <MenuList>
-                      {jkList.map((jkItem, i) => (
-                        <MenuItem
-                          key={i}
-                          onClick={(e) => setJKelamin(e.target.innerHTML)}
-                        >
-                          {jkItem}
-                        </MenuItem>
-                      ))}
-                    </MenuList>
-                  </Menu>
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>NIS</FormLabel>
-                  <Input
-                    placeholder="NIS"
-                    type="number"
-                    onChange={(e) => setNis(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Kelas</FormLabel>
-                  <Select
-                    defaultValue={kelas}
-                    onChange={setKelas}
-                    options={kelasData.data}
-                    isClearable
-                    isSearchable
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Kamar</FormLabel>
-                  <Input
-                    placeholder="Kamar"
-                    onChange={(e) => setKamar(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Tanggal Lahir</FormLabel>
-                  <Input
-                    type="date"
-                    onChange={(e) => setTglLahir(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel>Tahun Masuk</FormLabel>
-                  <Input
-                    type="number"
-                    onChange={(e) => setTahunMasuk(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Tahun Keluar</FormLabel>
-                  <Input
-                    type="number"
-                    onChange={(e) => setTahunKeluar(e.target.value)}
-                  />
-                </FormControl>
-              </form>
-            </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="teal"
+              mr={3}
+              isLoading={isSubmitting}
+              onClick={tambahSiswaHadler}
+            >
+              Simpan
+            </Button>
+            <Button onClick={onClose}>Batal</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
-            <ModalFooter>
-              <Button
-                colorScheme="teal"
-                mr={3}
-                isLoading={isSubmitting}
-                onClick={tambahSiswaHadler}
-              >
-                Simpan
-              </Button>
-              <Button onClick={onClose}>Batal</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        <SiswaTable data={siswaData.data} />
-      </>
-    );
-  }
+      <SiswaTable data={siswaData.data} />
+    </>
+  );
 }
 
 // Function untuk fetch data dari API students
-const daftarSiswaFetcher = async ({ queryKey }) => {
-  try {
-    const collection = queryKey[0];
-    let endpoint = `${URL}/${collection}`;
+const fetcher = async (key, token) => {
+  const endpoint = `${URL}/${key[0]}${key[1] || ""}`;
 
-    if (queryKey[1]) {
-      const params = queryKey[1];
-      endpoint = `${URL}/${collection}${params}`;
-    }
+  const { data } = await axios.get(endpoint, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-    const { data } = await axios.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+  if (key[0] !== "classrooms") return data;
+  else {
+    return data.map((kelas) => {
+      return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
     });
-
-    let newKelas = [];
-    if (collection === "classrooms") {
-      newKelas = data.map((kelas) => {
-        return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
-      });
-      return newKelas;
-    }
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    return { msg: "Query data failed" };
   }
 };
+
+export async function getServerSideProps(context) {
+  const siswa = await fetcher(
+    ["students", "?_sort=tahun_masuk:asc"],
+    context.req.cookies.jwt
+  );
+
+  return {
+    props: {
+      siswa,
+    },
+  };
+}
 
 export default DaftarSiswa;
