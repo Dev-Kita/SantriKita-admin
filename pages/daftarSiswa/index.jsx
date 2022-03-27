@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { useQuery, useQueryClient, useMutation } from "react-query";
-import axios from "axios";
-import Head from "next/head";
-import Select from "react-select";
-import SkeletonLoading from "../../components/skeletonLoading";
-import { parseCookies } from "nookies";
-import SiswaTable from "../../components/daftarSiswa/siswaTable";
-import { AddIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import React, { useState } from 'react';
+import { useQuery, useQueryClient, useMutation } from 'react-query';
+import axios from 'axios';
+import Head from 'next/head';
+import Select from 'react-select';
+// import SkeletonLoading from "../../components/skeletonLoading";
+import { parseCookies } from 'nookies';
+import SiswaTable from '../../components/daftarSiswa/siswaTable';
+import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import {
   useToast,
   VStack,
@@ -28,7 +28,7 @@ import {
   FormControl,
   FormLabel,
   Input,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
@@ -38,25 +38,25 @@ function DaftarSiswa(props) {
   const toast = useToast();
   // usequery Hooks untuk fetch data client-side
   const siswaData = useQuery(
-    ["students", "?_sort=tahun_masuk:asc"],
+    ['students', '?_sort=tahun_masuk:asc'],
     ({ queryKey }) => fetcher(queryKey, jwt),
     { initialData: props.siswa }
   );
   const kelasData = useQuery(
-    ["classrooms", "?_sort=kelas:asc"],
+    ['classrooms', '?_sort=kelas:asc'],
     ({ queryKey }) => fetcher(queryKey, jwt),
     { enabled: !!props.siswa }
   );
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [nama, setNama] = useState("");
+  const [nama, setNama] = useState('');
   const [nis, setNis] = useState(null);
-  const [kelas, setKelas] = useState("");
-  const [kamar, setKamar] = useState("");
-  const [jKelamin, setJKelamin] = useState("");
-  const [tglLahir, setTglLahir] = useState("");
+  const [kelas, setKelas] = useState('');
+  const [kamar, setKamar] = useState('');
+  const [jKelamin, setJKelamin] = useState('');
+  const [tglLahir, setTglLahir] = useState('');
   const [tahunMasuk, setTahunMasuk] = useState(null);
   const [tahunKeluar, setTahunKeluar] = useState(null);
-  const jkList = ["Laki-laki", "Perempuan"];
+  const jkList = ['Laki-laki', 'Perempuan'];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -115,8 +115,8 @@ function DaftarSiswa(props) {
               onSuccess: (data) => {
                 console.log(data.data);
                 queryClient.invalidateQueries([
-                  "students",
-                  "?_sort=tahun_masuk:asc",
+                  'students',
+                  '?_sort=tahun_masuk:asc',
                 ]);
                 const sid = data.data?.id;
                 updateUserMutation.mutate(
@@ -135,10 +135,10 @@ function DaftarSiswa(props) {
                       onClose();
                       setIsSubmitting(false);
                       toast({
-                        position: "bottom-right",
-                        title: "Data Siswa Dibuat.",
-                        description: "Data siswa baru telah berhasil dibuat.",
-                        status: "success",
+                        position: 'bottom-right',
+                        title: 'Data Siswa Dibuat.',
+                        description: 'Data siswa baru telah berhasil dibuat.',
+                        status: 'success',
                         duration: 5000,
                         isClosable: true,
                       });
@@ -190,7 +190,7 @@ function DaftarSiswa(props) {
                 <FormLabel>Jenis Kelamin</FormLabel>
                 <Menu>
                   <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                    {jKelamin ? jKelamin : "Jenis Kelamin"}
+                    {jKelamin ? jKelamin : 'Jenis Kelamin'}
                   </MenuButton>
                   <MenuList>
                     {jkList.map((jkItem, i) => (
@@ -274,7 +274,7 @@ function DaftarSiswa(props) {
 
 // Function untuk fetch data dari API students
 const fetcher = async (key, token) => {
-  const endpoint = `${URL}/${key[0]}${key[1] || ""}`;
+  const endpoint = `${URL}/${key[0]}${key[1] || ''}`;
 
   const { data } = await axios.get(endpoint, {
     headers: {
@@ -282,7 +282,7 @@ const fetcher = async (key, token) => {
     },
   });
 
-  if (key[0] !== "classrooms") return data;
+  if (key[0] !== 'classrooms') return data;
   else {
     return data.map((kelas) => {
       return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
@@ -292,7 +292,7 @@ const fetcher = async (key, token) => {
 
 export async function getServerSideProps(context) {
   const siswa = await fetcher(
-    ["students", "?_sort=tahun_masuk:asc"],
+    ['students', '?_sort=tahun_masuk:asc'],
     context.req.cookies.jwt
   );
 
