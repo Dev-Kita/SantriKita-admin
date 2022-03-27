@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { useQuery, useQueryClient, useMutation } from "react-query";
+import {
+  dehydrate,
+  useQuery,
+  useQueryClient,
+  QueryClient,
+  useMutation,
+} from "react-query";
 import axios from "axios";
 import Head from "next/head";
 import Select from "react-select";
@@ -32,8 +38,8 @@ const jwt = parseCookies().jwt;
 function DaftarKelas() {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], kelasFetcher);
-  const guruData = useQuery(["teachers", "?_sort=nama:asc"], kelasFetcher);
+  const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
+  const guruData = useQuery(["teachers", "?_sort=nama:asc"], fetcher);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [kelas, setKelas] = useState("");
@@ -80,7 +86,10 @@ function DaftarKelas() {
   };
 
   // error handling
-  if (kelasData.isError) console.log(error);
+  if (kelasData.isError) {
+    console.log(error);
+    return <div>error</div>;
+  }
   // loading state
   if (kelasData.isLoading) {
     return (
@@ -90,104 +99,100 @@ function DaftarKelas() {
     );
   }
 
-  if (kelasData.isSuccess) {
-    return (
-      <>
-        <Head>
-          <title>Daftar Kelas | Santri Kita</title>
-        </Head>
+  return (
+    <>
+      <Head>
+        <title>Daftar Kelas | Santri Kita</title>
+      </Head>
 
-        <Flex mb="4">
-          <Spacer />
-          <Button
-            leftIcon={<AddIcon />}
-            onClick={onOpen}
-            variant="solid"
-            colorScheme="teal"
-          >
-            Kelas
-          </Button>
-        </Flex>
+      <Flex mb="4">
+        <Spacer />
+        <Button
+          leftIcon={<AddIcon />}
+          onClick={onOpen}
+          variant="solid"
+          colorScheme="teal"
+        >
+          Kelas
+        </Button>
+      </Flex>
 
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Tambah Siswa</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <form>
-                <FormControl isRequired>
-                  <FormLabel>Kelas</FormLabel>
-                  <Input
-                    placeholder="Kelas"
-                    onChange={(e) => setKelas(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel>Pembimbing</FormLabel>
-                  <Select
-                    onChange={setPembimbing}
-                    options={guruData.data}
-                    isClearable
-                    isSearchable
-                  />
-                </FormControl>
-              </form>
-            </ModalBody>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Tambah Kelas</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <form>
+              <FormControl isRequired>
+                <FormLabel>Kelas</FormLabel>
+                <Input
+                  placeholder="Kelas"
+                  onChange={(e) => setKelas(e.target.value)}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Pembimbing</FormLabel>
+                <Select
+                  onChange={setPembimbing}
+                  options={guruData.data || []}
+                  isClearable
+                  isSearchable
+                />
+              </FormControl>
+            </form>
+          </ModalBody>
 
-            <ModalFooter>
-              <Button
-                colorScheme="teal"
-                mr={3}
-                isLoading={isSubmitting}
-                onClick={tambahKelasHadler}
-              >
-                Simpan
-              </Button>
-              <Button onClick={onClose}>Batal</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+          <ModalFooter>
+            <Button
+              colorScheme="teal"
+              mr={3}
+              isLoading={isSubmitting}
+              onClick={tambahKelasHadler}
+            >
+              Simpan
+            </Button>
+            <Button onClick={onClose}>Batal</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
-        <KelasTable data={kelasData.data} />
-      </>
-    );
-  }
+      <KelasTable data={kelasData.data} />
+    </>
+  );
 }
 
 // Function untuk fetch data dari API students
-const kelasFetcher = async ({ queryKey }) => {
-  const collection = queryKey[0];
-  let endpoint = `${URL}/${collection}`;
+const fetcher = async ({ queryKey }) => {
+  const endpoint = `${URL}/${queryKey[0]}${queryKey[1] || ""}`;
 
-  if (queryKey[1]) {
-    const filter = queryKey[1];
-    endpoint = `${URL}/${collection}${filter}`;
-  }
+  const { data } = await axios.get(endpoint, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
 
-  try {
-    const { data } = await axios.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+  if (queryKey[0] !== "teachers") return data;
+  else {
+    let guruTersedia = data.filter((g) => g.classroom === null);
+    let newGuru = guruTersedia.map((guru) => {
+      return { value: guru.nama, label: guru.nama, id: guru.id };
     });
-
-    let newGuru = [];
-    if (collection === "teachers") {
-      // console.log(data);
-      let guruTersedia = data.filter((g) => g.classroom === null);
-      newGuru = guruTersedia.map((guru) => {
-        return { value: guru.nama, label: guru.nama, id: guru.id };
-      });
-      newGuru.unshift({ value: "-", label: "-", id: null });
-      return newGuru;
-    }
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    return { msg: "Query data failed" };
+    newGuru.unshift({ value: "-", label: "-", id: null });
+    return newGuru;
   }
 };
+
+export async function getServerSideProps(context) {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+}
 
 export default DaftarKelas;

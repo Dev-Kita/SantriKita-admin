@@ -30,21 +30,23 @@ import {
 function KelasTable({ data }) {
   const router = useRouter();
   // DATA YANG DITAMPILKAN DI TABLE
-  const newData = data.map((kelasData, i) => {
-    return {
-      kelas: kelasData.kelas,
-      pembimbing: kelasData.teacher?.nama || "-",
-      detail: (
-        <NextLink href={`${router.pathname}/${kelasData.id}`}>
-          <Link color="teal.500" fontWeight="medium">
-            Detail
-          </Link>
-        </NextLink>
-      ),
-      // "Detail",
-    };
-  });
-  const rowsData = useMemo(() => newData, [data]);
+  const rowsData = useMemo(() => {
+    return data.map((kelasData, i) => {
+      return {
+        kelas: kelasData.kelas,
+        pembimbing: kelasData.teacher?.nama || "-",
+        detail: (
+          <NextLink href={`${router.pathname}/${kelasData.id}`}>
+            <Link color="teal.500" fontWeight="medium">
+              Detail
+            </Link>
+          </NextLink>
+        ),
+        // "Detail",
+      };
+    });
+  }, [data]);
+
   const columns = useMemo(
     () => [
       { Header: "Kelas", accessor: "kelas" },
