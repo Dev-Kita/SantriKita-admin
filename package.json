@@ -29,6 +29,13 @@
     "react-moment": "^1.1.1",
     "react-query": "^3.34.19",
     "react-select": "^5.2.2",
-    "react-table": "^7.7.0"
-  }
+    "react-table": "^7.7.0",
+    "regenerator-runtime": "^0.13.9"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.17.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions"
+  ]
 }

@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  dehydrate,
-  useQuery,
-  useQueryClient,
-  QueryClient,
-  useMutation,
-} from "react-query";
+import { useQuery, useQueryClient, useMutation } from "react-query";
 import axios from "axios";
 import Head from "next/head";
 import Select from "react-select";
@@ -35,11 +29,19 @@ import {
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
 
-function DaftarKelas() {
+function DaftarKelas(props) {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const kelasData = useQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
-  const guruData = useQuery(["teachers", "?_sort=nama:asc"], fetcher);
+  const kelasData = useQuery(
+    ["classrooms", "?_sort=kelas:asc"],
+    ({ queryKey }) => fetcher(queryKey, jwt),
+    { initialData: props.kelas }
+  );
+  const guruData = useQuery(
+    ["teachers", "?_sort=nama:asc"],
+    ({ queryKey }) => fetcher(queryKey, jwt),
+    { enabled: !!props.kelas }
+  );
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [kelas, setKelas] = useState("");
@@ -86,18 +88,18 @@ function DaftarKelas() {
   };
 
   // error handling
-  if (kelasData.isError) {
-    console.log(error);
-    return <div>error</div>;
-  }
-  // loading state
-  if (kelasData.isLoading) {
-    return (
-      <>
-        <SkeletonLoading title={"Daftar Kelas"} plusButton={"Kelas"} />
-      </>
-    );
-  }
+  // if (kelasData.isError) {
+  //   console.log(error);
+  //   return <div>error</div>;
+  // }
+  // // loading state
+  // if (kelasData.isLoading) {
+  //   return (
+  //     <>
+  //       <SkeletonLoading title={"Daftar Kelas"} plusButton={"Kelas"} />
+  //     </>
+  //   );
+  // }
 
   return (
     <>
@@ -163,16 +165,16 @@ function DaftarKelas() {
 }
 
 // Function untuk fetch data dari API students
-const fetcher = async ({ queryKey }) => {
-  const endpoint = `${URL}/${queryKey[0]}${queryKey[1] || ""}`;
+const fetcher = async (key, token) => {
+  const endpoint = `${URL}/${key[0]}${key[1] || ""}`;
 
   const { data } = await axios.get(endpoint, {
     headers: {
-      Authorization: `Bearer ${jwt}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
-  if (queryKey[0] !== "teachers") return data;
+  if (key[0] !== "teachers") return data;
   else {
     let guruTersedia = data.filter((g) => g.classroom === null);
     let newGuru = guruTersedia.map((guru) => {
@@ -184,13 +186,14 @@ const fetcher = async ({ queryKey }) => {
 };
 
 export async function getServerSideProps(context) {
-  const queryClient = new QueryClient();
-
-  await queryClient.prefetchQuery(["classrooms", "?_sort=kelas:asc"], fetcher);
+  const kelas = await fetcher(
+    ["classrooms", "?_sort=kelas:asc"],
+    context.req.cookies.jwt
+  );
 
   return {
     props: {
-      dehydratedState: dehydrate(queryClient),
+      kelas,
     },
   };
 }

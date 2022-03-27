@@ -1,7 +1,8 @@
-import { useState, createContext } from "react";
+import "regenerator-runtime/runtime.js";
+import { createContext } from "react";
 import { ChakraProvider, extendTheme, CSSReset } from "@chakra-ui/react";
 import { parseCookies } from "nookies";
-import { Hydrate, QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 import Router from "next/router";
 import Head from "next/head";
 import NProgress from "nprogress";
@@ -27,7 +28,7 @@ export const jwt = parseCookies().jwt;
 // ChakraUI Custom Config
 const theme = extendTheme(customTheme);
 // react-query & graphql-request init
-// const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 export const gqlConnect = new GraphQLClient(
   endpoint,
   jwt
@@ -42,7 +43,6 @@ export const gqlConnect = new GraphQLClient(
 export const GqlClient = createContext();
 
 function MyApp({ Component, pageProps }) {
-  const [queryClient] = useState(() => new QueryClient());
   return (
     <>
       <Head>
@@ -50,15 +50,13 @@ function MyApp({ Component, pageProps }) {
         <link rel="stylesheet" type="text/css" href="/nprogress.css" />
       </Head>
       <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <ChakraProvider theme={theme}>
-            <Fonts />
-            <CSSReset />
-            <Layout>
-              <Component {...pageProps} gqlClient={gqlConnect} />
-            </Layout>
-          </ChakraProvider>
-        </Hydrate>
+        <ChakraProvider theme={theme}>
+          <Fonts />
+          <CSSReset />
+          <Layout>
+            <Component {...pageProps} gqlClient={gqlConnect} />
+          </Layout>
+        </ChakraProvider>
       </QueryClientProvider>
     </>
   );
