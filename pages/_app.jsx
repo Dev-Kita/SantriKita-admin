@@ -1,25 +1,26 @@
-import "regenerator-runtime/runtime.js";
-import { createContext } from "react";
-import { ChakraProvider, extendTheme, CSSReset } from "@chakra-ui/react";
-import { parseCookies } from "nookies";
-import { QueryClient, QueryClientProvider } from "react-query";
-import Router from "next/router";
-import Head from "next/head";
-import NProgress from "nprogress";
+import 'regenerator-runtime/runtime.js';
+import { createContext } from 'react';
+import { ChakraProvider, extendTheme, CSSReset } from '@chakra-ui/react';
+import { parseCookies } from 'nookies';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
+import Router from 'next/router';
+import Head from 'next/head';
+import NProgress from 'nprogress';
 // import { endpoint } from "../utils/gql";
-import { GraphQLClient } from "graphql-request";
+import { GraphQLClient } from 'graphql-request';
 
-import Layout from "../components/layout";
-import { customTheme } from "../components/customStyles/theme";
-import { Fonts } from "../components/customStyles/Font";
+import Layout from '../components/layout';
+import { customTheme } from '../components/customStyles/theme';
+import { Fonts } from '../components/customStyles/Font';
 
 // INIT NPROGRESS
-Router.events.on("routeChangeStart", (url) => {
+Router.events.on('routeChangeStart', (url) => {
   console.log(`Loading: ${url}`);
   NProgress.start();
 });
-Router.events.on("routeChangeComplete", () => NProgress.done());
-Router.events.on("routeChangeError", () => NProgress.done());
+Router.events.on('routeChangeComplete', () => NProgress.done());
+Router.events.on('routeChangeError', () => NProgress.done());
 
 // INIT GRAPHQL
 export const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/graphql`;
@@ -56,6 +57,7 @@ function MyApp({ Component, pageProps }) {
           <Layout>
             <Component {...pageProps} gqlClient={gqlConnect} />
           </Layout>
+          <ReactQueryDevtools initialIsOpen={false} />
         </ChakraProvider>
       </QueryClientProvider>
     </>
@@ -76,21 +78,21 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
     const jwt = parseCookies(ctx).jwt;
 
     if (jwt) {
-      if (ctx.pathname === "/login") {
-        redirectUser(ctx, "/dashboard");
+      if (ctx.pathname === '/login') {
+        redirectUser(ctx, '/dashboard');
       }
     }
 
     if (!jwt) {
-      if (ctx.pathname !== "/login" && ctx.pathname !== "/") {
-        redirectUser(ctx, "/login");
+      if (ctx.pathname !== '/login' && ctx.pathname !== '/') {
+        redirectUser(ctx, '/login');
       }
     }
 
     return { msg: jwt };
   } catch (error) {
     console.log(error);
-    return { msg: "You need to login first" };
+    return { msg: 'You need to login first' };
   }
 };
 

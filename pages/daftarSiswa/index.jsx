@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useQueryClient, useMutation } from 'react-query';
 import axios from 'axios';
 import Head from 'next/head';
@@ -48,6 +48,7 @@ function DaftarSiswa(props) {
     { enabled: !!props.siswa }
   );
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [kelasOptions, setKelasOptions] = useState([]);
   const [nama, setNama] = useState('');
   const [nis, setNis] = useState(null);
   const [kelas, setKelas] = useState('');
@@ -59,6 +60,16 @@ function DaftarSiswa(props) {
   const jkList = ['Laki-laki', 'Perempuan'];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (kelasData.data) {
+      const kelasOptions = kelasData.data.map((kelas) => {
+        return { value: kelas.nama, label: kelas.nama, id: kelas.id };
+      });
+
+      setKelasOptions(kelasOptions);
+    }
+  }, [kelasData.data]);
 
   // SISWA MUTATION
   const siswaMutation = useMutation((newSiswa) =>
@@ -217,7 +228,7 @@ function DaftarSiswa(props) {
                 <Select
                   defaultValue={kelas}
                   onChange={setKelas}
-                  options={kelasData.data || []}
+                  options={kelasOptions}
                   isClearable
                   isSearchable
                 />
@@ -282,12 +293,13 @@ const fetcher = async (key, token) => {
     },
   });
 
-  if (key[0] !== 'classrooms') return data;
-  else {
-    return data.map((kelas) => {
-      return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
-    });
-  }
+  return data;
+  // if (key[0] !== 'classrooms') return data;
+  // else {
+  //   return data.map((kelas) => {
+  //     return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
+  //   });
+  // }
 };
 
 export async function getServerSideProps(context) {
