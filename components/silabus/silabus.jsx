@@ -41,7 +41,6 @@ function Silabus({ data, kelasData }) {
 
   useEffect(() => {
     if (kelasData) {
-      console.log(kelasData);
       const kelasOptions = kelasData.map(({ kelas, id }) => {
         return { value: kelas, label: kelas, id: id };
       });

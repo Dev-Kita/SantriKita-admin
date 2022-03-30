@@ -63,7 +63,6 @@ function DaftarSiswa(props) {
 
   useEffect(() => {
     if (kelasData.data) {
-      console.log(kelasData.data);
       const kelasOptions = kelasData.data.map(({ kelas, id }) => {
         return { value: kelas, label: kelas, id: id };
       });

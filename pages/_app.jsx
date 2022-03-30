@@ -24,7 +24,6 @@ Router.events.on('routeChangeError', () => NProgress.done());
 
 // INIT GRAPHQL
 export const endpoint = `${process.env.NEXT_PUBLIC_API_URL}/graphql`;
-export const jwt = parseCookies().jwt;
 
 // ChakraUI Custom Config
 const theme = extendTheme(customTheme);
@@ -35,7 +34,7 @@ export const gqlConnect = new GraphQLClient(
   jwt
     ? {
         headers: {
-          authorization: `Bearer ${jwt}`,
+          authorization: `Bearer ${parseCookies().jwt}`,
         },
       }
     : undefined
@@ -64,36 +63,36 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-const redirectUser = (ctx, location) => {
-  if (ctx.req) {
-    ctx.res.writeHead(302, { Location: location });
-    ctx.res.end();
-  } else {
-    Router.push(location);
-  }
-};
+// const redirectUser = (ctx, location) => {
+//   if (ctx.req) {
+//     ctx.res.writeHead(302, { Location: location });
+//     ctx.res.end();
+//   } else {
+//     Router.push(location);
+//   }
+// };
 
-MyApp.getInitialProps = async ({ Component, ctx }) => {
-  try {
-    const jwt = parseCookies(ctx).jwt;
+// MyApp.getInitialProps = async ({ Component, ctx }) => {
+//   try {
+//     const jwt = parseCookies(ctx).jwt;
 
-    if (jwt) {
-      if (ctx.pathname === '/login') {
-        redirectUser(ctx, '/dashboard');
-      }
-    }
+//     if (jwt) {
+//       if (ctx.pathname === '/login') {
+//         redirectUser(ctx, '/dashboard');
+//       }
+//     }
 
-    if (!jwt) {
-      if (ctx.pathname !== '/login' && ctx.pathname !== '/') {
-        redirectUser(ctx, '/login');
-      }
-    }
+//     if (!jwt) {
+//       if (ctx.pathname !== '/login' && ctx.pathname !== '/') {
+//         redirectUser(ctx, '/login');
+//       }
+//     }
 
-    return { msg: jwt };
-  } catch (error) {
-    console.log(error);
-    return { msg: 'You need to login first' };
-  }
-};
+//     return { msg: jwt };
+//   } catch (error) {
+//     console.log(error);
+//     return { msg: 'You need to login first' };
+//   }
+// };
 
 export default MyApp;

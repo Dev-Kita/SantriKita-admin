@@ -173,15 +173,6 @@ const fetcher = async (key, token) => {
   });
 
   return data;
-  // if (key[0] !== "teachers") return data;
-  // else {
-  //   let guruTersedia = data.filter((g) => g.classroom === null);
-  //   let newGuru = guruTersedia.map((guru) => {
-  //     return { value: guru.nama, label: guru.nama, id: guru.id };
-  //   });
-  //   newGuru.unshift({ value: "-", label: "-", id: null });
-  //   return newGuru;
-  // }
 };
 
 export async function getServerSideProps(context) {
