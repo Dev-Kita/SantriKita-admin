@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { parseCookies } from "nookies";
+import React, { useState } from 'react';
+import axios from 'axios';
 import {
   useToast,
   useDisclosure,
@@ -19,28 +18,20 @@ import {
   FormLabel,
   Input,
   ModalFooter,
-} from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
-import MapelTable from "./mapelTable";
-import SkeletonLoading from "../skeletonLoading";
-import { useQuery, useMutation, useQueryClient } from "react-query";
-import { useRouter } from "next/router";
+} from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
+import { useMutation, useQueryClient } from 'react-query';
+import { useRouter } from 'next/router';
+import MapelTable from './mapelTable';
 
-const URL = process.env.NEXT_PUBLIC_API_URL;
-const jwt = parseCookies().jwt;
-
-function Mapel() {
+function Mapel({ data }) {
   const queryClient = useQueryClient();
   const toast = useToast();
-  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const mapelData = useQuery("lessons", fetcher);
 
-  const [mapel, setMapel] = useState("");
+  const [mapel, setMapel] = useState('');
   const [isBukuSetoran, setIsBukuSetoran] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  console.log(mapelData);
 
   const mapelMutation = useMutation((newLesson) =>
     axios.post(`${URL}/lessons`, newLesson, {
@@ -61,14 +52,14 @@ function Mapel() {
         onError: (error) => console.log(error),
         onSuccess: (data) => {
           console.log(data.data);
-          queryClient.invalidateQueries("lessons");
+          queryClient.invalidateQueries(['lessons']);
           onClose();
           setIsSubmitting(false);
           toast({
-            position: "bottom-right",
-            title: "Data Mapel Dibuat.",
-            description: "Data mapel baru telah berhasil ditambahkan.",
-            status: "success",
+            position: 'bottom-right',
+            title: 'Data Mapel Dibuat.',
+            description: 'Data mapel baru telah berhasil ditambahkan.',
+            status: 'success',
             duration: 5000,
             isClosable: true,
           });
@@ -76,18 +67,6 @@ function Mapel() {
       }
     );
   };
-
-  /*
-    JSX RETURN
-   */
-  if (mapelData.isLoading) {
-    console.log(mapelData.status);
-    // return (
-    //   <>
-    //     <SkeletonLoading plusButton={"Mapel"} />
-    //   </>
-    // );
-  }
 
   return (
     <Box mt="6">
@@ -143,49 +122,9 @@ function Mapel() {
         </ModalContent>
       </Modal>
 
-      {mapelData.isSuccess ? (
-        <>
-          <MapelTable data={mapelData.data} />
-        </>
-      ) : undefined}
+      <MapelTable data={data} />
     </Box>
   );
 }
 
 export default Mapel;
-
-// Function untuk fetch data dari API classrooms
-const fetcher = async ({ queryKey }) => {
-  try {
-    const collection = queryKey[0];
-    let endpoint = `${URL}/${collection}`;
-
-    if (queryKey[1]) {
-      const params = queryKey[1];
-      endpoint = `${URL}/${collection}${params}`;
-    }
-
-    const { data } = await axios.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-
-    let newClassrooms = [];
-    if (collection === "classrooms") {
-      newClassrooms = data.map((classroom) => {
-        return {
-          value: classroom.kelas,
-          label: `${classroom.kelas}`,
-          id: classroom.id,
-        };
-      });
-      return newClassrooms;
-    }
-
-    return data;
-  } catch (error) {
-    console.error(error);
-    return { msg: "Query data failed" };
-  }
-};

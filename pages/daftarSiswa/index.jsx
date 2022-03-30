@@ -63,8 +63,9 @@ function DaftarSiswa(props) {
 
   useEffect(() => {
     if (kelasData.data) {
-      const kelasOptions = kelasData.data.map((kelas) => {
-        return { value: kelas.nama, label: kelas.nama, id: kelas.id };
+      console.log(kelasData.data);
+      const kelasOptions = kelasData.data.map(({ kelas, id }) => {
+        return { value: kelas, label: kelas, id: id };
       });
 
       setKelasOptions(kelasOptions);
@@ -294,12 +295,6 @@ const fetcher = async (key, token) => {
   });
 
   return data;
-  // if (key[0] !== 'classrooms') return data;
-  // else {
-  //   return data.map((kelas) => {
-  //     return { value: kelas.kelas, label: kelas.kelas, id: kelas.id };
-  //   });
-  // }
 };
 
 export async function getServerSideProps(context) {

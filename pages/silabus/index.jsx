@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import axios from "axios";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { parseCookies } from "nookies";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import Select from "react-select";
-import makeAnimated from "react-select/animated";
-import SkeletonLoading from "../../components/skeletonLoading";
-import SilabusTable from "../../components/silabus/silabusTable";
-import { ChevronDownIcon, AddIcon } from "@chakra-ui/icons";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { parseCookies } from 'nookies';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+import SkeletonLoading from '../../components/skeletonLoading';
+import SilabusTable from '../../components/silabus/silabusTable';
+import { ChevronDownIcon, AddIcon } from '@chakra-ui/icons';
 import {
   useToast,
   Flex,
@@ -30,231 +30,77 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-} from "@chakra-ui/react";
-import { animateVisualElement } from "framer-motion";
-import Mapel from "../../components/silabus/mapel.jsx";
+} from '@chakra-ui/react';
+import { animateVisualElement } from 'framer-motion';
+import Mapel from '../../components/silabus/mapel';
+import Silabus from '../../components/silabus/silabus';
 
 const URL = process.env.NEXT_PUBLIC_API_URL;
 const jwt = parseCookies().jwt;
-const animatedComponents = makeAnimated();
 
-function Silabus() {
-  const toast = useToast();
-  const queryClient = useQueryClient();
-  const router = useRouter();
-  const silabusData = useQuery(["silabuses"], silabusFetcher, {
-    refetchInterval: 500,
-  });
-  // console.log(silabusData.data);
-  const kelasData = useQuery("classrooms", silabusFetcher);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedClass, setSelectedClass] = useState("");
-  const [pelajaran, setPelajaran] = useState("null");
-  const [KD, setKD] = useState("");
-  const [keterangan, setKeterangan] = useState("");
-  const [bab, setBab] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const silabusMutation = useMutation((newsilabus) =>
-    axios.post(`${URL}/silabuses`, newsilabus, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
+function SilabusPage(props) {
+  const silabusData = useQuery(
+    ['silabuses'],
+    ({ queryKey }) => fetcher(queryKey, jwt),
+    { initialData: props.silabus }
+  );
+  const mapelData = useQuery(
+    ['lessons'],
+    ({ queryKey }) => fetcher(queryKey, jwt),
+    { initialData: props.mapel }
+  );
+  const kelasData = useQuery(
+    ['classrooms', '?_sort=kelas:asc'],
+    ({ queryKey }) => fetcher(queryKey, jwt),
+    { enabled: !!props.silabus }
   );
 
-  const tambahSilabusHandler = () => {
-    setIsSubmitting(true);
-    let submitClass = selectedClass.map((abc) => {
-      return { id: abc.id };
-    });
+  return (
+    <>
+      <Head>
+        <title>Silabus | Santri Kita</title>
+      </Head>
 
-    silabusMutation.mutate(
-      {
-        pelajaran: pelajaran,
-        kompetensi_dasar: KD,
-        bab: bab,
-        keterangan: keterangan,
-        classrooms: submitClass,
-      },
-      {
-        onError: (error) => console.log(error),
-        onSuccess: (data) => {
-          setSelectedClass(null);
-          onClose();
-          setIsSubmitting(false);
-
-          toast({
-            position: "bottom-right",
-            title: "Data Silabus Dibuat.",
-            description: "Data silabus baru telah berhasil dibuat.",
-            status: "success",
-            duration: 5000,
-            isClosable: true,
-          });
-        },
-      }
-    );
-  };
-
-  // error handling
-  if (silabusData.isError) {
-    console.log(silabusData.error);
-    return (
-      <Flex justify="center" direction="row">
-        <Button
-          mt="8"
-          mx="auto"
-          onClick={() => router.reload()}
-          variant="solid"
-          colorScheme="teal"
-        >
-          Reload
-        </Button>
-      </Flex>
-    );
-  }
-  // loading state
-  if (silabusData.isLoading) {
-    return (
-      <>
-        <SkeletonLoading title={"Silabus"} plusButton={"Silabus"} />
-      </>
-    );
-  }
-
-  if (silabusData.isSuccess) {
-    return (
-      <>
-        <Head>
-          <title>Silabus | Santri Kita</title>
-        </Head>
-
-        <Flex mb="4">
-          <Spacer />
-          <Button
-            leftIcon={<AddIcon />}
-            onClick={onOpen}
-            variant="solid"
-            colorScheme="teal"
-          >
-            Silabus
-          </Button>
-        </Flex>
-
-        {/* MODAL FORM TAMBAH PELANGGARAN */}
-        <Modal isOpen={isOpen} onClose={onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Tambah Silabus</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <form>
-                {/* Siswa */}
-                <FormControl isRequired>
-                  <FormLabel>Kelas</FormLabel>
-                  <Select
-                    defaultValue={selectedClass}
-                    onChange={setSelectedClass}
-                    options={kelasData.data}
-                    closeMenuOnSelect={false}
-                    components={animatedComponents}
-                    isMulti
-                    isClearable
-                    isSearchable
-                  />
-                </FormControl>
-                {/* Pelajaran */}
-                <FormControl isRequired>
-                  <FormLabel>Pelajaran</FormLabel>
-                  <Input
-                    placeholder="Pelajaran"
-                    onChange={(e) => setPelajaran(e.target.value)}
-                  />
-                </FormControl>
-                {/* BAB */}
-                <FormControl isRequired>
-                  <FormLabel>BAB</FormLabel>
-                  <Input
-                    placeholder="BAB"
-                    onChange={(e) => setBab(e.target.value)}
-                  />
-                </FormControl>
-                {/* Pengajar */}
-                <FormControl isRequired>
-                  <FormLabel>Kompetensi Dasar</FormLabel>
-                  <Input
-                    placeholder="Kompetensi Dasar"
-                    onChange={(e) => setKD(e.target.value)}
-                  />
-                </FormControl>
-                {/* Keterangan */}
-                <FormControl>
-                  <FormLabel>Keterangan</FormLabel>
-                  <Textarea
-                    placeholder="Keterangan"
-                    onChange={(e) => setKeterangan(e.target.value)}
-                  />
-                </FormControl>
-              </form>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button
-                colorScheme="teal"
-                mr={3}
-                isLoading={isSubmitting}
-                onClick={tambahSilabusHandler}
-              >
-                Simpan
-              </Button>
-              <Button onClick={onClose}>Batal</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        <SilabusTable data={silabusData.data} />
-
-        <Mapel />
-      </>
-    );
-  }
+      <Silabus data={silabusData.data} kelasData={kelasData.data} />
+      <Mapel data={mapelData.data} />
+    </>
+  );
 }
 
 // Function untuk fetch data dari API classrooms
-const silabusFetcher = async ({ queryKey }) => {
-  try {
-    const collection = queryKey[0];
-    let endpoint = `${URL}/${collection}`;
+const fetcher = async (key, token) => {
+  const endpoint = `${URL}/${key[0]}${key[1] || ''}`;
+  const { data } = await axios.get(endpoint, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-    if (queryKey[1]) {
-      const params = queryKey[1];
-      endpoint = `${URL}/${collection}${params}`;
-    }
-
-    const { data } = await axios.get(endpoint, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-
-    let newClassrooms = [];
-    if (collection === "classrooms") {
-      newClassrooms = data.map((classroom) => {
-        return {
-          value: classroom.kelas,
-          label: `${classroom.kelas}`,
-          id: classroom.id,
-        };
-      });
-      return newClassrooms;
-    }
-
-    return data;
-  } catch (error) {
-    console.error(error);
-    return { msg: "Query data failed" };
-  }
+  return data;
+  // let newClassrooms = [];
+  // if (collection === "classrooms") {
+  //   newClassrooms = data.map((classroom) => {
+  //     return {
+  //       value: classroom.kelas,
+  //       label: `${classroom.kelas}`,
+  //       id: classroom.id,
+  //     };
+  //   });
+  //   return newClassrooms;
+  // }
 };
+// const mapelData = useQuery("lessons", fetcher);
 
-export default Silabus;
+export async function getServerSideProps(context) {
+  const silabus = await fetcher(['silabuses'], context.req.cookies.jwt);
+  const mapel = await fetcher(['lessons'], context.req.cookies.jwt);
+
+  return {
+    props: {
+      silabus,
+      mapel,
+    },
+  };
+}
+
+export default SilabusPage;
