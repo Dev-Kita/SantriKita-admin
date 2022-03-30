@@ -176,6 +176,11 @@ const fetcher = async (key, token) => {
 };
 
 export async function getServerSideProps(context) {
+  if (!context.req.cookies.jwt)
+    return {
+      redirect: { destination: '/login', permanent: false },
+    };
+
   const kelas = await fetcher(
     ['classrooms', '?_sort=kelas:asc'],
     context.req.cookies.jwt

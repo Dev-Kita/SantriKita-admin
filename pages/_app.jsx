@@ -31,7 +31,7 @@ const theme = extendTheme(customTheme);
 const queryClient = new QueryClient();
 export const gqlConnect = new GraphQLClient(
   endpoint,
-  jwt
+  parseCookies().jwt
     ? {
         headers: {
           authorization: `Bearer ${parseCookies().jwt}`,

@@ -297,6 +297,11 @@ const fetcher = async (key, token) => {
 };
 
 export async function getServerSideProps(context) {
+  if (!context.req.cookies.jwt)
+    return {
+      redirect: { destination: '/login', permanent: false },
+    };
+
   const siswa = await fetcher(
     ['students', '?_sort=tahun_masuk:asc'],
     context.req.cookies.jwt

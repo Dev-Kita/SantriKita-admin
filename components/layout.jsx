@@ -9,6 +9,7 @@ function Layout({ children }) {
   const router = useRouter();
 
   React.useEffect(() => {
+    console.log(router.pathname);
     if (parseCookies().jwt)
       if (router.pathname === '/login') {
         router.replace('/dashboard');
@@ -19,7 +20,7 @@ function Layout({ children }) {
         router.replace('/login');
       }
     }
-  }, router.pathname);
+  }, [router.pathname]);
 
   return (
     <Box color="gray.700">

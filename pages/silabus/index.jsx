@@ -92,6 +92,11 @@ const fetcher = async (key, token) => {
 // const mapelData = useQuery("lessons", fetcher);
 
 export async function getServerSideProps(context) {
+  if (!context.req.cookies.jwt)
+    return {
+      redirect: { destination: '/login', permanent: false },
+    };
+
   const silabus = await fetcher(['silabuses'], context.req.cookies.jwt);
   const mapel = await fetcher(['lessons'], context.req.cookies.jwt);
 
